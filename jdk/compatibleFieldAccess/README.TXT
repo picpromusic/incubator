@@ -1,6 +1,10 @@
 Place asm-debug-all-4.0_RC1.jar in libs dir and run
 ant clean
 ant test
+
+you can download the jar from here:
+http://forge.ow2.org/project/showfiles.php?group_id=23
+
 The output should end with:
 
 
