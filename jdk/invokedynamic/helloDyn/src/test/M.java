@@ -1,8 +1,10 @@
+package test;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
+
 
 public class M {
 	public static void main(String[] args) throws ClassNotFoundException {

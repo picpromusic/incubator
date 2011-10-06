@@ -13,7 +13,7 @@ public class GEN {
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES
 				| ClassWriter.COMPUTE_MAXS);
 		// cw.newClass("G");
-		cw.visit(51, Opcodes.ACC_PUBLIC, "G", null, "java/lang/Object", null);
+		cw.visit(51, Opcodes.ACC_PUBLIC, "test/G", null, "java/lang/Object", null);
 
 		
 		MethodVisitor mw = cw.visitMethod(Opcodes.ACC_PUBLIC
@@ -22,7 +22,7 @@ public class GEN {
 //		mw.visitMethodInsn(Opcodes.INVOKESTATIC, "M", "cafeBabe", "()V");
 		MethodHandle BSM_LEFT = new MethodHandle(
 				Opcodes.MH_INVOKESTATIC,
-				"M",
+				"test/M",
 				"bootstrap",
 				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;I)Ljava/lang/invoke/CallSite;");
 		mw.visitInvokeDynamicInsn("dyn", "()V", BSM_LEFT, 1);
@@ -34,7 +34,7 @@ public class GEN {
 
 		byte[] byteArray = cw.toByteArray();
 		System.out.println(byteArray.length);
-		FileOutputStream fout = new FileOutputStream("gen/G.class");
+		FileOutputStream fout = new FileOutputStream("gen/test/G.class");
 		fout.write(byteArray);
 		fout.close();
 	}
