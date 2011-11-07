@@ -50,4 +50,8 @@ public class FileSummary {
 		return Base64.encodeBase64String(hash);
 	}
 
+	public long getFileSize() {
+		return this.length;
+	}
+
 }
