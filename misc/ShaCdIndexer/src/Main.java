@@ -66,8 +66,9 @@ public class Main {
 
 		private static final int SIZE_1_MB = 1024 * 1024;
 		private static final int SIZE_50_MB = SIZE_1_MB * 50;
-		private static final long MAX_ASYNC_SIZE = 10 * SIZE_1_MB;
-		private static final int MAX_TOTAL_ASYNC_SIZE = 100 * SIZE_1_MB;
+		private static final long MIN_ASYNC_SIZE = 0 * SIZE_1_MB;
+		private static final long MAX_ASYNC_SIZE = 256 * SIZE_1_MB;
+		private static final int MAX_TOTAL_ASYNC_SIZE = 256 * SIZE_1_MB;
 
 		private long globread;
 		private float globproz;
@@ -77,6 +78,7 @@ public class Main {
 		private ConcurrentLinkedDeque<Future<FileSummary>> futures;
 		private ExecutorService executorService;
 		private long asyncSize;
+		private int done;
 
 		public FileVisitorHashImplementation(Path globBaseDir, long size,
 				PrintWriter pw) {
@@ -87,9 +89,10 @@ public class Main {
 			this.globproz = 0f;
 			this.futures = new ConcurrentLinkedDeque<>();
 			this.asyncSize = 0;
+			this.done = 0;
 
 			executorService = Executors.newFixedThreadPool(Runtime.getRuntime()
-					.availableProcessors() * 4);
+					.availableProcessors());
 
 		}
 
@@ -105,7 +108,7 @@ public class Main {
 				throws IOException {
 			checkFutures();
 			Future<FileSummary> result = calcHash(path);
-			if (result.isDone()) {
+			if (result instanceof CompletedFuture && result.isDone()) {
 				printSummary(result);
 			} else {
 				futures.add(result);
@@ -115,15 +118,24 @@ public class Main {
 		}
 
 		private void checkFutures() {
+			int todo = 0;
+			int olddone = done;
 			for (Future<FileSummary> result : futures) {
 				if (result.isDone()) {
-					System.out.println("DONE");
+					done++;
 					futures.remove(result);
 					FileSummary fs = printSummary(result);
 					asyncSize -= fs.getFileSize();
 				} else {
-					System.out.println("NOT YET DONE");
-
+					todo++;
+				}
+			}
+			if (todo > 5) {
+				System.out.println("DONE: " + done + " TO BE DONE:" + todo
+						+ " ASYNC_BYTES_TODO:" + asyncSize);
+			} else if((done / 1000) - (olddone / 1000) > 0) {
+				for(int i = 0; i < (done / 1000) - (olddone / 1000); i++) {
+					System.out.print(".");
 				}
 			}
 		}
@@ -153,7 +165,7 @@ public class Main {
 			final File file = path.toFile();
 			byte[] mdbytes = null;
 			final long length = file.length();
-			if (length < MAX_ASYNC_SIZE
+			if (length > MIN_ASYNC_SIZE && length < MAX_ASYNC_SIZE
 					&& asyncSize + length < MAX_TOTAL_ASYNC_SIZE) {
 				asyncSize += length;
 				final ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -169,7 +181,6 @@ public class Main {
 
 						@Override
 						public FileSummary call() throws Exception {
-							TimeUnit.SECONDS.sleep(2);
 							MessageDigest md = MessageDigest
 									.getInstance("SHA-512");
 							md.update(bout.toByteArray());

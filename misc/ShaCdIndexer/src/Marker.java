@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,39 +9,49 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.TreeMap;
 
 public class Marker {
 	public static void main(String[] args) throws IOException {
 		BufferedReader bufr = new BufferedReader(new FileReader(args[0]));
+		FileField f = FileField.valueOf(args[1]);
+		String firstline = bufr.readLine();
 		String line = bufr.readLine();
-		Map<String, List<String>> content = new TreeMap<>();
-		String dest = args[0]+".marked.txt";
-		if (args[0].endsWith(".marked.txt")) {
-			dest = args[0];
-		}
+		String dest = args[0] + ".marked.txt";
+		Pattern regEx = Pattern.compile(args[2]);
 		PrintWriter pw = new PrintWriter(new FileWriter(dest));
+		pw.println(firstline);
+		boolean plusMinus = args[3].trim().length() == 1;
 		while (line != null) {
-			String[] split = line.split("!");
-//			System.out.println(split[1]);
-			if (split[1].matches(args[1])) {
-				System.out.print(args[2]);
-				System.out.println(line.substring(1));
-				pw.print(args[2]);
-				pw.println(line.substring(1));
-			}else {
+			boolean optionalLine = line.startsWith(" ");
+			boolean canBeMarked = plusMinus && optionalLine;
+			boolean canBeUnmarked = !plusMinus && !optionalLine;
+			if (canBeMarked || canBeUnmarked) {
+				String[] split = line.split("!");
+				// System.out.println(split[1]);
+				String value = split[f.getPos()];
+				if (regEx.matcher(value).matches()) {
+					// System.out.print(args[3]);
+					// System.out.println(line.substring(1));
+					pw.print(args[3]);
+					pw.println(line.substring(1));
+				} else {
+					pw.println(line);
+				}
+			} else {
 				pw.println(line);
 			}
 			line = bufr.readLine();
 		}
 		bufr.close();
-		System.out.println(content.size());
-		for(Entry<String, List<String>> s : content.entrySet()) {
-			List<String> value = s.getValue();
-			for (String string : value) {
-				pw.println(string);
-			}
-		}
 		pw.close();
+		if (args[0].endsWith(".marked.txt")) {
+			File src = new File(args[0]);
+			src.delete();
+			new File(dest).renameTo(src);
+		}
+
 	}
 }
