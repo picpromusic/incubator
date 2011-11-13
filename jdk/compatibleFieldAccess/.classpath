@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="testsrc"/>
 	<classpathentry kind="src" path="generator"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/j2sdk-image"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asm3"/>
 	<classpathentry kind="lib" path="gen"/>
 	<classpathentry kind="output" path="bin"/>

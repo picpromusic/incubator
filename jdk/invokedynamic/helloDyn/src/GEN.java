@@ -37,5 +37,6 @@ public class GEN {
 		FileOutputStream fout = new FileOutputStream("gen/test/G.class");
 		fout.write(byteArray);
 		fout.close();
+		
 	}
 }
