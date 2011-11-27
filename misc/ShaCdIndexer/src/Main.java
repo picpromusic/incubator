@@ -359,7 +359,7 @@ public class Main {
 		String name = dvdName + ".sha.txt";
 		System.out.println(name);
 		pw = new PrintWriter(new FileWriter(name));
-		pw.println("!V1.0!");
+		pw.println("|V1.0|");
 		if (calcSize) {
 			size = calcSize(globBaseDir);
 		} else {

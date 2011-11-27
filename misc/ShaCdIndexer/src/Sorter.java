@@ -19,7 +19,7 @@ public class Sorter {
 		line = bufr.readLine();
 		Map<Object, List<String>> content = new TreeMap<>(f.getComparator());
 		while (line != null) {
-			String[] split = line.split("!");
+			String[] split = line.split("\\|");
 //			System.out.println(split[0]);
 			Object key = f.getParser().toObject(split[f.getPos()]);
 			List<String> list = content.get(key);
@@ -33,9 +33,9 @@ public class Sorter {
 		bufr.close();
 		System.out.println(content.size());
 		PrintWriter pw = new PrintWriter(new FileWriter(args[0]+".sorted."+f.name()+".txt"));
-		pw.println("!V1.0!");
+		pw.println("|V1.0|");
 		PrintWriter pw2 = new PrintWriter(new FileWriter(args[0]+".doppelte."+f.name()+".txt"));
-		pw2.println("!V1.0!");
+		pw2.println("|V1.0|");
 		for(Entry<Object, List<String>> s : content.entrySet()) {
 			List<String> value = s.getValue();
 			if (value.size() > 1) {

@@ -35,13 +35,13 @@ public class FileSummary {
 	public void printToTxt(PrintWriter pw) {
 		pw.print(includeInBackup ? "+" : "-");
 		pw.print(getHashAsTxt());
-		pw.print("!");
+		pw.print("|");
 		pw.print(backupMediumName);
 		pw.print("/");
 		pw.print(globBaseDir.relativize(relPath));
-		pw.print("!");
+		pw.print("|");
 		pw.print(length);
-		pw.print("!");
+		pw.print("|");
 		pw.print(formatter.format(lastModified));
 		pw.println();
 	}

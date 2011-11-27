@@ -29,7 +29,7 @@ public class Marker {
 			boolean canBeMarked = plusMinus && optionalLine;
 			boolean canBeUnmarked = !plusMinus && !optionalLine;
 			if (canBeMarked || canBeUnmarked) {
-				String[] split = line.split("!");
+				String[] split = line.split("\\|");
 				// System.out.println(split[1]);
 				String value = split[f.getPos()];
 				if (regEx.matcher(value).matches()) {
