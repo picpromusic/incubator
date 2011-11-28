@@ -1,6 +1,5 @@
-local $tdir=$1
-local $trepos=$2
-
+local tdir=$1
+local trepos=$2
 
 mkdir $tdir
 echo ""
