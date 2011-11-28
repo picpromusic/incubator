@@ -7,3 +7,6 @@ local barerepo=$trepos/bare
 local connectrepo=$trepos/connect
 
 sh svn_git_test_init.sh $tdir $trepos
+sh svn_init_connection_repository.sh file://$trepos/svnrepo $connectrepo
+sh svn_init_bare_repository.sh $connectrepo $barerepo
+sh svn_create_local_repository.sh $barerepo $workrepo
