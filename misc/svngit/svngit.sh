@@ -53,14 +53,13 @@ git svn dcommit >> $tlog
 
 echo "*** updating the three svn checkouts" >> $tlog
 cd ..
-svn up svnco/ >> $tlog
-svn up svnrepo/ >> $tlog
-svn up svntags/ >> $tlog
-svn up svnbranches/ >> $tlog
+svn up svnco/ svntags/ svnbranches/ >> $tlog
 
 echo "*** now create a bare clone of the gitsvn-connection-repository" >> $tlog
 git clone --mirror $connectrepo/ $barerepo  >> $tlog
+cd $barerepo
 git fetch $barerepo
+cd $trepos
 
 echo "*** now create a work clone of the bare repository" >> $tlog 
 git clone $barerepo $workrepo >> $tlog
