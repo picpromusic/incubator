@@ -15,5 +15,5 @@ git replace `git log -2 --oneline | cut -d " " -f1`
 cd $barerepo
 git fetch
 
-sh $DEBUG svn_pull_inclusive_replacespec.sh $workrepo
 cd $ldir
+sh $DEBUG svn_pull_inclusive_replacespec.sh $workrepo

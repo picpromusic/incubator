@@ -5,6 +5,7 @@ local tlog=$tdir/svngit.log
 local workrepo=$trepos/working
 local barerepo=$trepos/bare
 local connectrepo=$trepos/connect
+local ldir=`pwd`
 
 sh $DEBUG svn_git_test_init.sh $tdir $trepos
 sh $DEBUG svn_init_connection_repository.sh file://$trepos/svnrepo $connectrepo
@@ -17,4 +18,5 @@ git add work.txt
 git commit -m "git commit of touched work.txt"
 git push
 
+cd $ldir
 sh $DEBUG svn_transfer_to_svn.sh $workrepo $barerepo $connectrepo 
