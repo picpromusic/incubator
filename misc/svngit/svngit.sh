@@ -137,3 +137,6 @@ echo "** pull changes'svn-dcommit' result and changed replacesspec to work-repos
 cd $workrepo
 git pull origin >> $tlog
 git pull replacespec >> $tlog
+
+
+cd $tdir/..
