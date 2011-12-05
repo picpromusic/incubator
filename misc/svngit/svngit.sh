@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 local tdir=$HOME/testrepos
 local trepos=$tdir/repos
 local tlog=$tdir/svngit.log

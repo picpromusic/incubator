@@ -1,3 +1,4 @@
+#!/bin/bash
 local tdir=$1
 local trepos=$2
 

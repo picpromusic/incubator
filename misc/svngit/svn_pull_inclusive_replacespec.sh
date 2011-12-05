@@ -1,8 +1,9 @@
+#!/bin/bash
 local workrepo=$1
-local ldir=`pwd`
+pushd
 
 cd $workrepo
 git pull origin
 git pull replacespec
-cd $ldir
 
+popd
