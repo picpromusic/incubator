@@ -1,0 +1,1121 @@
+From chris.hegarty at oracle.com  Thu Dec  1 05:02:25 2011
+From: chris.hegarty at oracle.com (chris.hegarty at oracle.com)
+Date: Thu, 01 Dec 2011 13:02:25 +0000
+Subject: hg: jdk8/tl/jdk: 7116722: Miscellaneous warnings sun.misc ( and
+	related classes )
+Message-ID: <20111201130235.EF2FA474E1@hg.openjdk.java.net>
+
+Changeset: 3b8186aee592
+Author:    chegar
+Date:      2011-12-01 11:09 +0000
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/3b8186aee592
+
+7116722: Miscellaneous warnings sun.misc ( and related classes )
+Reviewed-by: alanb, darcy, forax, hawtin, lancea
+
+! src/share/classes/com/sun/net/httpserver/spi/HttpServerProvider.java
+! src/share/classes/java/net/InetAddress.java
+! src/share/classes/java/util/jar/JarVerifier.java
+! src/share/classes/java/util/jar/JavaUtilJarAccessImpl.java
+! src/share/classes/javax/script/ScriptEngineManager.java
+! src/share/classes/sun/misc/BASE64Decoder.java
+! src/share/classes/sun/misc/ExtensionDependency.java
+! src/share/classes/sun/misc/JarIndex.java
+! src/share/classes/sun/misc/JavaUtilJarAccess.java
+! src/share/classes/sun/misc/ProxyGenerator.java
+! src/share/classes/sun/misc/Service.java
+! src/share/classes/sun/misc/Signal.java
+! test/sun/misc/JarIndex/metaInfFilenames/Basic.java
+
+
+From Xuelei.Fan at Oracle.Com  Thu Dec  1 06:20:22 2011
+From: Xuelei.Fan at Oracle.Com (Xuelei Fan)
+Date: Thu, 1 Dec 2011 22:20:22 +0800
+Subject: code review request: 7115524: Regression: keytool -printcert
+	-sslserver failure
+In-Reply-To: <4ED6F601.8070404@oracle.com>
+References: <03DF622B-D49A-40D7-9581-4AF32747C9BB@Oracle.Com>
+	<3ABE0759-F871-41D8-A3D0-66896AD4B2F8@oracle.com>
+	<F877799D-DA5B-46D8-86A8-BF4D2F9D196B@Oracle.Com>
+	<4ED6F601.8070404@oracle.com>
+Message-ID: <C24B891C-0E7E-472A-941D-061F16E00868@Oracle.Com>
+
+Looks fine to me.
+
+Xuelei
+
+On Dec 1, 2011, at 11:35 AM, Weijun Wang <weijun.wang at oracle.com> wrote:
+
+> Hi Xuelei
+> 
+> Please review the code changes for 7u4:
+> 
+>  http://cr.openjdk.java.net/~weijun/7115524/7u4/webrev.00/
+> 
+> I've changed the synopsis because there is no SSLServerCertStore in 7u4.
+> 
+> Thanks
+> Max
+> 
+> --------------------------------------------------
+> 7115524: Regression: keytool -printcert -sslserver failure
+> 
+> Description:
+> In 7u4, there is no sun.security.provider.certpath.ssl.SSLServerCertStore. That's because the class was extracted from a KeyTool method in JDK 8 (6953295). However, the same coding error still exists inside the KeyTool method. The synopis for this subCR is updated to reflect the fact.
+
+From weijun.wang at oracle.com  Thu Dec  1 06:54:57 2011
+From: weijun.wang at oracle.com (Weijun Wang)
+Date: Thu, 01 Dec 2011 22:54:57 +0800
+Subject: Kerberos codes in Apple's Java
+In-Reply-To: <34482A59-CDB2-4639-BB24-AF788D7C0BB0@apple.com>
+References: <4E987379.1060501@oracle.com>
+	<34482A59-CDB2-4639-BB24-AF788D7C0BB0@apple.com>
+Message-ID: <4ED79541.408@oracle.com>
+
+Hi Bino
+
+>> 2. Reading native memory-based credentials cache into Credentials objects
+>
+> I don't think we do this in JDK6 either.
+
+I just tried OS X's builtin kinit and klist command:
+
+$ kinit dummy
+Please enter the password for dummy at THREE.LOCAL:
+$ klist
+Kerberos 5 ticket cache: 'API:Initial default ccache'
+...
+
+So here the ccache name is "API:Initial default ccache", which looks 
+like an in-memory ccache. At least I cannot find normal file-based 
+ccache file named /tmp/krb5cc_**.
+
+There is also a difference between Apple's JDK 6u29 and the current 
+macosx-port OpenJDK build when calling the following method:
+
+     sun.security.krb5,Credentials.acquireTGTFromCache()
+
+It returns a valid credential (which is identical to the klist output) 
+in Apple's 6u29, but the macosx-port one returns null. So it seems the 
+Apple JDK can see the special ccache object but macosx-port cannot.
+
+Thanks
+Max
+
+
+
+
+>
+> Regards
+> Bino.
+>
+>
+>
+> On Oct 14, 2011, at 10:38 AM, Weijun Wang wrote:
+>
+>> Hi Mike
+>>
+>> I'm working in the Java SE Security Team in Oracle. Apple's JRE (at
+>> least in the JDK 6 releases) supports some extra Kerberos features for
+>> OS X. As I know, at least there are:
+>>
+>> 1. Looking for krb5.conf at /Library/Preferences/edu.mit.Kerberos
+>> 2. Reading native memory-based credentials cache into Credentials objects
+>>
+>> I didn't see them on the Project Status page [1]. Is it because they
+>> are too trivial to be listed or you're not going to support them?
+>>
+>> Thanks
+>> Max
+>>
+>> [1] http://wikis.sun.com/display/OpenJDK/Mac+OS+X+Port+Project+Status
+>
+
+From sean.mullan at oracle.com  Thu Dec  1 07:12:22 2011
+From: sean.mullan at oracle.com (Sean Mullan)
+Date: Thu, 01 Dec 2011 10:12:22 -0500
+Subject: Answer requested!!! was: Re: 7081804: Remove	cause	field	from
+	javax.xml.crypto.NoSuchMechnismException
+In-Reply-To: <4ECC7A87.1030604@gmx.de>
+References: <4E525386.9000207@gmx.de>	<4E52758D.2020208@oracle.com>	<4E5E8AE3.3070402@gmx.de>	<4E5FE753.2010705@oracle.com>	<4E606D1D.6050509@gmx.de>	<4E613565.1080801@oracle.com>	<4E625E14.9060101@gmx.de>	<4E67AF3D.2090609@oracle.com>	<4E68FFBD.2030601@gmx.de>	<4E6A13A2.2020503@gmx.de>	<4E74F05D.7090806@gmx.de>	<4E7CD5F8.9000501@oracle.com>	<4E7DA91C.2000600@gmx.de>	<4E81EDE6.9050205@oracle.com>	<4E82A437.30907@gmx.de>	<4E86073D.9050101@gmx.de>	<4E873DA0.5050906@oracle.com>	<4E88C03A.90904@gmx.de>
+	<4EA96FB4.7000502@gmx.de> <4EABE0D5.5050802@gmx.de>
+	<4ECC7A87.1030604@gmx.de>
+Message-ID: <4ED79956.4020101@oracle.com>
+
+On 11/22/2011 11:45 PM, Sebastian Sickelmann wrote:
+> It's been a long time ago.
+> Had someone had the time to think about this:
+>
+> Am 29.10.2011 13:17, schrieb Sebastian Sickelmann:
+>> Sorry i linked the wrong webrev for Solution 3.
+>>
+>> Am 27.10.2011 16:50, schrieb Sebastian Sickelmann:
+>>> Some time ago (see below) i ask what would be the right solution to
+>>> refactor
+>>> exception initialization to?
+>>>
+>>> Solution 1: Disallow calls to initCause after creation, if there was an
+>>> exception-cause-functionality in this class before it was introduced
+>>> to Throwable.
+>>> Solution 2: Disallow calls to initCause after creation with in ctor
+>>> which has a cause parameter.
+>>> Solution 3: Disallow calls to initCause after creation, if and only
+>>> if there are ctors
+>>> that allows us to specify the cause at creation time.
+>>>
+>>>
+>>> If i investigated it right::
+>>> * Solution 1 is used by in the Exceptions in core-libs.
+>>> * Exceptions that had no cause-chain prior to Throwable's-cause-chain
+>>> uses Solution 2.
+>>> * Personally i found Solution 3 is the most intuitive for the users
+>>>
+>>> javax/xml/security- Exceptions had cause-chaining prio to Throwable
+>>> introduces them. jx/x/s-Exceptions are actually not refactored to
+>>> solution 2 like the other exceptions in core-libs that had
+>>> cause-chaining prior to Throwable.
+>>>
+>>> Before my change-request for jx/x/s-Exceptions i changed some in
+>>> core-libs (InternalError and VirtualMachineError) to provide
+>>> exception-chaining. These use Solution 2 like all other exceptions
+>>> that provided exception-chaining after it where introduced by Throwable.
+>>>
+>>> My personal view of this is that i think it may be valueable to
+>>> change all to Solution 3 or at least merge all Solutions to one
+>>> Solution(maybe Solution 2) and get rid of Solution 1.
+>>> I created a webrev[0] for jx/x/s-Exceptions that implements Solution
+>>> 2 (this can be used for all those Exceptions that used Solution 1 too).
+
+webrev[0] looks like it is using Solution 1. Looking at the diffs for 
+KeySelectorException, the ctors that don't supply cause parameters are 
+still forbidden from subsequently calling initCause.
+
+ >>> The problem with Solution 3 is that bahavoir compatibility is not 
+given
+ >>> and some code may break.
+
+Can you please explain what you think the compatibility issues are in 
+more detail?
+
+I would also like to see the diffs for solution 2 before I give you my 
+opinion.
+
+--Sean
+
+
+
+>>> And I created a webrev[1] for jx/x/s-Exceptions that implement
+>>> Solution 3 for comparision.
+>>>
+>>> [0]
+>>> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_4/index.html
+>>>
+>>>
+>> [1]
+>> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_6/index.html
+>>
+>
+
+
+From maurizio.cimadamore at oracle.com  Thu Dec  1 10:35:55 2011
+From: maurizio.cimadamore at oracle.com (maurizio.cimadamore at oracle.com)
+Date: Thu, 01 Dec 2011 18:35:55 +0000
+Subject: hg: jdk8/tl/jdk: 7116954: Misc warnings in
+	java.beans/java.beans.context
+Message-ID: <20111201183605.0D411474E9@hg.openjdk.java.net>
+
+Changeset: 89130611b178
+Author:    mcimadamore
+Date:      2011-12-01 18:34 +0000
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/89130611b178
+
+7116954: Misc warnings in java.beans/java.beans.context
+Summary: Remove generic warnings form java.beans and java.beans.context
+Reviewed-by: alanb, chegar
+
+! src/share/classes/java/beans/BeanDescriptor.java
+! src/share/classes/java/beans/Beans.java
+! src/share/classes/java/beans/ChangeListenerMap.java
+! src/share/classes/java/beans/DefaultPersistenceDelegate.java
+! src/share/classes/java/beans/Encoder.java
+! src/share/classes/java/beans/EventHandler.java
+! src/share/classes/java/beans/EventSetDescriptor.java
+! src/share/classes/java/beans/FeatureDescriptor.java
+! src/share/classes/java/beans/IndexedPropertyDescriptor.java
+! src/share/classes/java/beans/Introspector.java
+! src/share/classes/java/beans/MetaData.java
+! src/share/classes/java/beans/MethodDescriptor.java
+! src/share/classes/java/beans/NameGenerator.java
+! src/share/classes/java/beans/PersistenceDelegate.java
+! src/share/classes/java/beans/PropertyChangeSupport.java
+! src/share/classes/java/beans/PropertyDescriptor.java
+! src/share/classes/java/beans/PropertyEditorSupport.java
+! src/share/classes/java/beans/ReflectionUtils.java
+! src/share/classes/java/beans/SimpleBeanInfo.java
+! src/share/classes/java/beans/Statement.java
+! src/share/classes/java/beans/VetoableChangeSupport.java
+! src/share/classes/java/beans/XMLEncoder.java
+! src/share/classes/java/beans/beancontext/BeanContext.java
+! src/share/classes/java/beans/beancontext/BeanContextMembershipEvent.java
+
+
+From stuart.marks at oracle.com  Thu Dec  1 16:14:10 2011
+From: stuart.marks at oracle.com (stuart.marks at oracle.com)
+Date: Fri, 02 Dec 2011 00:14:10 +0000
+Subject: hg: jdk8/tl/jdk: 7116890: additional warnings fixes for java.io
+Message-ID: <20111202001420.0DAB8474F8@hg.openjdk.java.net>
+
+Changeset: 0e3f706741ca
+Author:    smarks
+Date:      2011-12-01 16:14 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/0e3f706741ca
+
+7116890: additional warnings fixes for java.io
+Reviewed-by: alanb, smarks
+Contributed-by: Sebastian Sickelmann <sebastian.sickelmann at gmx.de>
+
+! src/share/classes/java/io/ExpiringCache.java
+! src/share/classes/java/io/LineNumberInputStream.java
+! src/share/classes/java/io/LineNumberReader.java
+! src/share/classes/java/io/ObjectOutputStream.java
+! src/share/classes/java/io/RandomAccessFile.java
+
+
+From sebastian.sickelmann at gmx.de  Thu Dec  1 21:54:25 2011
+From: sebastian.sickelmann at gmx.de (Sebastian Sickelmann)
+Date: Fri, 02 Dec 2011 06:54:25 +0100
+Subject: Answer requested!!! was: Re: 7081804: Remove	cause	field	from
+	javax.xml.crypto.NoSuchMechnismException
+In-Reply-To: <4ED79956.4020101@oracle.com>
+References: <4E525386.9000207@gmx.de>	<4E52758D.2020208@oracle.com>	<4E5E8AE3.3070402@gmx.de>	<4E5FE753.2010705@oracle.com>	<4E606D1D.6050509@gmx.de>	<4E613565.1080801@oracle.com>	<4E625E14.9060101@gmx.de>	<4E67AF3D.2090609@oracle.com>	<4E68FFBD.2030601@gmx.de>	<4E6A13A2.2020503@gmx.de>	<4E74F05D.7090806@gmx.de>	<4E7CD5F8.9000501@oracle.com>	<4E7DA91C.2000600@gmx.de>	<4E81EDE6.9050205@oracle.com>	<4E82A437.30907@gmx.de>	<4E86073D.9050101@gmx.de>	<4E873DA0.5050906@oracle.com>	<4E88C03A.90904@gmx.de>
+	<4EA96FB4.7000502@gmx.de> <4EABE0D5.5050802@gmx.de>
+	<4ECC7A87.1030604@gmx.de> <4ED79956.4020101@oracle.com>
+Message-ID: <4ED86811.4090804@gmx.de>
+
+Am 01.12.2011 16:12, schrieb Sean Mullan:
+> On 11/22/2011 11:45 PM, Sebastian Sickelmann wrote:
+>> It's been a long time ago.
+>> Had someone had the time to think about this:
+>>
+>> Am 29.10.2011 13:17, schrieb Sebastian Sickelmann:
+>>> Sorry i linked the wrong webrev for Solution 3.
+>>>
+>>> Am 27.10.2011 16:50, schrieb Sebastian Sickelmann:
+>>>> Some time ago (see below) i ask what would be the right solution to
+>>>> refactor
+>>>> exception initialization to?
+>>>>
+>>>> Solution 1: Disallow calls to initCause after creation, if there 
+>>>> was an
+>>>> exception-cause-functionality in this class before it was introduced
+>>>> to Throwable.
+>>>> Solution 2: Disallow calls to initCause after creation with in ctor
+>>>> which has a cause parameter.
+>>>> Solution 3: Disallow calls to initCause after creation, if and only
+>>>> if there are ctors
+>>>> that allows us to specify the cause at creation time.
+>>>>
+>>>>
+>>>> If i investigated it right::
+>>>> * Solution 1 is used by in the Exceptions in core-libs.
+>>>> * Exceptions that had no cause-chain prior to Throwable's-cause-chain
+>>>> uses Solution 2.
+>>>> * Personally i found Solution 3 is the most intuitive for the users
+>>>>
+>>>> javax/xml/security- Exceptions had cause-chaining prio to Throwable
+>>>> introduces them. jx/x/s-Exceptions are actually not refactored to
+>>>> solution 2 like the other exceptions in core-libs that had
+>>>> cause-chaining prior to Throwable.
+>>>>
+>>>> Before my change-request for jx/x/s-Exceptions i changed some in
+>>>> core-libs (InternalError and VirtualMachineError) to provide
+>>>> exception-chaining. These use Solution 2 like all other exceptions
+>>>> that provided exception-chaining after it where introduced by 
+>>>> Throwable.
+>>>>
+>>>> My personal view of this is that i think it may be valueable to
+>>>> change all to Solution 3 or at least merge all Solutions to one
+>>>> Solution(maybe Solution 2) and get rid of Solution 1.
+>>>> I created a webrev[0] for jx/x/s-Exceptions that implements Solution
+>>>> 2 (this can be used for all those Exceptions that used Solution 1 
+>>>> too).
+>
+> webrev[0] looks like it is using Solution 1. Looking at the diffs for 
+> KeySelectorException, the ctors that don't supply cause parameters are 
+> still forbidden from subsequently calling initCause.
+>
+> >>> The problem with Solution 3 is that bahavoir compatibility is not 
+> given
+> >>> and some code may break.
+>
+> Can you please explain what you think the compatibility issues are in 
+> more detail?
+>
+> I would also like to see the diffs for solution 2 before I give you my 
+> opinion.
+>
+> --Sean
+>
+>
+>
+>>>> And I created a webrev[1] for jx/x/s-Exceptions that implement
+>>>> Solution 3 for comparision.
+>>>>
+>>>> [0]
+>>>> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_4/index.html 
+>>>>
+>>>>
+>>>>
+>>> [1]
+>>> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_6/index.html 
+>>>
+>>>
+>>
+>
+The 3 solutions I mentioned are solutions that can be commonly discussed 
+for a solution choosing for all Exceptions in OpenJDK.
+
+Webrev[0] shows solution 1 for jx/x/s-Exceptions. From the users 
+perspective (outside view) solution 1 and 3 are completely similar.
+
+Solution 2 are used widely in jdk codebase in Exceptions that had no 
+chaining before it was introduced globally throught java/lang/Throwable.
+An Example for Solution2 is java/lang/RuntimeException.
+An webrev that show this jx/x/s-Exception is webrev[1]
+
+Solution 3 is actually not used by any Exception in JDK (or I haven't 
+found them)
+
+The problem i see is that we now have 2 ways exception-chaining might work.
+
+  * Solution 1 disallows chaining after creation.
+  * Solution 2 disallows chaining only after creation with an ctors that 
+supports it or after a call to initCause.
+
+We should only support one solution.
+If we introduce the commonly used exception-ctors for every class (which 
+i actually try) we can switch over to an solutions that is consistent 
+for the user. I think every Exception that gives the user the choice to 
+use exception-chaining via a ctor-variant that supports chaining should 
+disallow changes of the exception-chain via initCause even when the 
+exception is created with an ctor that doesn't had chaining parameters.
+This is what i call Solution 3.
+
+Unfortunately Solution 3 introduces an behavior-incompatibility. In JDK 
+every think is fine and we can make all the changes that are needed to 
+do (replace all initCause calls with the right ctor-choice). But in the 
+outside world there maybe users that rely on the feature of plumbing up 
+the exception chain after creation. Those will get an Exception when 
+they call initCause. Maybe we can warn them to not use initCause anymore 
+through marking initCause deprecated. And switch over to solution 3 over 
+several releases (maybe OpenJDK9 or 10)
+
+Sorry for the misleading webrev-mappings in my previous mails. Hope to 
+cleared thinks up now (with my wired english ;-) ).
+
+-- Sebastian
+
+
+[0] Solution 1 
+http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_4/index.html
+[1] Solution 2 
+http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_6/index.html
+
+From yuka.kamiya at oracle.com  Thu Dec  1 23:10:52 2011
+From: yuka.kamiya at oracle.com (yuka.kamiya at oracle.com)
+Date: Fri, 02 Dec 2011 07:10:52 +0000
+Subject: hg: jdk8/tl/jdk: 7056472: Speed up
+	test/java/util/ResourceBundle/Control/ExpirationTest.sh
+Message-ID: <20111202071112.F40AC47513@hg.openjdk.java.net>
+
+Changeset: b03da32c3186
+Author:    peytoia
+Date:      2011-12-02 16:09 +0900
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/b03da32c3186
+
+7056472: Speed up test/java/util/ResourceBundle/Control/ExpirationTest.sh
+Reviewed-by: okutsu
+
+- test/java/util/ResourceBundle/Control/ExpirationTest.java
+- test/java/util/ResourceBundle/Control/ExpirationTest.sh
+
+
+From chris.hegarty at oracle.com  Fri Dec  2 05:34:11 2011
+From: chris.hegarty at oracle.com (chris.hegarty at oracle.com)
+Date: Fri, 02 Dec 2011 13:34:11 +0000
+Subject: hg: jdk8/tl/jdk: 7116946: JSSecurityManager should use
+	java.util.ServiceLoader to lookup service providers
+Message-ID: <20111202133429.9FDB84751A@hg.openjdk.java.net>
+
+Changeset: f615db07991e
+Author:    chegar
+Date:      2011-12-02 11:39 +0000
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/f615db07991e
+
+7116946: JSSecurityManager should use java.util.ServiceLoader to lookup service providers
+Reviewed-by: prr
+
+! src/share/classes/com/sun/media/sound/JSSecurityManager.java
+
+
+From sean.mullan at oracle.com  Fri Dec  2 08:02:28 2011
+From: sean.mullan at oracle.com (Sean Mullan)
+Date: Fri, 02 Dec 2011 11:02:28 -0500
+Subject: Answer requested!!! was: Re: 7081804: Remove	cause	field	from
+	javax.xml.crypto.NoSuchMechnismException
+In-Reply-To: <4ED86811.4090804@gmx.de>
+References: <4E525386.9000207@gmx.de>	<4E52758D.2020208@oracle.com>	<4E5E8AE3.3070402@gmx.de>	<4E5FE753.2010705@oracle.com>	<4E606D1D.6050509@gmx.de>	<4E613565.1080801@oracle.com>	<4E625E14.9060101@gmx.de>	<4E67AF3D.2090609@oracle.com>	<4E68FFBD.2030601@gmx.de>	<4E6A13A2.2020503@gmx.de>	<4E74F05D.7090806@gmx.de>	<4E7CD5F8.9000501@oracle.com>	<4E7DA91C.2000600@gmx.de>	<4E81EDE6.9050205@oracle.com>	<4E82A437.30907@gmx.de>	<4E86073D.9050101@gmx.de>	<4E873DA0.5050906@oracle.com>	<4E88C03A.90904@gmx.de>
+	<4EA96FB4.7000502@gmx.de> <4EABE0D5.5050802@gmx.de>
+	<4ECC7A87.1030604@gmx.de> <4ED79956.4020101@oracle.com>
+	<4ED86811.4090804@gmx.de>
+Message-ID: <4ED8F694.8010705@oracle.com>
+
+On 12/2/11 12:54 AM, Sebastian Sickelmann wrote:
+
+> The 3 solutions I mentioned are solutions that can be commonly discussed 
+> for a solution choosing for all Exceptions in OpenJDK.
+> 
+> Webrev[0] shows solution 1 for jx/x/s-Exceptions. From the users 
+> perspective (outside view) solution 1 and 3 are completely similar.
+> 
+> Solution 2 are used widely in jdk codebase in Exceptions that had no 
+> chaining before it was introduced globally throught java/lang/Throwable.
+> An Example for Solution2 is java/lang/RuntimeException.
+> An webrev that show this jx/x/s-Exception is webrev[1]
+> 
+> Solution 3 is actually not used by any Exception in JDK (or I haven't 
+> found them)
+> 
+> The problem i see is that we now have 2 ways exception-chaining might work.
+> 
+>   * Solution 1 disallows chaining after creation.
+>   * Solution 2 disallows chaining only after creation with an ctors that 
+> supports it or after a call to initCause.
+> 
+> We should only support one solution.
+> If we introduce the commonly used exception-ctors for every class (which 
+> i actually try) we can switch over to an solutions that is consistent 
+> for the user. I think every Exception that gives the user the choice to 
+> use exception-chaining via a ctor-variant that supports chaining should 
+> disallow changes of the exception-chain via initCause even when the 
+> exception is created with an ctor that doesn't had chaining parameters.
+> This is what i call Solution 3.
+> 
+> Unfortunately Solution 3 introduces an behavior-incompatibility. In JDK 
+> every think is fine and we can make all the changes that are needed to 
+> do (replace all initCause calls with the right ctor-choice). But in the 
+> outside world there maybe users that rely on the feature of plumbing up 
+> the exception chain after creation. 
+
+Right, and I think some of those cases are legitimate. I have seen exception
+handling code which performs cleanup in a finally block, and if an exception is
+thrown in the finally block, it catches that exception, but sets the cause of
+the exception to the original exception. This would not be possible with
+solution 3 if there was already a ctor that had a cause parameter. For example,
+I have seen code like this:
+
+Throwable t = null;
+try {
+    ...
+} catch (Exception x) {
+    t = x;
+} finally {
+    try {
+        ...
+    } catch (FooException e) {
+        if (t != null)
+            e.initCause(t);
+        throw e;
+    }
+}
+
+> Those will get an Exception when 
+> they call initCause. Maybe we can warn them to not use initCause anymore 
+> through marking initCause deprecated. And switch over to solution 3 over 
+> several releases (maybe OpenJDK9 or 10)
+
+My opinion is that the potential compatibility issues, as well as having awkward
+workarounds for the case above outweigh the advantages of making this change. So
+I am not in favor of solution 3. But that's just my opinion, others may feel
+differently.
+
+> Sorry for the misleading webrev-mappings in my previous mails. Hope to 
+> cleared thinks up now (with my wired english ;-) ).
+
+Ok, so I think we're down to 2 solutions. Give me some more time to look them
+over more carefully and get back to you.
+
+--Sean
+
+> 
+> -- Sebastian
+> 
+> 
+> [0] Solution 1 
+> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_4/index.html
+> [1] Solution 2 
+> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_6/index.html
+
+From chris.hegarty at oracle.com  Fri Dec  2 08:11:19 2011
+From: chris.hegarty at oracle.com (chris.hegarty at oracle.com)
+Date: Fri, 02 Dec 2011 16:11:19 +0000
+Subject: hg: jdk8/tl/jdk: 7116957: javax.script.ScriptEngineManager should use
+	java.util.ServiceLoader to lookup service providers
+Message-ID: <20111202161129.210C34751E@hg.openjdk.java.net>
+
+Changeset: 37f6e294759f
+Author:    chegar
+Date:      2011-12-02 14:17 +0000
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/37f6e294759f
+
+7116957: javax.script.ScriptEngineManager should use java.util.ServiceLoader to lookup service providers
+Reviewed-by: alanb, lancea
+
+! src/share/classes/com/sun/net/httpserver/spi/HttpServerProvider.java
+! src/share/classes/javax/script/ScriptEngineManager.java
+! src/share/classes/sun/net/ftp/FtpClientProvider.java
+
+
+From alan.bateman at oracle.com  Fri Dec  2 09:48:39 2011
+From: alan.bateman at oracle.com (alan.bateman at oracle.com)
+Date: Fri, 02 Dec 2011 17:48:39 +0000
+Subject: hg: jdk8/tl/jdk: 7117357: Warnings in sun.instrument,
+	tools and other sun.* classes
+Message-ID: <20111202174849.7CBD147520@hg.openjdk.java.net>
+
+Changeset: 9950e2c9f3b5
+Author:    alanb
+Date:      2011-12-02 17:37 +0000
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/9950e2c9f3b5
+
+7117357: Warnings in sun.instrument, tools and other sun.* classes
+Reviewed-by: lancea, chegar
+
+! src/share/classes/sun/instrument/InstrumentationImpl.java
+! src/share/classes/sun/instrument/TransformerManager.java
+! src/share/classes/sun/launcher/LauncherHelper.java
+! src/share/classes/sun/management/counter/perf/PerfInstrumentation.java
+! src/share/classes/sun/management/jmxremote/ConnectorBootstrap.java
+! src/share/classes/sun/net/RegisteredDomain.java
+! src/share/classes/sun/net/www/protocol/jar/Handler.java
+! src/share/classes/sun/tools/attach/HotSpotAttachProvider.java
+! src/share/classes/sun/tools/jinfo/JInfo.java
+! src/share/classes/sun/tools/jmap/JMap.java
+! src/share/classes/sun/tools/jps/Jps.java
+! src/share/classes/sun/tools/jstack/JStack.java
+! src/share/classes/sun/tools/serialver/SerialVer.java
+
+
+From naoto.sato at oracle.com  Fri Dec  2 16:05:06 2011
+From: naoto.sato at oracle.com (naoto.sato at oracle.com)
+Date: Sat, 03 Dec 2011 00:05:06 +0000
+Subject: hg: jdk8/tl/jdk: 7117465: Warning cleanup for IMF classes
+Message-ID: <20111203000516.221AD47548@hg.openjdk.java.net>
+
+Changeset: 42532a097816
+Author:    naoto
+Date:      2011-12-02 16:04 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/42532a097816
+
+7117465: Warning cleanup for IMF classes
+Reviewed-by: okutsu
+
+! src/share/classes/java/awt/im/InputMethodHighlight.java
+! src/share/classes/sun/awt/im/CompositionArea.java
+! src/share/classes/sun/awt/im/CompositionAreaHandler.java
+! src/share/classes/sun/awt/im/InputContext.java
+! src/share/classes/sun/awt/im/InputMethodContext.java
+! src/share/classes/sun/awt/im/InputMethodJFrame.java
+! src/share/classes/sun/awt/im/InputMethodManager.java
+! src/share/classes/sun/awt/im/SimpleInputMethodWindow.java
+
+
+From xueming.shen at oracle.com  Fri Dec  2 16:24:22 2011
+From: xueming.shen at oracle.com (xueming.shen at oracle.com)
+Date: Sat, 03 Dec 2011 00:24:22 +0000
+Subject: hg: jdk8/tl/jdk: 5035850: (str) String.CASE_INSENSITIVE_ORDER should
+	override readResolve()
+Message-ID: <20111203002432.0B18C47549@hg.openjdk.java.net>
+
+Changeset: 1d7037df65ed
+Author:    sherman
+Date:      2011-12-02 16:25 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/1d7037df65ed
+
+5035850: (str) String.CASE_INSENSITIVE_ORDER should override readResolve()
+Summary: Fix to ensure singleton property of String.CaseInsensitiveComparator is maintained through de/serialization.
+Reviewed-by: alanb, forax, smarks, dholmes
+Contributed-by: darryl.mocek at oracle.com
+
+! src/share/classes/java/lang/String.java
++ test/java/lang/String/CaseInsensitiveComparator.java
+
+
+From mandy.chung at oracle.com  Fri Dec  2 16:29:33 2011
+From: mandy.chung at oracle.com (mandy.chung at oracle.com)
+Date: Sat, 03 Dec 2011 00:29:33 +0000
+Subject: hg: jdk8/tl/jdk: 7117585: Eliminate java.lang.instrument,
+	java.lang.management warnings
+Message-ID: <20111203002943.4A5AC4754A@hg.openjdk.java.net>
+
+Changeset: 98502d7a3f98
+Author:    mchung
+Date:      2011-12-02 16:29 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/98502d7a3f98
+
+7117585: Eliminate java.lang.instrument, java.lang.management warnings
+Reviewed-by: mchung
+Contributed-by: Jon VanAlten <jon.vanalten at redhat.com>
+
+! src/share/classes/java/lang/instrument/ClassDefinition.java
+! src/share/classes/java/lang/management/ManagementFactory.java
+! src/share/classes/java/lang/management/PlatformComponent.java
+
+
+From lance.andersen at oracle.com  Fri Dec  2 16:34:59 2011
+From: lance.andersen at oracle.com (lance.andersen at oracle.com)
+Date: Sat, 03 Dec 2011 00:34:59 +0000
+Subject: hg: jdk8/tl/jdk: 7116445: Miscellaneous warnings in the JDBC/RowSet
+	classes
+Message-ID: <20111203003509.5C3374754B@hg.openjdk.java.net>
+
+Changeset: 3c524deb8431
+Author:    lancea
+Date:      2011-12-02 19:33 -0500
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/3c524deb8431
+
+7116445: Miscellaneous warnings in the JDBC/RowSet classes
+Reviewed-by: smarks, chegar
+
+! src/share/classes/com/sun/rowset/CachedRowSetImpl.java
+! src/share/classes/com/sun/rowset/FilteredRowSetImpl.java
+! src/share/classes/com/sun/rowset/JdbcRowSetImpl.java
+! src/share/classes/com/sun/rowset/JdbcRowSetResourceBundle.java
+! src/share/classes/com/sun/rowset/JoinRowSetImpl.java
+! src/share/classes/com/sun/rowset/WebRowSetImpl.java
+! src/share/classes/com/sun/rowset/internal/CachedRowSetReader.java
+! src/share/classes/com/sun/rowset/internal/CachedRowSetWriter.java
+! src/share/classes/com/sun/rowset/internal/Row.java
+! src/share/classes/com/sun/rowset/internal/SyncResolverImpl.java
+! src/share/classes/com/sun/rowset/internal/WebRowSetXmlWriter.java
+! src/share/classes/com/sun/rowset/internal/XmlReaderContentHandler.java
+! src/share/classes/java/sql/Date.java
+! src/share/classes/java/sql/DriverManager.java
+! src/share/classes/java/sql/Time.java
+! src/share/classes/java/sql/Timestamp.java
+! src/share/classes/javax/sql/StatementEvent.java
+! src/share/classes/javax/sql/rowset/BaseRowSet.java
+! src/share/classes/javax/sql/rowset/RowSetMetaDataImpl.java
+! src/share/classes/javax/sql/rowset/RowSetProvider.java
+! src/share/classes/javax/sql/rowset/serial/SQLInputImpl.java
+! src/share/classes/javax/sql/rowset/serial/SQLOutputImpl.java
+! src/share/classes/javax/sql/rowset/serial/SerialArray.java
+! src/share/classes/javax/sql/rowset/serial/SerialBlob.java
+! src/share/classes/javax/sql/rowset/serial/SerialJavaObject.java
+! src/share/classes/javax/sql/rowset/serial/SerialRef.java
+! src/share/classes/javax/sql/rowset/serial/SerialStruct.java
+! src/share/classes/javax/sql/rowset/spi/SyncFactory.java
+
+
+From masayoshi.okutsu at oracle.com  Fri Dec  2 18:19:05 2011
+From: masayoshi.okutsu at oracle.com (masayoshi.okutsu at oracle.com)
+Date: Sat, 03 Dec 2011 02:19:05 +0000
+Subject: hg: jdk8/tl/jdk: 7117487: Warnings Cleanup: some i18n classes in
+	java.util and sun.util
+Message-ID: <20111203021915.6E3C04754D@hg.openjdk.java.net>
+
+Changeset: f2a5d0001f15
+Author:    okutsu
+Date:      2011-12-03 10:58 +0900
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/f2a5d0001f15
+
+7117487: Warnings Cleanup: some i18n classes in java.util and sun.util
+Reviewed-by: lancea, naoto
+
+! src/share/classes/java/util/Date.java
+! src/share/classes/java/util/GregorianCalendar.java
+! src/share/classes/java/util/JapaneseImperialCalendar.java
+! src/share/classes/java/util/ResourceBundle.java
+! src/share/classes/sun/util/calendar/BaseCalendar.java
+! src/share/classes/sun/util/calendar/CalendarSystem.java
+! src/share/classes/sun/util/calendar/LocalGregorianCalendar.java
+! src/share/classes/sun/util/calendar/ZoneInfo.java
+! src/share/classes/sun/util/calendar/ZoneInfoFile.java
+! src/share/classes/sun/util/resources/OpenListResourceBundle.java
+! src/share/classes/sun/util/resources/TimeZoneNamesBundle.java
+
+
+From weijun.wang at oracle.com  Sun Dec  4 18:19:51 2011
+From: weijun.wang at oracle.com (weijun.wang at oracle.com)
+Date: Mon, 05 Dec 2011 02:19:51 +0000
+Subject: hg: jdk8/tl/jdk: 7116857: Warnings in javax.security and some sun.misc
+Message-ID: <20111205022009.5BF384755E@hg.openjdk.java.net>
+
+Changeset: 2ae848ea980a
+Author:    weijun
+Date:      2011-12-05 10:19 +0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/2ae848ea980a
+
+7116857: Warnings in javax.security and some sun.misc
+Reviewed-by: smarks
+
+! src/share/classes/javax/security/auth/kerberos/ServicePermission.java
+! src/share/classes/sun/misc/CEFormatException.java
+! src/share/classes/sun/misc/CEStreamExhausted.java
+! src/share/classes/sun/misc/ClassLoaderUtil.java
+! src/share/classes/sun/misc/CompoundEnumeration.java
+! src/share/classes/sun/misc/ExtensionInstallationException.java
+! src/share/classes/sun/misc/FloatingDecimal.java
+! src/share/classes/sun/misc/FormattedFloatingDecimal.java
+! src/share/classes/sun/misc/InvalidJarIndexException.java
+! src/share/classes/sun/misc/LRUCache.java
+! src/share/classes/sun/misc/Queue.java
+! src/share/classes/sun/misc/RequestProcessor.java
+! src/share/classes/sun/misc/ServiceConfigurationError.java
+! src/share/classes/sun/misc/URLClassPath.java
+
+
+From alan.bateman at oracle.com  Mon Dec  5 04:28:02 2011
+From: alan.bateman at oracle.com (alan.bateman at oracle.com)
+Date: Mon, 05 Dec 2011 12:28:02 +0000
+Subject: hg: jdk8/tl/jdk: 2 new changesets
+Message-ID: <20111205122831.CED8A47562@hg.openjdk.java.net>
+
+Changeset: 053cb321467a
+Author:    alanb
+Date:      2011-12-05 12:23 +0000
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/053cb321467a
+
+7117717: (aio) Tests failing due to implementation bug 7052549
+Reviewed-by: weijun, chegar
+
+! test/ProblemList.txt
+! test/java/nio/channels/AsynchronousSocketChannel/Basic.java
+
+Changeset: da28826c5672
+Author:    alanb
+Date:      2011-12-05 12:24 +0000
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/da28826c5672
+
+Merge
+
+
+
+From chris.hegarty at oracle.com  Mon Dec  5 09:35:42 2011
+From: chris.hegarty at oracle.com (chris.hegarty at oracle.com)
+Date: Mon, 05 Dec 2011 17:35:42 +0000
+Subject: hg: jdk8/tl/jdk: 7117360: Warnings in java.util.concurrent.atomic
+	package
+Message-ID: <20111205173606.A46904758B@hg.openjdk.java.net>
+
+Changeset: f352dd3cdff8
+Author:    dl
+Date:      2011-12-05 13:58 +0000
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/f352dd3cdff8
+
+7117360: Warnings in java.util.concurrent.atomic package
+Reviewed-by: chegar, dholmes
+
+! src/share/classes/java/util/concurrent/atomic/AtomicBoolean.java
+! src/share/classes/java/util/concurrent/atomic/AtomicInteger.java
+! src/share/classes/java/util/concurrent/atomic/AtomicIntegerArray.java
+! src/share/classes/java/util/concurrent/atomic/AtomicIntegerFieldUpdater.java
+! src/share/classes/java/util/concurrent/atomic/AtomicLong.java
+! src/share/classes/java/util/concurrent/atomic/AtomicLongArray.java
+! src/share/classes/java/util/concurrent/atomic/AtomicLongFieldUpdater.java
+! src/share/classes/java/util/concurrent/atomic/AtomicReference.java
+! src/share/classes/java/util/concurrent/atomic/AtomicReferenceArray.java
+! src/share/classes/java/util/concurrent/atomic/AtomicReferenceFieldUpdater.java
+! src/share/classes/java/util/concurrent/atomic/AtomicStampedReference.java
+
+
+From sean.mullan at oracle.com  Mon Dec  5 10:06:38 2011
+From: sean.mullan at oracle.com (Sean Mullan)
+Date: Mon, 05 Dec 2011 13:06:38 -0500
+Subject: Answer requested!!! was: Re: 7081804: Remove	cause	field	from
+	javax.xml.crypto.NoSuchMechnismException
+In-Reply-To: <4ED8F694.8010705@oracle.com>
+References: <4E525386.9000207@gmx.de>	<4E52758D.2020208@oracle.com>	<4E5E8AE3.3070402@gmx.de>	<4E5FE753.2010705@oracle.com>	<4E606D1D.6050509@gmx.de>	<4E613565.1080801@oracle.com>	<4E625E14.9060101@gmx.de>	<4E67AF3D.2090609@oracle.com>	<4E68FFBD.2030601@gmx.de>	<4E6A13A2.2020503@gmx.de>	<4E74F05D.7090806@gmx.de>	<4E7CD5F8.9000501@oracle.com>	<4E7DA91C.2000600@gmx.de>	<4E81EDE6.9050205@oracle.com>	<4E82A437.30907@gmx.de>	<4E86073D.9050101@gmx.de>	<4E873DA0.5050906@oracle.com>	<4E88C03A.90904@gmx.de>
+	<4EA96FB4.7000502@gmx.de> <4EABE0D5.5050802@gmx.de>
+	<4ECC7A87.1030604@gmx.de> <4ED79956.4020101@oracle.com>
+	<4ED86811.4090804@gmx.de> <4ED8F694.8010705@oracle.com>
+Message-ID: <4EDD082E.7060803@oracle.com>
+
+On 12/2/11 11:02 AM, Sean Mullan wrote:
+
+>> [0] Solution 1 
+>> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_4/index.html
+>> [1] Solution 2 
+>> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_6/index.html
+
+I definitely prefer solution 2. Just a few minor comments:
+
+- Use the javadoc @inheritDoc tag instead of copying the javadoc for the
+initCause method.
+
+- PreventOverridingOfChaining
+
+lines 68, 71: what do these comments mean?
+
+one additional test that would be useful to add would be to call initCause twice
+for those ctors that don't have a Throwable parameter, and make sure initCause
+throws IllegalStateExc.
+
+--Sean
+
+
+From xueming.shen at oracle.com  Mon Dec  5 10:51:34 2011
+From: xueming.shen at oracle.com (xueming.shen at oracle.com)
+Date: Mon, 05 Dec 2011 18:51:34 +0000
+Subject: hg: jdk8/tl/jdk: 5063455: (fmt)
+	MissingFormatArgumentException.getFormatSpecifier() incorrect
+	return value
+Message-ID: <20111205185143.E36C24758D@hg.openjdk.java.net>
+
+Changeset: 194faa6fdb3c
+Author:    sherman
+Date:      2011-12-05 10:50 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/194faa6fdb3c
+
+5063455: (fmt) MissingFormatArgumentException.getFormatSpecifier() incorrect return value
+Summary: updated the incorrect StringBuilder constructor usage
+Reviewed-by: dholmes, sherman
+Contributed-by: brandon.passanisi at oracle.com
+
+! src/share/classes/java/util/Formatter.java
++ test/java/util/MissingFormatArgumentException/GetFormatSpecifier.java
+
+
+From yuka.kamiya at oracle.com  Mon Dec  5 15:40:39 2011
+From: yuka.kamiya at oracle.com (yuka.kamiya at oracle.com)
+Date: Mon, 05 Dec 2011 23:40:39 +0000
+Subject: hg: jdk8/tl/jdk: 7116914: Miscellaneous warnings (sun.text)
+Message-ID: <20111205234049.2693647591@hg.openjdk.java.net>
+
+Changeset: ca383e32deaf
+Author:    peytoia
+Date:      2011-12-06 08:39 +0900
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/ca383e32deaf
+
+7116914: Miscellaneous warnings (sun.text)
+Reviewed-by: smarks, okutsu
+
+! src/share/classes/sun/text/CompactByteArray.java
+! src/share/classes/sun/text/IntHashtable.java
+! src/share/classes/sun/text/bidi/BidiBase.java
+! src/share/classes/sun/text/normalizer/ICUData.java
+! src/share/classes/sun/text/normalizer/NormalizerBase.java
+! src/share/classes/sun/text/normalizer/NormalizerImpl.java
+! src/share/classes/sun/text/normalizer/SymbolTable.java
+! src/share/classes/sun/text/normalizer/UnicodeSet.java
+! src/share/classes/sun/text/normalizer/UnicodeSetIterator.java
+! src/share/classes/sun/text/normalizer/VersionInfo.java
+
+
+From stuart.marks at oracle.com  Mon Dec  5 16:51:00 2011
+From: stuart.marks at oracle.com (stuart.marks at oracle.com)
+Date: Tue, 06 Dec 2011 00:51:00 +0000
+Subject: hg: jdk8/tl/jdk: 7116993: fix warnings in java.applet
+Message-ID: <20111206005114.C208A47592@hg.openjdk.java.net>
+
+Changeset: f4fe86bba8a2
+Author:    smarks
+Date:      2011-12-05 16:30 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/f4fe86bba8a2
+
+7116993: fix warnings in java.applet
+Reviewed-by: art, smarks
+Contributed-by: Danesh Dadachanji <ddadacha at redhat.com>
+
+! src/share/classes/java/applet/Applet.java
+
+
+From naoto.sato at oracle.com  Mon Dec  5 17:09:42 2011
+From: naoto.sato at oracle.com (naoto.sato at oracle.com)
+Date: Tue, 06 Dec 2011 01:09:42 +0000
+Subject: hg: jdk8/tl/jdk: 7117469: Warning cleanup for j.u.Currency and
+	j.u.Locale related classes
+Message-ID: <20111206010951.8BAC347593@hg.openjdk.java.net>
+
+Changeset: 85363edbc92f
+Author:    naoto
+Date:      2011-12-05 17:08 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/85363edbc92f
+
+7117469: Warning cleanup for j.u.Currency and j.u.Locale related classes
+Reviewed-by: okutsu, smarks
+
+! src/share/classes/java/util/Currency.java
+! src/share/classes/sun/util/LocaleServiceProviderPool.java
+! src/share/classes/sun/util/resources/LocaleData.java
+
+
+From stuart.marks at oracle.com  Tue Dec  6 10:23:11 2011
+From: stuart.marks at oracle.com (stuart.marks at oracle.com)
+Date: Tue, 06 Dec 2011 18:23:11 +0000
+Subject: hg: jdk8/tl/jdk: 7116997: fix warnings in java.util.PropertyPermission
+Message-ID: <20111206182332.B74AA475A4@hg.openjdk.java.net>
+
+Changeset: 77f6d4360f4b
+Author:    smarks
+Date:      2011-12-06 10:14 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/77f6d4360f4b
+
+7116997: fix warnings in java.util.PropertyPermission
+Reviewed-by: smarks
+Contributed-by: Brandon Passanisi <brandon.passanisi at oracle.com>
+
+! src/share/classes/java/util/PropertyPermission.java
+
+
+From sebastian.sickelmann at gmx.de  Tue Dec  6 12:48:18 2011
+From: sebastian.sickelmann at gmx.de (Sebastian Sickelmann)
+Date: Tue, 06 Dec 2011 21:48:18 +0100
+Subject: Answer requested!!! was: Re: 7081804: Remove	cause	field	from
+	javax.xml.crypto.NoSuchMechnismException
+In-Reply-To: <4EDD082E.7060803@oracle.com>
+References: <4E525386.9000207@gmx.de>	<4E52758D.2020208@oracle.com>	<4E5E8AE3.3070402@gmx.de>	<4E5FE753.2010705@oracle.com>	<4E606D1D.6050509@gmx.de>	<4E613565.1080801@oracle.com>	<4E625E14.9060101@gmx.de>	<4E67AF3D.2090609@oracle.com>	<4E68FFBD.2030601@gmx.de>	<4E6A13A2.2020503@gmx.de>	<4E74F05D.7090806@gmx.de>	<4E7CD5F8.9000501@oracle.com>	<4E7DA91C.2000600@gmx.de>	<4E81EDE6.9050205@oracle.com>	<4E82A437.30907@gmx.de>	<4E86073D.9050101@gmx.de>	<4E873DA0.5050906@oracle.com>	<4E88C03A.90904@gmx.de>
+	<4EA96FB4.7000502@gmx.de> <4EABE0D5.5050802@gmx.de>
+	<4ECC7A87.1030604@gmx.de> <4ED79956.4020101@oracle.com>
+	<4ED86811.4090804@gmx.de> <4ED8F694.8010705@oracle.com>
+	<4EDD082E.7060803@oracle.com>
+Message-ID: <4EDE7F92.406@gmx.de>
+
+Am 05.12.2011 19:06, schrieb Sean Mullan:
+> On 12/2/11 11:02 AM, Sean Mullan wrote:
+>
+>>> [0] Solution 1
+>>> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_4/index.html
+>>> [1] Solution 2
+>>> http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_6/index.html
+> I definitely prefer solution 2. Just a few minor comments:
+>
+> - Use the javadoc @inheritDoc tag instead of copying the javadoc for the
+> initCause method.
+>
+> - PreventOverridingOfChaining
+>
+> lines 68, 71: what do these comments mean?
+>
+> one additional test that would be useful to add would be to call initCause twice
+> for those ctors that don't have a Throwable parameter, and make sure initCause
+> throws IllegalStateExc.
+>
+> --Sean
+>
+Updated the webrev[2] to include your review.
+
+[2] 
+http://dl.dropbox.com/u/43692695/oss-patches/openjdk8/NoSuchMechanismException/7011804_7/index.html
+
+-- Sebastian
+
+From stuart.marks at oracle.com  Wed Dec  7 13:47:48 2011
+From: stuart.marks at oracle.com (stuart.marks at oracle.com)
+Date: Wed, 07 Dec 2011 21:47:48 +0000
+Subject: hg: jdk8/tl/jdk: 7117249: fix warnings in java.util.jar, .logging,
+	.prefs, .zip
+Message-ID: <20111207214805.430C647632@hg.openjdk.java.net>
+
+Changeset: 4f0f9f9c4892
+Author:    smarks
+Date:      2011-12-07 12:12 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/jdk/rev/4f0f9f9c4892
+
+7117249: fix warnings in java.util.jar, .logging, .prefs, .zip
+Reviewed-by: alanb, dholmes, forax, sherman, smarks
+Contributed-by: Prasannaa <prasannaa_ss at yahoo.com>, Martijn Verburg <martijnverburg at gmail.com>, Goerge_Albrecht <goerge.albrecht at gmx.net>, Graham Allan <grundlefleck at googlemail.com>, Michael Barker <mikeb01 at gmail.com>
+
+! src/share/classes/java/util/jar/JarFile.java
+! src/share/classes/java/util/jar/Manifest.java
+! src/share/classes/java/util/logging/LogManager.java
+! src/share/classes/java/util/prefs/Preferences.java
+! src/share/classes/java/util/prefs/XmlSupport.java
+! src/share/classes/java/util/zip/ZipEntry.java
+
+
+From kumar.x.srinivasan at oracle.com  Wed Dec  7 14:35:20 2011
+From: kumar.x.srinivasan at oracle.com (kumar.x.srinivasan at oracle.com)
+Date: Wed, 07 Dec 2011 22:35:20 +0000
+Subject: hg: jdk8/tl/langtools: 7086015: fix
+	test/tools/javac/parser/netbeans/JavacParserTest.java
+Message-ID: <20111207223524.462F347633@hg.openjdk.java.net>
+
+Changeset: abfa0d8ea803
+Author:    ksrini
+Date:      2011-12-07 10:47 -0800
+URL:       http://hg.openjdk.java.net/jdk8/tl/langtools/rev/abfa0d8ea803
+
+7086015: fix test/tools/javac/parser/netbeans/JavacParserTest.java
+Reviewed-by: ksrini, jjg
+Contributed-by: matherey.nunez at oracle.com
+
+! test/tools/javac/parser/netbeans/JavacParserTest.java
+
+
+From stuart.marks at oracle.com  Wed Dec  7 17:38:03 2011
+From: stuart.marks at oracle.com (Stuart Marks)
+Date: Wed, 07 Dec 2011 17:38:03 -0800
+Subject: please review fix for 7118546, warnings cleanup in javax.xml.crypto
+Message-ID: <4EE014FB.6090707@oracle.com>
+
+Webrev is here:
+
+http://cr.openjdk.java.net/~smarks/reviews/7118546/webrev.0/
+
+Notes:
+
+In addition to changes to javax.xml.crypto, this webrev also includes a change 
+to a file in javax.script. This package (among others) is included in the same 
+build step as javax.xml.crypto, specifically in jdk/make/javax/others/Makefile. 
+With this change, this entire build step will become warning-free.
+
+Many of the changes are simply adding @SuppressWarnings("rawtypes") at 
+locations where raw types are used in the API. I tried to be careful not to 
+change any actual APIs, but please recheck this. (During this warnings effort, 
+inadvertent API changes seem to be catching everyone.)
+
+Of particular note are changes in the following files:
+
+  - ExcC14NParameterSpec.java
+  - XPathFilter2ParameterSpec.java
+  - XPathFilterParameterSpec.java
+  - XPathType.java
+
+The constructors in these classes take a raw List or Map, make a defensive 
+copy, run through the elements and use instanceof to ensure they're all of the 
+right type, create an unmodifiable wrapper and then assign it to a field. The 
+current code uses all raw types.
+
+(For the following discussion it probably would be useful to bring up the code 
+for the XPathType constructor.)
+
+There were several alternative approaches to getting rid of the warnings in 
+this code. Since the code inevitably would have raw types and unchecked casts, 
+one approach would simply be to put @SuppressWarnings({"rawtypes","unchecked"}) 
+at the top of the constructor and be done with it. However, this obscures up a 
+bunch of important details and IMHO covers too much code with @SuppressWarnings.
+
+Another approach would be to do an unchecked cast (with warning suppressed) 
+directly from the raw type to the destination generic type such as 
+Map<String,String>. The code would then run through the entries to ensure that 
+each key and value is indeed a String. This seems odd, and might lead a future 
+maintenance programmer to "optimize away" such checks. Of course, these dynamic 
+type checks are important for the security of the system.
+
+The approach I ended up taking was to make the defensive copy into a wildcarded 
+type such as Map<?,?> which I believe is an accurate type: it's a map, but we 
+don't know the actual types of its keys and values. Only after doing all the 
+instanceof checks do we do the cast to Map<String,String>. Unfortunately, the 
+resulting code is longer and has a proliferation of wildcards, making it appear 
+to be quite complex. But I think it actually makes the most sense of the 
+alternatives.
+
+If we want to simplify this code, I'd suggest we convert these cases to use the 
+enhanced-for loop. I've refrained from doing so since we're avoiding 
+refactoring as part of the warnings cleanup exercise.
+
+But let me know what you think.
+
+s'marks
+
