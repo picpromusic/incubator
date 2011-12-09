@@ -33,10 +33,10 @@ public class SummaryTests {
 				+ "AAAAAAAA" //
 				+ "AAAAAAAA" //
 				+ "AAAAAA==" //
-				+ "!dvdName/" //
+				+ "|dvdName/" //
 				+ "../." //
-				+ "!10" //
-				+ "!Donnerstag, 1. Januar 1970 01:16 Uhr MEZ\n", //
+				+ "|10" //
+				+ "|Donnerstag, 1. Januar 1970 01:16 Uhr MEZ\n", //
 				sw.getBuffer().toString());
 
 		sw = new StringWriter();
@@ -56,10 +56,10 @@ public class SummaryTests {
 				+ "========" //
 				+ "========" //
 				+ "========" //
-				+ "!dvdName/" //
+				+ "|dvdName/" //
 				+ "../." //
-				+ "!0" //
-				+ "!Donnerstag, 1. Januar 1970 01:00 Uhr MEZ\n", //
+				+ "|0" //
+				+ "|Donnerstag, 1. Januar 1970 01:00 Uhr MEZ\n", //
 				sw.getBuffer().toString());
 
 	}
