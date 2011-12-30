@@ -1,4 +1,5 @@
 package inc.util;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -10,13 +11,28 @@ import java.io.OutputStreamWriter;
 
 public class HexDumpInputstream extends InputStream {
 
-  private BufferedReader ir;
-  private byte[] buffer = new byte[16];
+  private final BufferedReader ir;
+  private final byte[] buffer = new byte[16];
+  private final int startPos;
+  private final int endPos;
+  private final int numberOfBytesPerLine;
   int pos = 16;
 
+  public HexDumpInputstream(InputStream is, int startPos, int endPos,
+      int numberOfBytesPerLine) {
+    this.startPos = startPos;
+    this.endPos = endPos;
+    this.numberOfBytesPerLine = numberOfBytesPerLine;
+    this.pos = numberOfBytesPerLine;
+    this.ir = new BufferedReader(new InputStreamReader(is));
+  }
 
-  public HexDumpInputstream(InputStream os) {
-    this.ir = new BufferedReader(new InputStreamReader(os));
+  public HexDumpInputstream(InputStream is, int startPos, int endPos) {
+    this(is, startPos, endPos, 16);
+  }
+
+  public HexDumpInputstream(InputStream is) {
+    this(is, 10, 58);
   }
 
   @Override
@@ -29,12 +45,14 @@ public class HexDumpInputstream extends InputStream {
         if (line == null) {
           return -1;
         } else {
-          StringBuilder sb = new StringBuilder(line.substring(10, 33));
-          sb.append(line.substring(34, 58));
-          String[] split = sb.toString().trim().split(" ");
+          String[] split = line//
+              .substring(startPos, endPos)//
+              .replace("  ", " ")//
+              .trim()//
+              .split(" ");
           pos = buffer.length - split.length;
           for (int i = split.length - 1; i >= 0; i--) {
-            buffer[pos + i] = (byte) Integer.parseInt(split[i], 16);
+            buffer[pos + i] = (byte) Integer.parseInt(split[i]);
           }
           return read();
         }
@@ -44,7 +62,7 @@ public class HexDumpInputstream extends InputStream {
       throw new RuntimeException(t);
     }
   }
-  
+
   @Override
   public void close() throws IOException {
     this.ir.close();
