@@ -11,11 +11,16 @@ public class HexDumpOutputstream extends OutputStream {
   private byte[] buffer = new byte[16];
   private int pos = 0;
   private int adress = 0;
-  private static final String zeroPattern8 = "00000000";;
+  private HexDumpPattern.FieldDescription[] fieldDescriptions;
+
+  public HexDumpOutputstream(OutputStream os,HexDumpPattern hdp) {
+    this.fieldDescriptions = hdp.getFields();
+    this.ow = new BufferedWriter(new OutputStreamWriter(os));
+  }
 
 
   public HexDumpOutputstream(OutputStream os) {
-    this.ow = new BufferedWriter(new OutputStreamWriter(os));
+    this(os, HexDumpPattern.DEFAULT);
   }
 
   @Override
@@ -29,7 +34,7 @@ public class HexDumpOutputstream extends OutputStream {
 
   private void writeArray(byte[] array) throws IOException {
     StringBuilder line = new StringBuilder(120);
-    String adressString = zeroPattern8 + Integer.toHexString(adress);
+    String adressString = zeroAdressPattern + Integer.toHexString(adress);
     adressString = adressString.substring(adressString.length() - 8);
     line.append(adressString);
     line.append("  ");
@@ -70,7 +75,7 @@ public class HexDumpOutputstream extends OutputStream {
       int size, StringBuilder line) {
     for (int j = base; j < base + size && j + i < byteArray.length; j++) {
       String value =
-          zeroPattern8 + Integer.toHexString(0xff & byteArray[i + j]);
+          zeroAdressPattern + Integer.toHexString(0xff & byteArray[i + j]);
       value = value.substring(value.length() - 2);
       line.append(value);
       line.append(' ');
