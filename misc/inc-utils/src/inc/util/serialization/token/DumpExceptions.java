@@ -1,4 +1,4 @@
-package inc.main;
+package inc.util.serialization.token;
 
 import inc.util.HexDumpInputstream;
 import inc.util.HexDumpOutputstream;
@@ -24,6 +24,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import sun.misc.HexDumpEncoder;
 
 public class DumpExceptions {
 
@@ -128,21 +130,29 @@ public class DumpExceptions {
         if (t != null) {
           System.out.println("\t" + name);
           File fname = new File(f, name + ".dump." + postfix);
+          ByteArrayOutputStream bout = new ByteArrayOutputStream();
+//          HexDumpEncoder hde = new HexDumpEncoder();
           FileOutputStream fw = new FileOutputStream(fname);
+          
+//          byte[] byteArray = bout.toByteArray();
+//          hde.encodeBuffer(byteArray, fw);
+//          fw.close();
+          
           HexDumpOutputstream hexOut = new HexDumpOutputstream(fw);
           ObjectOutputStream oo = new ObjectOutputStream(hexOut);
           oo.writeObject(t);
           oo.close();
+          
 
-          try {
-            FileInputStream fin = new FileInputStream(fname);
-            HexDumpInputstream hexIn = new HexDumpInputstream(fin);
-            ObjectInputStream oi = new ObjectInputStream(hexIn);
-            Object readObject = oi.readObject();
-            System.out.println(readObject.getClass());
-          } catch (RuntimeException e) {
-            fname.delete();
-          }
+//          try {
+//            FileInputStream fin = new FileInputStream(fname);
+//            HexDumpInputstream hexIn = new HexDumpInputstream(fin);
+//            ObjectInputStream oi = new ObjectInputStream(hexIn);
+//            Object readObject = oi.readObject();
+//            System.out.println(readObject.getClass());
+//          } catch (RuntimeException e) {
+//            fname.delete();
+//          }
         }
       } catch (Throwable t) {
         notCalled.add(constructor);
