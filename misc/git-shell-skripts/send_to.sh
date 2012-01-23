@@ -1,8 +1,15 @@
+ISSET=$1'notset'
+if [ $ISSET = 'notset' ]; then
+ echo "Usage: $0 send-destination"
+ exit
+fi
+
 ISSET=`git config --get sync.$1.bundleout | wc -l`
 if [ $ISSET != '0' ]; then
  BUNDLEOUT=`git config --get sync.$1.bundleout`
 else
  echo "Config Parameter sync.$1.bundleout not set"
+ echo "Configure Sync with conf_sync.sh"
  exit
 fi
 
@@ -11,6 +18,7 @@ if [ $ISSET != '0' ]; then
  TAGOUT=`git config --get sync.$1.out`
 else
  echo "Config Parameter sync.$1.out not set"
+ echo "Configure Sync with conf_sync.sh"
  exit
 fi 
 
@@ -21,6 +29,18 @@ if [ $ISSET != '0' ]; then
 else
  SIGNKEY_EXIST='0'
 fi
+
+ISSET=`git config --get sync.self.name | wc -l`
+if [ $SIGNKEY_EXIST = '1' ]; then
+ if [ $ISSET != '0' ]; then
+  SELF_NAME=`git config --get sync.self.name`
+ else
+  echo "Config Parameter sync.self.name not set"
+  echo "Configure Sync with conf_sync.sh"
+  exit
+ fi
+fi
+
 
 TEMP=`ls $BUNDLEOUT | sort -u | tail -1 | cut -d "." -f1`
 TEMP=`echo $TEMP | sed 's/0*//'`
@@ -39,25 +59,25 @@ fi
 if [ $SIGNKEY_EXIST = '1' ]; then
  if [ $TAG_EXIST = '1' ]; then
   TAG_MESSAGE=`git log --oneline $TAGOUT..HEAD`
-  git tag -f -u $SIGNKEY -m '$TAG_MESSAGE' out.sign.tag.$1
+  git tag -f -u $SIGNKEY -m '$TAG_MESSAGE' out.sign.tag.$SELF_NAME.to.$1
  else
-  git tag -f -u $SIGNKEY -m 'Initial send' out.sign.tag.$1
+  git tag -f -u $SIGNKEY -m 'Initial send' out.sign.tag.$SELF_NAME.to.$1
  fi
 fi
 
 if [ $TAG_EXIST != '1' ]; then
  if [ $SIGNKEY_EXIST = '1' ]; then
-  git bundle create $BUNDLEOUT/$T HEAD --tags=out.sign.tag.$1
+  git bundle create $BUNDLEOUT/$T HEAD --tags=out.sign.tag.$SELF_NAME.to.$1
  else
   git bundle create $BUNDLEOUT/$T HEAD
  fi
 else 
  if [ $SIGNKEY_EXIST = '1' ]; then
-  git bundle create $BUNDLEOUT/$T HEAD $TAGOUT --tags=out.sign.tag.$1
+  git bundle create $BUNDLEOUT/$T HEAD $TAGOUT --tags=out.sign.tag.$SELF_NAME.to.$1
  else
   git bundle create $BUNDLEOUT/$T HEAD $TAGOUT 
  fi
 fi
 
 git tag -f `git config --get sync.$1.out`
-echo $T
+ls -lha $BUNDLEOUT/$T
