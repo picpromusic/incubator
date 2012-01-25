@@ -1,3 +1,5 @@
+declare -i error_found=0
+
 function global_usage_info() {
   echo "Usage $0 -self --> to set own name"
   echo "Usage $0 -other --> to setup other syncrepo"
@@ -25,9 +27,9 @@ function key_usage_info() {
 function single_check() {
   if !(grep -q "$2" - <<< $1); then
     echo [$3] configuration does not contain $2
-#    if [ $3 = 'error' ]; then
-#      exit
-#    fi
+    if [ $3 = 'error' ]; then
+      error_found=$error_found+1
+    fi
   fi
 }
 
@@ -84,6 +86,10 @@ case "$1" in
     check $2
   else
     checkall
+  fi
+  if [ $error_found -gt 0 ]; then
+    echo $error_found errors found in configuration. Please Check
+    exit 1
   fi
   ;;
 --help )
