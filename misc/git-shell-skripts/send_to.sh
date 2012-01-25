@@ -8,7 +8,7 @@ function global_usage() {
 }
 
 if [ $# -lt 1 ]; then
-  global_usage();
+  global_usage
 fi
 
 if grep -q sync.$1.bundleout= - <<< $(git config -l); then
@@ -83,8 +83,8 @@ else
 fi
 
 if grep -q sync.$1.email= - <<< $(git config -l); then
-  gpg -e -r $(git config --get sync.$1.email) 
+  gpg -e -r $(git config --get sync.$1.email) $BUNDLEOUT/$T
 fi
 
 git tag -f $TAGOUT
-ls -lha $BUNDLEOUT/$T
+ls -lha $BUNDLEOUT/$T*
