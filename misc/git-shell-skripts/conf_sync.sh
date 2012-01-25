@@ -28,10 +28,15 @@ function key_usage_info() {
   exit
 }
 
+function crypt_usage_info() {
+  echo "Usage $0 -crypt other_name email" 
+  exit
+}
+
 function single_check() {
-  if !(grep -q "$2" - <<< $1); then
+  if !(grep -q "$2=" - <<< $1); then
     echo [$3] configuration does not contain $2
-    if [ $3 = 'error' ]; then
+    if [ "$3" = 'error' ]; then
       error_found=$error_found+1
     fi
   fi
@@ -45,7 +50,8 @@ function check() {
   single_check "$conf" sync.$1.out error
   single_check "$conf" sync.$1.bundlein error
   single_check "$conf" sync.$1.bundleout error
-  single_check "$conf" sync.$1.signkey warning
+  single_check "$conf" sync.$1.signkey "warning: no signature-key given"
+  single_check "$conf" sync.$1.email "warning: no encryption email given"
 }
 
 
@@ -84,6 +90,12 @@ case "$1" in
     key_usage_info
   fi
   git config sync.$2.signkey $3
+  ;;
+-crypt )
+  if [ $# -ne 3 ]; then
+    crypt_usage_info
+  fi
+  git config sync.$2.email $3
   ;;
 -check )
   if [ $# -eq 2 ]; then

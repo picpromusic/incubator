@@ -11,7 +11,7 @@ if [ $# -lt 1 ]; then
   global_usage();
 fi
 
-if grep -q sync.$1.bundleout - <<< $(git config -l); then
+if grep -q sync.$1.bundleout= - <<< $(git config -l); then
  BUNDLEOUT=$(git config --get sync.$1.bundleout)
 else
  echo "Config Parameter sync.$1.bundleout not set"
@@ -19,7 +19,7 @@ else
  exit
 fi
 
-if grep -q sync.$1.out - <<< $(git config -l); then
+if grep -q sync.$1.out= - <<< $(git config -l); then
  TAGOUT=$(git config --get sync.$1.out)
 else
  echo "Config Parameter sync.$1.out not set"
@@ -27,7 +27,7 @@ else
  exit
 fi 
 
-if grep -q sync.$1.signkey - <<< $(git config -l); then
+if grep -q sync.$1.signkey= - <<< $(git config -l); then
  SIGNKEY=$(git config --get sync.$1.signkey)
  SIGNKEY_EXIST='1'
 else
@@ -35,7 +35,7 @@ else
 fi
 
 if [ $SIGNKEY_EXIST = '1' ]; then
- if grep -q sync.self.name - <<< $(git config -l); then
+ if grep -q sync.self.name= - <<< $(git config -l); then
   SELF_NAME=$(git config --get sync.self.name)
  else
   echo "Config Parameter sync.self.name not set"
@@ -80,6 +80,10 @@ else
  else
   git bundle create $BUNDLEOUT/$T HEAD $TAGOUT 
  fi
+fi
+
+if grep -q sync.$1.email= - <<< $(git config -l); then
+  gpg -e -r $(git config --get sync.$1.email) 
 fi
 
 git tag -f $TAGOUT
