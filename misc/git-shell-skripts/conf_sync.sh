@@ -1,3 +1,7 @@
+#! /bin/bash
+#Script with implements :"configure sync with 
+#an foreign party"
+
 declare -i error_found=0
 
 function global_usage_info() {
