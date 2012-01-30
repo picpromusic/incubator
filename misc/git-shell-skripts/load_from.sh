@@ -66,6 +66,7 @@ fi
 decrypted=$(ls $BUNDLEIN | grep .decrypted$ | sort -u)
 for t in $decrypted; do
   git pull $BUNDLEIN/$t
+  git fetch --tags $BUNDLEIN/$t 
 done
 if [ $NO_MASTER_YET = '1' ]; then
  git branch $BRANCHIN

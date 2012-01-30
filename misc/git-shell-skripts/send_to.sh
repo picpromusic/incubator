@@ -62,24 +62,26 @@ fi
 if [ $SIGNKEY_EXIST = '1' ]; then
  if [ $TAG_EXIST = '1' ]; then
   TAG_MESSAGE=$(git log --oneline $TAGOUT..HEAD)
-  git tag -f -u $SIGNKEY -m '$TAG_MESSAGE' out.sign.tag.$SELF_NAME.to.$1
+  git tag -f -u $SIGNKEY -m "$TAG_MESSAGE" out.sign.tag.$SELF_NAME.to.$1.$NEXT
  else
-  git tag -f -u $SIGNKEY -m 'Initial send' out.sign.tag.$SELF_NAME.to.$1
+  git tag -f -u $SIGNKEY -m "Initial send" out.sign.tag.$SELF_NAME.to.$1.$NEXT
  fi
 fi
 
 if [ $TAG_EXIST != '1' ]; then
  if [ $SIGNKEY_EXIST = '1' ]; then
-  git bundle create $BUNDLEOUT/$T HEAD --tags=out.sign.tag.$SELF_NAME.to.$1
+  echo "Mit Tag"
+  git bundle create $BUNDLEOUT/$T HEAD --tags=out.sign.tag.$SELF_NAME.to.$1.$NEXT
  else
   git bundle create $BUNDLEOUT/$T HEAD
  fi
 else 
  if [ $SIGNKEY_EXIST = '1' ]; then
-  git bundle create $BUNDLEOUT/$T HEAD $TAGOUT --tags=out.sign.tag.$SELF_NAME.to.$1
+  echo "Mit Tag"
+  git bundle create $BUNDLEOUT/$T HEAD $TAGOUT --tags=out.sign.tag.$SELF_NAME.to.$1.$NEXT
  else
   git bundle create $BUNDLEOUT/$T HEAD $TAGOUT 
- fi
+ fi	
 fi
 
 if grep -q sync.$1.email= - <<< $(git config -l); then
