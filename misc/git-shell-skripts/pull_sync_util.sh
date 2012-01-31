@@ -44,7 +44,6 @@ if [ $FIRST_IMPORT = '1' ]; then
 
   COMMIT_HASH=$(echo 'import sync_util' | git commit-tree $TREE_HASH -p $EMPTY_COMMIT)
   git update-ref refs/heads/sync_tool $COMMIT_HASH
-  git checkout master
 else
   for e in $scripts; do
     wget -O tools/bin/$e https://raw.github.com/picpromusic/incubator/master/misc/git-shell-skripts/$e
@@ -52,3 +51,6 @@ else
   done
   git commit -m "updated sync_tool"
 fi
+
+git checkout master
+
