@@ -2,5 +2,4 @@ conf_sync.sh
 load_from.sh
 merge_with.sh
 pull_sync_util.sh
-script.list
 send_to.sh
