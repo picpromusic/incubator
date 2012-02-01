@@ -1,4 +1,4 @@
-DOWNLOAD_FROM="https://raw.github.com/picpromusic/incubator/master/misc/git-shell-skripts/"
+DOWNLOAD_FROM="https://raw.github.com/picpromusic/incubator/SYNC_TOOL_STABLE/misc/git-shell-skripts/"
 DOWNLOAD_FROM_WEB='1'
 
 
@@ -11,6 +11,8 @@ if [ $# -eq 1 ]; then
   fi
   if [ $DOWNLOAD_FROM = "--help" ]; then
     echo "Usage: $0 [alternating download_url or download_path]"
+    echo "Use for latest UNSTABLE version: https://raw.github.com/picpromusic/incubator/SYNC_TOOL_DEV/misc/git-shell-skripts/"
+    echo "Use for latest HEAD version : https://raw.github.com/picpromusic/incubator/master/misc/git-shell-skripts/"
     exit
   fi
 fi
