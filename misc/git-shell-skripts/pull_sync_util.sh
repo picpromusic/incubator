@@ -1,9 +1,29 @@
-if ! git checkout -q master
+DOWNLOAD_FROM="https://raw.github.com/picpromusic/incubator/master/misc/git-shell-skripts/"
+DOWNLOAD_FROM_WEB='1'
+if [ $# -eq 1 ]; then
+  DOWNLOAD_FROM=$1
+  if ! grep -q ^http:// - <<< $DOWNLOAD_FROM; then
+    if ! grep -q ^https:// - <<< $DOWNLOAD_FROM; then
+      DOWNLOAD_FROM_WEB='0'
+    fi 
+  fi
+fi
+
+
+PREV_BRANCH=$(git branch | grep ^\* | cut -d \* -f 2 | wc -l)
+if [ $PREV_BRANCH != '0' ]; then
+  PREV_BRANCH=$(git branch | grep ^\* | cut -d \* -f 2)
+else
+  PREV_BRANCH=master
+fi
+echo $PREV_BRANCH
+
+if ! git checkout -q $PREV_BRANCH
 then
-	echo "Creating empty master branch"
+	echo "Creating empty branch: $PREV_BRANCH"
 	TREE_HASH=$(git write-tree)
-	COMMIT_HASH=$(echo 'init master-branch' | git commit-tree $TREE_HASH)
-	git update-ref refs/heads/master $COMMIT_HASH
+	COMMIT_HASH=$(echo "init $PREV_BRANCH-branch" | git commit-tree $TREE_HASH)
+	git update-ref refs/heads/$PREV_BRANCH $COMMIT_HASH
 fi
 
 FIRST_IMPORT='0'
@@ -19,15 +39,21 @@ then
   EMPTY_COMMIT=$(echo -n '' | git hash-object -t commit -w empty_tree.txt)
   rm empty_tree.txt
   git update-ref refs/heads/sync_tool $EMPTY_COMMIT
-  git checkout sync_tool
+  git checkout -q sync_tool
 fi
 
-wget https://raw.github.com/picpromusic/incubator/master/misc/git-shell-skripts/script.list
-scripts=$(cat script.list)
-rm script.list
+if [ $DOWNLOAD_FROM_WEB = '1' ]; then
+	scripts=$(wget -qO- $DOWNLOAD_FROM/script.list)
+else 
+	scripts=$(cat $DOWNLOAD_FROM/script.list)
+fi
 if [ $FIRST_IMPORT = '1' ]; then
   for e in $scripts; do
-    wget https://raw.github.com/picpromusic/incubator/master/misc/git-shell-skripts/$e
+    if [ $DOWNLOAD_FROM_WEB = '1' ]; then
+      wget -q $DOWNLOAD_FROM/$e
+    else
+      cp $DOWNLOAD_FROM/$e ./$e
+    fi
 	HASH=$(git hash-object -w $e)
 	git update-index --add --cacheinfo 100755 $HASH $e
   done
@@ -46,11 +72,15 @@ if [ $FIRST_IMPORT = '1' ]; then
   git update-ref refs/heads/sync_tool $COMMIT_HASH
 else
   for e in $scripts; do
-    wget -O tools/bin/$e https://raw.github.com/picpromusic/incubator/master/misc/git-shell-skripts/$e
+    if [ $DOWNLOAD_FROM_WEB = '1' ]; then
+      wget -qO tools/bin/$e $DOWNLOAD_FROM/$e
+    else
+      cp $DOWNLOAD_FROM/$e ./tools/bin/$e
+    fi
     git add tools/bin/$e
   done
   git commit -m "updated sync_tool"
 fi
 
-git checkout master
-
+echo "Branch sync_tool updated. You can now merge with your branch"
+git checkout -q $PREV_BRANCH
