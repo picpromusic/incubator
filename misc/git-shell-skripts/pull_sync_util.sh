@@ -1,11 +1,17 @@
 DOWNLOAD_FROM="https://raw.github.com/picpromusic/incubator/master/misc/git-shell-skripts/"
 DOWNLOAD_FROM_WEB='1'
+
+
 if [ $# -eq 1 ]; then
   DOWNLOAD_FROM=$1
   if ! grep -q ^http:// - <<< $DOWNLOAD_FROM; then
     if ! grep -q ^https:// - <<< $DOWNLOAD_FROM; then
       DOWNLOAD_FROM_WEB='0'
     fi 
+  fi
+  if [ $DOWNLOAD_FROM = "--help" ]; then
+    echo "Usage: $0 [alternating download_url or download_path]"
+    exit
   fi
 fi
 
