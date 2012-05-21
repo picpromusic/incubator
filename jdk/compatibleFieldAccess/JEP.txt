@@ -1,0 +1,190 @@
+// Short descriptive title of the proposal -- REQUIRED
+//
+Title: Enable binary compatible changes to the access of non private fields
+Author: SponsorRequired, Sebastian Sickelmann
+//
+// Owner's full name (no e-mail address) -- REQUIRED, if the person now
+// responsible for this JEP is not the Author
+//
+Owner: SponsorRequired, Sebastian Sickelmann
+Created: 2012/MM/DD
+Type: Feature/Research
+State: Draft
+Exposure: Open
+//
+// Component affected, REQUIRED for Feature JEPs
+//
+// We use two-part identifiers of the form <area>/<component>.
+//
+// The areas are: vm, core, client, web
+//
+// The components depend upon the areas, as follows:
+//
+//    vm: comp, gc, rt, svc
+//    core: lang, libs, i18n, net, sec, svc
+//    client: gui, sound
+//    web: jaxp, jaxb, jaxws, corba
+//
+// A proposal for a new garbage collector, e.g., would go in "vm/gc",
+// while one for a new networking protocol would go in "core/net".
+//
+// Use "--" for the component name if more than one component in an area
+// is significantly affected, or if some component not listed here is
+// affected.
+//
+// Use "--/--" for the value of this header if more than one area is
+// affected, e.g., for a proposal to restructure the build process.
+//
+Component: --/--
+Scope: SE
+JSR: TBD
+Discussion: jk8 dash dev at openjdk dot java dot net
+//
+// Suggested start date, in the format <year>/Q<quarter>
+//
+Start: 2012/Q3
+Effort: S
+Duration: L
+Template: 1.0
+Reviewed-by: TBD
+Endorsed-by: TBD
+Funded-by: Sebastian Sickelmann, Other contributors are welcome
+//
+//
+// PROPOSAL BODY
+// -------------
+//
+// The body of the proposal itself uses the Markdown markup language
+// (http://daringfireball.net/projects/markdown/basics).  It must be
+// separated from the header by at least one blank line.
+//
+// All sections are optional except those marked REQUIRED.  Please keep
+// sections in the order shown below.  Please use lines of dashes under
+// section titles rather than "##"-style prefixes, which are less
+// readable.
+//
+
+Summary
+-------
+
+Actually it is not possible to remove non-private fields or limit the 
+visibility of existing fields without braeking binary compatibility. Where
+binary compatility is not a major issue in most application projects it
+is a somewhat bigger issue in library projects and a real showstopper in 
+APIs that are part of the JDK. The change suggested through this JEP make
+is possible to remove non-private fields or change the visibility of fields
+in a binary compatible way.
+
+Non-Goals
+---------
+
+I want no change to Java(The Language) for this change. It is not in my intension
+to allow attribute access through accessor methods with simple field/property access
+syntax. Changes to field should be possible in a binary compatible way. This does not
+ensure that the changes are fully runtime compatible. And it definitivly does not garanty
+source compatiblity.
+
+Motivation
+----------
+
+This will enable the OpenJDK-Contibutors to make some changes to the APIs and
+implementations that would otherwise be non binary compatible. Futhermore external
+Java Library Projects can make more changes in a binary compatible way. It is not
+a must have for Java Library Projects but a good investment in existing Java Software.
+The only competitor i had seen are some suguesstions to make changes to Java(The Language) 
+to enable Source-Level use to Accessor-Methods via field/property access syntax. This JEP
+does not want to change the Language. Anyway a change to Java(The Language) that enables the
+use of accessor Methods through field/property access syntax should also observe binary
+compatibility in some way. 
+
+Description
+-----------
+
+// REQUIRED -- Describe the enhancement in detail: Both what it is and,
+// to the extent understood, how you intend to implement it.  Summarize,
+// at a high level, all of the interfaces you expect to modify or extend,
+// including Java APIs, command-line switches, library/JVM interfaces,
+// and file formats.  Explain how failures in applications using this
+// enhancement will be diagnosed, both during development and in
+// production.  Describe any open design issues.
+//
+// This section will evolve over time as the work progresses, ultimately
+// becoming the authoritative high-level description of the end result.
+// Include hyperlinks to additional documents as required.
+
+Alternatives
+------------
+
+I had implemented a very thin prototype with bytecode-manipulation through
+the PreMain-Hook. We can simply transform all loaded classes to use lacy
+linkage through invokedynamic for field access. The implemntation level
+impact would be much smaller, but i think the runtime costs are to high
+for this approach. We could limit lacy linkage(invokedynamic) for field
+access only for fields that are not visible/accessible at classload 
+time(ex. the target class is not loaded yet), leave accessible field as
+they are and change field access that are not directly accesible but are
+accessible through access-methods to calling the access methods. 
+
+We could also handle every field access as an call to an accessor-method
+in first place and only if there is a field that is directly accessible
+from the callsite change this to direct field access. This solution has 
+an even bigger performance cost, because field access to private fields 
+are so common. 
+
+Testing
+-------
+
+Performance
+
+// What kinds of test development and execution will be required in order
+// to validate this enhancement, beyond the usual mandatory unit tests?
+// Be sure to list any special platform or hardware requirements.
+
+Risks and Assumptions
+---------------------
+
+The linkage process is slightly more complicated that it is today. So the
+startup-time for cases that usese the compatiblity layer for field access
+will startup more slowly.
+The semantic of an long existing bytecode is changed with an somewhat more 
+dificult/difure meaning. 
+Simple, somewhat statically linked, field accesses are replaced with method
+calls with implicit semantics and possible exception occurance that can
+surpress other security related exceptions.
+Library Project that uses the new compatiblity field access can effect existing
+applications in new ways. The simple fast access to a simple field is replaced
+throught a method call with is somewhat slower. If the field has some concurrency
+carateristics this can even result in concurrency problems that are hard to find.
+Applications Projects that are implicity using the new compatiblity field access
+can run into some realy late(production) runtime exceptions where the binary
+imcompatible change to the field would had resulted in an early (test-stage)
+linkage error.
+
+Dependences
+-----------
+
+// Describe all dependences that this JEP has on other JEPs, components,
+// products, or anything else.  Dependences upon other JEPs should also
+// be listed in the "Depends:" header at the top of the file.
+//
+// Describe any JEPs that depend upon this JEP, and likewise make sure
+// they are listed in the "Blocks:" header at the top of this file.
+
+Impact
+------
+
+// How will this work impact other parts of the platform, the product,
+// and the contributors working on them?  Omit any irrelevant items.
+
+  - Other JDK components: ...
+  - Compatibility: The changes that are possible after this work is done are source incompatible.
+  - Security: ...
+  - Performance/scalability: ...
+  - User experience: ...
+  - I18n/L10n: ...
+  - Accessibility: ...
+  - Portability: ...
+  - Packaging/installation: ...
+  - Documentation: ...
+  - TCK: ...
+  - Other: ...
