@@ -1,6 +1,6 @@
 // Short descriptive title of the proposal -- REQUIRED
 //
-Title: Enable binary compatible changes to the access of non private fields
+Title: Enable changes in visibility of non private fields in a binary compatible way
 Author: SponsorRequired, Sebastian Sickelmann
 //
 // Owner's full name (no e-mail address) -- REQUIRED, if the person now
@@ -68,21 +68,21 @@ Summary
 -------
 
 Actually it is not possible to remove non-private fields or limit the 
-visibility of existing fields without braeking binary compatibility. Where
+visibility of existing fields without breaking binary compatibility. Where
 binary compatility is not a major issue in most application projects it
-is a somewhat bigger issue in library projects and a real showstopper in 
-APIs that are part of the JDK. The change suggested through this JEP make
-is possible to remove non-private fields or change the visibility of fields
-in a binary compatible way.
+is a somewhat bigger issue in library projects and must have in APIs that
+are part of the JDK. The suggested changes to the jvm allows it to remove
+non-private fields or change the visibility of fields in a binary compatible way.
 
 Non-Goals
 ---------
 
-I want no change to Java(The Language) for this change. It is not in my intension
-to allow attribute access through accessor methods with simple field/property access
-syntax. Changes to field should be possible in a binary compatible way. This does not
-ensure that the changes are fully runtime compatible. And it definitivly does not garanty
-source compatiblity.
+The suggested Change does not want to change to Java(The Language). It is not intendes
+to allow field access through accessor methods with simple field/property access
+syntax(instanceOrClass dot fieldname). Changes in visibility of fields should be possible
+in a binary compatible way. This does not ensure that the changes are fully runtime compatible.
+And it definitivly breaks source compatibility in Java(The Language), other languages that
+run ontop of the jvm can implement this differently.
 
 Motivation
 ----------
@@ -94,11 +94,24 @@ a must have for Java Library Projects but a good investment in existing Java Sof
 The only competitor i had seen are some suguesstions to make changes to Java(The Language) 
 to enable Source-Level use to Accessor-Methods via field/property access syntax. This JEP
 does not want to change the Language. Anyway a change to Java(The Language) that enables the
-use of accessor Methods through field/property access syntax should also observe binary
+use of accessor methods through field/property access syntax should also observe binary
 compatibility in some way. 
 
 Description
 -----------
+
+Maybe the suggested change to the bytecode semantics should not be applied
+to signed code that is compiled for a jvm version prior to the suggested change.
+Lets say JVM(0) is the version which comes with the changed bytecode semantics.
+And JVM(<0) are versions before that and JVM(>0) are versions after JVM(0).
+Than maybe the suggested changes to the bytecode semantics should not be applied
+to siged code that is compiled for JVM(<0). Some implementors of security related
+implementations or signed code what to turn of this compatibility function even
+if they compile against JVM(>0), so this feature should be turned of in some way.
+It is possible to turn of this compatible-mode in varios levels from instruction
+to jar/(jigsaw-module). 
+ - Annotation (instruction/method/class)
+ - MANIFEST (jar/jigsaw-module)
 
 // REQUIRED -- Describe the enhancement in detail: Both what it is and,
 // to the extent understood, how you intend to implement it.  Summarize,
@@ -115,12 +128,12 @@ Description
 Alternatives
 ------------
 
-I had implemented a very thin prototype with bytecode-manipulation through
-the PreMain-Hook. We can simply transform all loaded classes to use lacy
-linkage through invokedynamic for field access. The implemntation level
-impact would be much smaller, but i think the runtime costs are to high
-for this approach. We could limit lacy linkage(invokedynamic) for field
-access only for fields that are not visible/accessible at classload 
+I had implemented a very small concept-prototype with bytecode-manipulation 
+through the PreMain-Hook. We can simply transform all loaded classes to use
+lasy linkage through invokedynamic for field accesses. The implementation level
+impact would be much smaller, but i think the runtime costs would be to 
+high for this approach. We could limit lasy linkage(invokedynamic) for
+field access only for fields that are not visible/accessible at classload 
 time(ex. the target class is not loaded yet), leave accessible field as
 they are and change field access that are not directly accesible but are
 accessible through access-methods to calling the access methods. 
@@ -129,13 +142,17 @@ We could also handle every field access as an call to an accessor-method
 in first place and only if there is a field that is directly accessible
 from the callsite change this to direct field access. This solution has 
 an even bigger performance cost, because field access to private fields 
-are so common. 
+is naturally much more common.
+
+One other problem i see with bytecode transformation is signed/sealed 
+code. I don't think that this code should be changed. But maybe it is
+prefareable for signed/seald not to change the bytecode semantics as well. 
 
 Testing
 -------
 
 Performance
-
+Security (for signed code)
 // What kinds of test development and execution will be required in order
 // to validate this enhancement, beyond the usual mandatory unit tests?
 // Be sure to list any special platform or hardware requirements.
@@ -144,20 +161,21 @@ Risks and Assumptions
 ---------------------
 
 The linkage process is slightly more complicated that it is today. So the
-startup-time for cases that usese the compatiblity layer for field access
+startup-time for cases that uses the compatiblity layer for field access
 will startup more slowly.
-The semantic of an long existing bytecode is changed with an somewhat more 
-dificult/difure meaning. 
-Simple, somewhat statically linked, field accesses are replaced with method
+The semantic of an long existing bytecode would be changed with an somewhat 
+more dificult/diffuse meaning. 
+Simple (in some way statically linked) field accesses are replaced with method
 calls with implicit semantics and possible exception occurance that can
-surpress other security related exceptions.
+surpress other (security related) exceptions.
 Library Project that uses the new compatiblity field access can effect existing
 applications in new ways. The simple fast access to a simple field is replaced
-throught a method call with is somewhat slower. If the field has some concurrency
-carateristics this can even result in concurrency problems that are hard to find.
+throught a method call which can be (depending of the code inside the method) 
+somewhat slower. If the field has some concurrency carateristics this can even 
+result in new concurrency problems that are hard to find.
 Applications Projects that are implicity using the new compatiblity field access
 can run into some realy late(production) runtime exceptions where the binary
-imcompatible change to the field would had resulted in an early (test-stage)
+imcompatible change to the field would had resulted in an early (test-stage/startup)
 linkage error.
 
 Dependences
