@@ -77,12 +77,16 @@ non-private fields or change the visibility of fields in a binary compatible way
 Non-Goals
 ---------
 
-The suggested Change does not want to change to Java(The Language). It is not intendes
-to allow field access through accessor methods with simple field/property access
-syntax(instanceOrClass dot fieldname). Changes in visibility of fields should be possible
-in a binary compatible way. This does not ensure that the changes are fully runtime compatible.
-And it definitivly breaks source compatibility in Java(The Language), other languages that
-run ontop of the jvm can implement this differently.
+The suggested Change does not want to change to Java(The Language). It is not intended
+to allow field access through accessor(get/set) methods with simple field/property access
+syntax(instanceOrClass dot fieldname). It would be possible to also support one special
+change to the static property of an field (from non-static to static) but this is out 
+of focus. However this would also be possible in an implementation-specific way. 
+
+Changes in visibility of fields should be possible in a binary compatible way.
+This does not ensure that the changes are fully runtime compatible. And it definitivly 
+breaks source compatibility in Java(The Language), other languages that run ontop of 
+the jvm can implement this differently. 
 
 Motivation
 ----------
@@ -91,15 +95,50 @@ This will enable the OpenJDK-Contibutors to make some changes to the APIs and
 implementations that would otherwise be non binary compatible. Futhermore external
 Java Library Projects can make more changes in a binary compatible way. It is not
 a must have for Java Library Projects but a good investment in existing Java Software.
-The only competitor i had seen are some suguesstions to make changes to Java(The Language) 
-to enable Source-Level use to Accessor-Methods via field/property access syntax. This JEP
-does not want to change the Language. Anyway a change to Java(The Language) that enables the
-use of accessor methods through field/property access syntax should also observe binary
+The only competitor i had seen are some suggestions to make changes to Java(The Language) 
+to enable source-level use to accessor-methods via field/property access syntax. This JEP
+does not want to change the language. Anyway a change to Java(The Language) that enables the
+use of accessor-methods through field/property access syntax should also observe binary
 compatibility in some way. 
 
 Description
 -----------
 
+If you limit the visibility of an existing(older version of your implementation) field
+than callsites- (independent if it is byte-code or source-code) that accesses this 
+field maybe(depending of the relationship of the callsite and the changed field) no 
+longer valid. You get compiler-errors for source-code and linkage-errors for byte-code.
+While this maybe not a problem for API- and application-projects it is a real 
+show-stopper, for limiting the visibility of existing fields, for APIs like the JDK.
+While source-code compatibility is not a major case for the JDK-APIs binary-compatibility
+is. (todo: search and link the article about different compatibility-levels).
+
+Field-Access in the jvm is done via the GETSTATIC(0xB2),PUTSTATIC(0xB3),GETFIELD(0xB4),
+PUTFIELD(0xB5) bytecodes. This byte-codes are more or less simple (with some visibility
+checks) accesses to fields(static of instance-level). If there is a field access through
+these byte-codes and the field to access in not visibile for the call-site you get linkage
+errors. If you use the static variants to access an non-static field and vice-versa you
+UncompatibleClassChangeErrors. Primary we want to get a solution to the linkage error
+case(change in visibity). This should be solved in thie following way:
+
+If there is a field access, static or non-static, and the callsite cannot access it (wherever
+it is not visible or non-existing) the linker searches for methods (with the same static/
+non-static property) that gives access to this field and is visible to the callsite.
+The field should be marked with an annotation (ex. java/lang/Accessor). The Accessor-Annoation
+has a property value that contains the name of the supported field. The matching method for
+PUTSTATIC and PUTFIELD has one single Parameter which in compatible to the expexted fieldtype.
+The returntype for this method must be void. The matching method for GETSTATIC and GETFIELD 
+has no parameter and an returnvaluetype which is compatible to the expected fieldtype.
+
+If there are multiple methods that matches the requirement the method with the laest visiblity
+is choosen. If there are multiple methods with the same visibility an uneindeutige accessor
+error is thrown while verifying the class that contains the uneideutigen accessor-methods. 
+However this situation should be checked at compiletime of the class with the uneindeutigen
+field access-methods.
+
+
+
+Signed-Code / Security-Related-Code
 Maybe the suggested change to the bytecode semantics should not be applied
 to signed code that is compiled for a jvm version prior to the suggested change.
 Lets say JVM(0) is the version which comes with the changed bytecode semantics.
