@@ -119,24 +119,73 @@ checks) accesses to fields(static of instance-level). If there is a field access
 these byte-codes and the field to access in not visibile for the call-site you get linkage
 errors. If you use the static variants to access an non-static field and vice-versa you
 UncompatibleClassChangeErrors. Primary we want to get a solution to the linkage error
-case(change in visibity). This should be solved in thie following way:
+case(change in visibity). I can imaging two solution how this can be solved:
 
+1. field resolution is not ambiguous anymore and linkage is callsite-class specific. 
 If there is a field access, static or non-static, and the callsite cannot access it (wherever
-it is not visible or non-existing) the linker searches for methods (with the same static/
-non-static property) that gives access to this field and is visible to the callsite.
-The field should be marked with an annotation (ex. java/lang/Accessor). The Accessor-Annoation
-has a property value that contains the name of the supported field. The matching method for
-PUTSTATIC and PUTFIELD has one single Parameter which in compatible to the expexted fieldtype.
-The returntype for this method must be void. The matching method for GETSTATIC and GETFIELD 
-has no parameter and an returnvaluetype which is compatible to the expected fieldtype.
+it is not visible or non-existing) the jvm searches for methods(now called accessor-method)
+, which has a compatible(same) static/non-static property as bytecode enforces) that gives 
+access to this field and is visible to the callsite.
+This resoltion step, which is discussed in more detail later, is inserted between the steps
+1 and 2 of JVMS7 5.4.3.2 and before the second step after a failed acceability check for 
+an resolved field that would otherwise lead directly to an IllegalAccessError. 
+The accessor-method will be be marked with an annotation (ex. java/lang/Accessor) in source-code.
+The Accessor-Annoation has a property value that contains the name of the supported field. 
+The matching method for PUTSTATIC and PUTFIELD has one single Parameter which descriptor 
+equals to the expected fieldtype. The returntype for this method must be void. 
+The matching method for GETSTATIC and GETFIELD has no parameter and a returnvaluetype 
+which descriptor equals to the expected fieldtype.
 
-If there are multiple methods that matches the requirement the method with the laest visiblity
-is choosen. If there are multiple methods with the same visibility an uneindeutige accessor
-error is thrown while verifying the class that contains the uneideutigen accessor-methods. 
-However this situation should be checked at compiletime of the class with the uneindeutigen
+If there are multiple methods that matches the requirement the method with the least visiblity
+is choosen. If there are multiple methods with the same visibility an unambiguous accessor
+error is thrown while verifying the class that contains the unambiguous accessor-methods. 
+However this situation should be checked at compiletime of the class with the unambiguous
 field access-methods.
 
+If there is no match method match in the actually class that method lookup is recursively continued
+with the Field Resolution in superinterfaces (JVMS7 5.4.3.2 (2)) respectivly if the process
+has already found the field but it was not accessible leads now to the IllegalAccessError.
 
+I see one major downside in this approach. It introduces an callsite-class dependent resolution.
+A private field which is accessed inside the declaring class is access directly (which must
+be ensured) but is accessed from other classes via the accessor-method (which may or may not
+use the private field). This has also some impact on reflection compatiblity which may be lead
+to confusing problems. 
+
+2. field resolution is ambiguous and linkage is not callsite-class specific.
+If there is a field access, static or non-static, and the callsite cannot resolve it the
+jvm searches for methods(now called accessor-method), which has a compatible(same) 
+static/non-static property as bytecode enforces) that gives access to this field and is 
+visible to the callsite.
+This resoltion step, which is discussed in more detail later, is inserted between the steps
+1 and 2 of JVMS7 5.4.3.2. 
+The accessor-method will be be marked with an annotation (ex. java/lang/Accessor) in source-code.
+The Accessor-Annoation has a property value that contains the name of the supported field. 
+The matching method for PUTSTATIC and PUTFIELD has one single Parameter which descriptor 
+equals to the expected fieldtype. The returntype for this method must be void. 
+The matching method for GETSTATIC and GETFIELD has no parameter and a returnvaluetype 
+which descriptor equals to the expected fieldtype.
+
+There can only be two methods (one for GET and one for PUT) with the same fieldname. 
+If there are multiple methods with the same fieldname an unambiguous accessor
+error is thrown while verifying the class that contains the unambiguous accessor-methods. 
+However this situation should be checked at compiletime of the class with the unambiguous
+field access-methods.
+
+If there is no match method match in the actually class that method lookup is recursively continued
+with the Field Resolution in superinterfaces (JVMS7 5.4.3.2 (2)).
+
+This solution would lead to the following two workflows for changing visibility of fields in a binary
+compatible way.
+a) for removing the original field -> just implement two methods (GET,PUT) that enables "virtual"-access
+to the "old-field".
+b) for changing visibility of on original field -> refactor the original field to another fieldnam
+and implement two methods (GET,PUT) that enables "virtual"-access to the old field.
+In both cases the new methods should have the visibility and static/non-static property of the original
+field.
+ 
+This solution may introduces some "ugly" fieldnames. You maybe want to introduce some set/get-method style
+checks to your field access and don't want to change the name.  
 
 Signed-Code / Security-Related-Code
 Maybe the suggested change to the bytecode semantics should not be applied
