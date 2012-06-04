@@ -5,15 +5,25 @@ public class AllInOneTest {
 
 	public static void main(String[] args) throws ReflectiveOperationException,
 			SecurityException, IllegalArgumentException {
+		boolean reflect = false;
+		boolean testStatic = true;
 		System.out.println("Version 2012-05-23 05:40");
 		for (int i = 0; i < TIMES; i++) {
 			System.out.println("<<<OLD>>>");
 			TestOld.testIt();
+			if (testStatic) {
+				TestOld.testItStatically();
+			}
 		}
+		System.out.flush();
 		for (int i = 0; i < TIMES; i++) {
 			System.out.println("<<<NEW>>>");
 			TestNew.testIt();
+			if (testStatic) {
+				TestNew.testItStatically();
+			}
 		}
+		System.out.flush();
 		for (int i = 0; i < TIMES; i++) {
 			System.out.println("<<<NEW2>>>");
 			try {
@@ -22,37 +32,55 @@ public class AllInOneTest {
 			} catch (IllegalStateException e) {
 				System.out.println("***" + e);
 			}
-		}
-		for (int i = 0; i < TIMES; i++) {
-			System.out.println("<<<OLD_REFLECT>>>");
-			OLD n = new OLD();
-			Field field = n.getClass().getField("cause");
-			System.out.println(field.get(n));
-			RuntimeException newCause = new RuntimeException("OLD Reflective");
-			field.set(n, newCause);
-			System.out.println(field.get(n));
-		}
-		for (int i = 0; i < TIMES; i++) {
-			System.out.println("<<<NEW_REFLECT>>>");
-			NEW n = new NEW();
-			Field field = n.getClass().getField("cause");
-			System.out.println(field.get(n));
-			RuntimeException newCause = new RuntimeException("NEW Reflective");
-			field.set(n, newCause);
-			System.out.println(field.get(n));
-		}
-		for (int i = 0; i < TIMES; i++) {
-			System.out.println("<<<NEW2_REFLECT>>>");
-			NEW2 n = new NEW2();
-			Field field = n.getClass().getField("cause");
-			System.out.println(field.get(n));
-			RuntimeException newCause = new RuntimeException("NEW2 Reflective");
-			try {
-				field.set(n, newCause);
-				throw new RuntimeException("Exception expected");
-			} catch (RuntimeException e) {
-				System.out.println("***" + e);
+
+			if (testStatic) {
+				try {
+					TestNew2.testItStatically();
+				} catch (IllegalStateException e) {
+					System.out.println("***" + e);
+				}
 			}
+
+		}
+		System.out.flush();
+		if (reflect) {
+			for (int i = 0; i < TIMES; i++) {
+				System.out.println("<<<OLD_REFLECT>>>");
+				OLD n = new OLD();
+				Field field = n.getClass().getField("cause");
+				System.out.println(field.get(n));
+				RuntimeException newCause = new RuntimeException(
+						"OLD Reflective");
+				field.set(n, newCause);
+				System.out.println(field.get(n));
+			}
+			System.out.flush();
+			for (int i = 0; i < TIMES; i++) {
+				System.out.println("<<<NEW_REFLECT>>>");
+				NEW n = new NEW();
+				Field field = n.getClass().getField("cause");
+				System.out.println(field.get(n));
+				RuntimeException newCause = new RuntimeException(
+						"NEW Reflective");
+				field.set(n, newCause);
+				System.out.println(field.get(n));
+			}
+			System.out.flush();
+			for (int i = 0; i < TIMES; i++) {
+				System.out.println("<<<NEW2_REFLECT>>>");
+				NEW2 n = new NEW2();
+				Field field = n.getClass().getField("cause");
+				System.out.println(field.get(n));
+				RuntimeException newCause = new RuntimeException(
+						"NEW2 Reflective");
+				try {
+					field.set(n, newCause);
+					throw new RuntimeException("Exception expected");
+				} catch (RuntimeException e) {
+					System.out.println("***" + e);
+				}
+			}
+			System.out.flush();
 		}
 	}
 }

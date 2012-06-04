@@ -13,9 +13,11 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.omg.CORBA.NO_MEMORY;
 
 public class CheckFieldAccess {
 
+	private static final int NON_MODIFIER = 0x0;
 	private final ClassNode classNode;
 	private boolean sol1;
 	private boolean sol2;
@@ -30,13 +32,13 @@ public class CheckFieldAccess {
 				Opcodes.H_INVOKESTATIC,
 				"Bootstrapper",
 				"getFunction",
-				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
+				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;I)Ljava/lang/invoke/CallSite;");
 
 		BOOTSTRAP_SET = new Handle(
 				Opcodes.H_INVOKESTATIC,
 				"Bootstrapper",
 				"setFunction",
-				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
+				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;I)Ljava/lang/invoke/CallSite;");
 	}
 
 	public CheckFieldAccess(ClassNode classNode) {
@@ -59,9 +61,12 @@ public class CheckFieldAccess {
 				if (isAccessable(fins))
 					continue;
 				if (!fins.owner.equals(classNode.name)) {
-					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(
-							fins.name, "(L" + fins.owner + ";)" + fins.desc,
-							BOOTSTRAP_GET, false);
+					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
+							fins.name,//
+							"(L" + fins.owner + ";)" + fins.desc,//
+							BOOTSTRAP_GET,//
+							fins.owner.replace('/','.'), //
+							NON_MODIFIER);
 					iterator.set(getInsnNode);
 				}
 			} else if (next.getOpcode() == Opcodes.PUTFIELD) {
@@ -69,20 +74,26 @@ public class CheckFieldAccess {
 				if (isAccessable(fins))
 					continue;
 				if (!fins.owner.equals(classNode.name)) {
-					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(
-							fins.name, "(L" + fins.owner + ";" + fins.desc
-									+ ")V", BOOTSTRAP_SET, false);
+					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
+							fins.name,//
+							"(L" + fins.owner + ";" + fins.desc + ")V",//
+							BOOTSTRAP_SET,//
+							fins.owner.replace('/','.'), //
+							NON_MODIFIER);
 					iterator.set(getInsnNode);
 				}
-/*
+
 			} else if (next.getOpcode() == Opcodes.GETSTATIC) {
 				FieldInsnNode fins = (FieldInsnNode) next;
 				if (isAccessable(fins))
 					continue;
 				if (!fins.owner.equals(classNode.name)) {
-					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(
-							fins.name, "(L" + fins.owner + ";)" + fins.desc,
-							BOOTSTRAP_GET, true);
+					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
+							fins.name,//
+							"()" + fins.desc,//
+							BOOTSTRAP_GET,//
+							fins.owner.replace('/','.'), //
+							Modifier.STATIC);
 					iterator.set(getInsnNode);
 				}
 			} else if (next.getOpcode() == Opcodes.PUTSTATIC) {
@@ -90,12 +101,15 @@ public class CheckFieldAccess {
 				if (isAccessable(fins))
 					continue;
 				if (!fins.owner.equals(classNode.name)) {
-					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(
-							fins.name, "(L" + fins.owner + ";" + fins.desc
-									+ ")V", BOOTSTRAP_SET, true);
+					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
+							fins.name,//
+							"(" + fins.desc + ")V",//
+							BOOTSTRAP_SET,//
+							fins.owner.replace('/','.'),//
+							Modifier.STATIC);
 					iterator.set(getInsnNode);
 				}
-*/
+
 			}
 		}
 	}
