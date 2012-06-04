@@ -1,34 +1,39 @@
-import java.io.File;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.objectweb.asm.MethodHandle;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class CheckFieldAccess {
 
 	private final ClassNode classNode;
-	private static final MethodHandle BOOTSTRAP_GET;
-	private static final MethodHandle BOOTSTRAP_SET;
+	private boolean sol1;
+	private boolean sol2;
+	private boolean solBoot;
+	private int traceLevel;
+	private PrintStream tracer;
+	private static final Handle BOOTSTRAP_GET;
+	private static final Handle BOOTSTRAP_SET;
 
 	static {
-		BOOTSTRAP_GET = new MethodHandle(
-				Opcodes.MH_INVOKESTATIC,
+		BOOTSTRAP_GET = new Handle(
+				Opcodes.H_INVOKESTATIC,
 				"Bootstrapper",
 				"getFunction",
 				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
 
-		BOOTSTRAP_SET = new MethodHandle(
-				Opcodes.MH_INVOKESTATIC,
+		BOOTSTRAP_SET = new Handle(
+				Opcodes.H_INVOKESTATIC,
 				"Bootstrapper",
 				"setFunction",
 				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
@@ -41,7 +46,6 @@ public class CheckFieldAccess {
 	public void makeItSo() {
 		for (MethodNode method : (List<MethodNode>) classNode.methods) {
 			checkFieldAccess(method);
-			// method.maxStack += 7;
 		}
 	}
 
@@ -52,22 +56,46 @@ public class CheckFieldAccess {
 			AbstractInsnNode next = iterator.next();
 			if (next.getOpcode() == Opcodes.GETFIELD) {
 				FieldInsnNode fins = (FieldInsnNode) next;
-				if (isAccessable(fins)) continue;
+				if (isAccessable(fins))
+					continue;
 				if (!fins.owner.equals(classNode.name)) {
 					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(
 							fins.name, "(L" + fins.owner + ";)" + fins.desc,
-							BOOTSTRAP_GET);
+							BOOTSTRAP_GET, false);
 					iterator.set(getInsnNode);
 				}
 			} else if (next.getOpcode() == Opcodes.PUTFIELD) {
 				FieldInsnNode fins = (FieldInsnNode) next;
-				if (isAccessable(fins)) continue;
+				if (isAccessable(fins))
+					continue;
 				if (!fins.owner.equals(classNode.name)) {
 					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(
 							fins.name, "(L" + fins.owner + ";" + fins.desc
-									+ ")V", BOOTSTRAP_SET);
+									+ ")V", BOOTSTRAP_SET, false);
 					iterator.set(getInsnNode);
 				}
+/*
+			} else if (next.getOpcode() == Opcodes.GETSTATIC) {
+				FieldInsnNode fins = (FieldInsnNode) next;
+				if (isAccessable(fins))
+					continue;
+				if (!fins.owner.equals(classNode.name)) {
+					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(
+							fins.name, "(L" + fins.owner + ";)" + fins.desc,
+							BOOTSTRAP_GET, true);
+					iterator.set(getInsnNode);
+				}
+			} else if (next.getOpcode() == Opcodes.PUTSTATIC) {
+				FieldInsnNode fins = (FieldInsnNode) next;
+				if (isAccessable(fins))
+					continue;
+				if (!fins.owner.equals(classNode.name)) {
+					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(
+							fins.name, "(L" + fins.owner + ";" + fins.desc
+									+ ")V", BOOTSTRAP_SET, true);
+					iterator.set(getInsnNode);
+				}
+*/
 			}
 		}
 	}
@@ -76,6 +104,7 @@ public class CheckFieldAccess {
 		try {
 			Class<?> clazz = Class.forName(fins.owner);
 			Field field = clazz.getField(fins.name);
+			// Public check isn't enough, but should work here for demonstation.
 			if (Modifier.isPublic(field.getModifiers())
 					|| fins.owner.equals(classNode.name)) {
 				return true;
@@ -85,5 +114,25 @@ public class CheckFieldAccess {
 		} catch (SecurityException e) {
 		}
 		return false;
+	}
+
+	public void setSolution1(boolean enabled) {
+		this.sol1 = enabled;
+	}
+
+	public void setSolution2(boolean enabled) {
+		this.sol2 = enabled;
+	}
+
+	public void setSolutionBootstrap(boolean enabled) {
+		this.solBoot = enabled;
+	}
+
+	public void setTraceOutput(PrintStream tracer) {
+		this.tracer = tracer;
+	}
+
+	public void setTraceLevel(int traceLevel) {
+		this.traceLevel = traceLevel;
 	}
 }

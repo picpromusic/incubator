@@ -7,19 +7,25 @@
 	<!-- ================================= 
           target: default              
          ================================= -->
-	<target name="test" depends="jar,compile-test" description="description">
+	<target name="test" depends="test-disabled,test-enabled" description="description" />
+	
+	<target name="test-disabled" depends="jar,compile-test">
 		<mkdir dir="tmp" />
-		<java classname="Main" fork="true">
+		<java classname="AllInOneTest" fork="true">
 			<classpath>
 				<path location="output-test" />
 				<path location="gen" />
 			</classpath>
 		</java>
-		<java classname="Main" fork="true">
+	</target>
+	<target name="test-enabled" depends="jar,compile-test">
+		<mkdir dir="tmp" />
+		<java classname="AllInOneTest" fork="true">
 			<jvmarg line="-javaagent:transformer.jar" />
 			<classpath>
 				<path location="output-test" />
 				<path location="gen" />
+				<path refid="libs" />
 			</classpath>
 		</java>
 	</target>
@@ -34,14 +40,14 @@
 
 	<path id="libs">
 		<fileset dir="libs">
-			<include name="**/*.jar" />
+			<include name="*.jar" />
 			<exclude name="Accessor.class" />
 		</fileset>
 	</path>
 
 	<target name="compile-test" depends="jar,generate">
 		<mkdir dir="output-test" />
-		<javac srcdir="testsrc" destdir="output-test" debug="on">
+		<javac includeantruntime="false" srcdir="testsrc" destdir="output-test" debug="on">
 			<classpath>
 				<path location="gen">
 				</path>
@@ -53,12 +59,12 @@
 
 	<target name="compile">
 		<mkdir dir="output" />
-		<javac srcdir="src" destdir="output" classpathref="libs" debug="on" />
+		<javac includeantruntime="false" srcdir="src" destdir="output" classpathref="libs" debug="on" />
 	</target>
 
 	<target name="generate" depends="compile-generator">
 		<mkdir dir="gen" />
-		<java classname="GEN">
+		<java fork="true" classname="GEN">
 			<classpath>
 				<path refid="libs" />
 				<path location="output-generator" />
@@ -68,15 +74,21 @@
 
 	<target name="compile-generator">
 		<mkdir dir="output-generator" />
-		<javac srcdir="generator" destdir="output-generator" classpathref="libs" debug="on" />
+		<javac includeantruntime="false" srcdir="generator" destdir="output-generator" classpathref="libs" debug="on" />
 	</target>
 
 	<target name="clean" description="clean">
-		<delete dir="gen"></delete>
-		<delete dir="output"></delete>
-		<delete dir="output-transformer"></delete>
-		<delete dir="output-test"></delete>
-		<delete dir="output-generator"></delete>
-		<delete dir="tmp"></delete>
+		<delete dir="gen">
+		</delete>
+		<delete dir="output">
+		</delete>
+		<delete dir="output-transformer">
+		</delete>
+		<delete dir="output-test">
+		</delete>
+		<delete dir="output-generator">
+		</delete>
+		<delete dir="tmp">
+		</delete>
 	</target>
 </project>

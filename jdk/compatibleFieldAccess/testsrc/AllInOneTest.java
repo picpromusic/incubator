@@ -5,7 +5,7 @@ public class AllInOneTest {
 
 	public static void main(String[] args) throws ReflectiveOperationException,
 			SecurityException, IllegalArgumentException {
-		System.out.println("Version 2011-11-12 13:05");
+		System.out.println("Version 2012-05-23 05:40");
 		for (int i = 0; i < TIMES; i++) {
 			System.out.println("<<<OLD>>>");
 			TestOld.testIt();
