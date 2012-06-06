@@ -1,12 +1,11 @@
+package incubator.cfa;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodType;
 import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 
 public class Bootstrapper {
 	public static CallSite getFunction(Lookup lookup, String name,

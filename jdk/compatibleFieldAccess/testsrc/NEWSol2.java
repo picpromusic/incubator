@@ -1,5 +1,7 @@
+import incubator.cfa.Accessor;
 
-public class NEW {
+
+public class NEWSol2 {
 
 	private Throwable cause = new RuntimeException("INIT_NEW");
 	private static Object staticField = "ORIG_VALUE_NEW";

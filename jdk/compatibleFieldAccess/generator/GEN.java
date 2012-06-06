@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,9 +12,10 @@ public class GEN {
 
 	public static void main(String[] args) throws IOException,
 			NoSuchMethodException, SecurityException {
+		System.out.println(new File("gen").mkdir());
 		genClass("TestOld", "OLD");
-		genClass("TestNew", "NEW");
-		genClass("TestNew2", "NEW2");
+		genClass("TestNewSolution2", "NEWSol2");
+		genClass("TestNew2Solution12", "NEW2Sol12");
 	}
 
 	private static void genClass(String className, String testAgainst)

@@ -1,3 +1,4 @@
+package incubator.cfa;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -30,13 +31,13 @@ public class CheckFieldAccess {
 	static {
 		BOOTSTRAP_GET = new Handle(
 				Opcodes.H_INVOKESTATIC,
-				"Bootstrapper",
+				"incubator/cfa/Bootstrapper",
 				"getFunction",
 				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;I)Ljava/lang/invoke/CallSite;");
 
 		BOOTSTRAP_SET = new Handle(
 				Opcodes.H_INVOKESTATIC,
-				"Bootstrapper",
+				"incubator/cfa/Bootstrapper",
 				"setFunction",
 				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;I)Ljava/lang/invoke/CallSite;");
 	}

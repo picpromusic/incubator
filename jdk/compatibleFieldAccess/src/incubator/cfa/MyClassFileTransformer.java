@@ -1,3 +1,4 @@
+package incubator.cfa;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -88,6 +89,7 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 
 		byte[] byteArray = cw.toByteArray();
 		if (className.startsWith("Test")) {
+			new File("tmp").mkdir();
 			FileOutputStream fout = new FileOutputStream("tmp/" + className
 					+ ".class");
 			fout.write(byteArray);

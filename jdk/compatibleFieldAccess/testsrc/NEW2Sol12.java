@@ -1,19 +1,18 @@
-import org.objectweb.asm.tree.InnerClassNode;
+import incubator.cfa.Accessor;
 
-
-public class NEW2 {
+public class NEW2Sol12 {
 
 	private Throwable inner_cause = new RuntimeException("INIT_NEW2");
 	private static Object inner_staticField = "FINAL VALUE";
-	
+
 	@Accessor("cause")
 	public Throwable getCause() {
 		return inner_cause;
 	}
-	
+
 	@Accessor("cause")
 	public void initCause(Throwable cause) {
-		throw new IllegalStateException("Not allowed to change");
+		ExceptionExpectedOn.PUT.throwRTE();
 	}
 
 	@Accessor("staticField")
@@ -23,7 +22,7 @@ public class NEW2 {
 
 	@Accessor("staticField")
 	public static void setFoo(Object value) {
-		throw new IllegalStateException("Not allowed to change");
+		ExceptionExpectedOn.PUTSTATIC.throwRTE();
 	}
 
 }
