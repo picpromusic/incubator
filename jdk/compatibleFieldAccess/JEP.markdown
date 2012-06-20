@@ -156,9 +156,11 @@ Changes to existing Methods:
 
 Details: 
 
-1. The returned Array contains both fields and accesor-methods (as emulated fields)
-2. The returned Field is just the accesor-method as emulated field which matches the given field name. If there are no such methods it returns the field with the given name if there is such an field.
-3. 
+1. The returned Array contains both fields and accesor-methods (as emulated fields) but only one of these for each field name. Because there can only a public field or a public accesor-method for an emulated field.
+2. The returned Field is just the accesor-method as emulated field which matches the given field name. If there are(get/set) no such methods it returns the field with the given name if there is such a field.
+3. The returned Array contains all fields and accessor-methods (as emulated fields). In Solution 2 there can be multiple values for the same field name. This is this way because there can be a field with the same name as the more accessible accessor-method. Ex. a field with private accesibility and an public accesor-method with the same fieldname.
+4. The returned Field is just the accesor-method as emulated field which matches the given field name. If there are(get/set) no such methods it returns the field with the given name if the is such a field.
+5. 
 
 New Methods:
 

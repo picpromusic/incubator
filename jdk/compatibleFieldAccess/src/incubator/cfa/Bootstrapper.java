@@ -1,4 +1,6 @@
 package incubator.cfa;
+import incubator.cfa.jdk.Accessor;
+
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
