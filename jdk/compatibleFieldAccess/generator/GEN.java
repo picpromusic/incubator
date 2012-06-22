@@ -28,6 +28,7 @@ public class GEN {
 		genClass(genPath, "TestOld", "OLD");
 		genClass(genPath, "TestNewSolution2", "NEWSol2");
 		genClass(genPath, "TestNew2Solution12", "NEW2Sol12");
+		genClass(genPath, "TestNew3Solution12", "NEW3Sol12");
 	}
 
 	/**

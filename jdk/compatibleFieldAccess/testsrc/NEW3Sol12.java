@@ -5,37 +5,37 @@ import util.ExceptionExpectedOn;
 import incubator.cfa.jdk.Accessor;
 import incubator.cfa.jdk.AccessorAnnotationWrapper;
 
-public class NEW2Sol12 {
+public class NEW3Sol12 {
 
 	@AccessorAnnotationWrapper
 	private @interface FieldAnnotation {
 		OldFieldAnnotationForTesting value();
 	}
 
-	private Throwable inner_cause = new RuntimeException("INIT_NEW2");
+	private Throwable inner_cause = new RuntimeException("INIT_NEW3");
 	private static Object inner_staticField = "FINAL VALUE";
 
 	@Accessor("cause")
 	@FieldAnnotation(value = @OldFieldAnnotationForTesting(a = {
-			@Documented, @Documented }, b = true, s = "DEMO_NON-STATIC-FIELD for <<<NEW2SOL12>>>"))
+			@Documented, @Documented }, b = true, s = "DEMO_NON-STATIC-FIELD for <<<NEW3SOL12>>>"))
 	public Throwable getCause() {
 		return inner_cause;
 	}
 
 	@Accessor("cause")
-	public void initCause(Throwable cause) {
-		ExceptionExpectedOn.PUT.throwRTE();
+	public void initCause(Throwable cause) throws Throwable {
+		ExceptionExpectedOn.PUT.throwCHECKED();
 	}
 
-	@FieldAnnotation(value = @OldFieldAnnotationForTesting(a = { @Documented }, b = false, s = "DEMO_STATIC-FIELD <<<NEW2SOL12>>>"))
+	@FieldAnnotation(value = @OldFieldAnnotationForTesting(a = { @Documented }, b = false, s = "DEMO_STATIC-FIELD <<<NEW3SOL12>>>"))
 	@Accessor("staticField")
 	public static Object getFoo() {
 		return inner_staticField;
 	}
 
 	@Accessor("staticField")
-	public static void setFoo(Object value) {
-		ExceptionExpectedOn.PUTSTATIC.throwRTE();
+	public static void setFoo(Object value) throws Throwable {
+		ExceptionExpectedOn.PUTSTATIC.throwCHECKED();
 	}
 
 }

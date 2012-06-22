@@ -14,11 +14,13 @@ public class DescriptionOfTest {
 		private boolean testNonStatic;
 		private boolean testReflective;
 		private final String testname;
-		private List<ExceptionExpectedOn> exceptionExpectedOn;
+		private List<ExceptionExpectedOn> runtimeExceptionExpectedOn;
+		private List<ExceptionExpectedOn> checkedExceptionExpectedOn;
 
 		public DescriptionOfTestSentence(String name) {
 			this.testname = name;
-			exceptionExpectedOn = new ArrayList<>(2);
+			runtimeExceptionExpectedOn = new ArrayList<>(2);
+			checkedExceptionExpectedOn = new ArrayList<>(2);
 
 		}
 
@@ -49,16 +51,27 @@ public class DescriptionOfTest {
 			return this;
 		}
 
-		public DescriptionOfTestSentence exceptionOn(ExceptionExpectedOn ex) {
-			this.exceptionExpectedOn.add(ex);
+		public DescriptionOfTestSentence runtimeExceptionOn(
+				ExceptionExpectedOn ex) {
+			this.runtimeExceptionExpectedOn.add(ex);
+			return this;
+		}
+
+		public DescriptionOfTestSentence checkedExceptionOn(
+				ExceptionExpectedOn ex) {
+			this.checkedExceptionExpectedOn.add(ex);
 			return this;
 		}
 
 		public void testIt(List<DescriptionOfTest> tests) {
-			ExceptionExpectedOn[] exceptions = exceptionExpectedOn
-					.toArray(new ExceptionExpectedOn[exceptionExpectedOn.size()]);
+			ExceptionExpectedOn[] runtime = runtimeExceptionExpectedOn
+					.toArray(new ExceptionExpectedOn[runtimeExceptionExpectedOn
+							.size()]);
+			ExceptionExpectedOn[] checked = checkedExceptionExpectedOn
+					.toArray(new ExceptionExpectedOn[checkedExceptionExpectedOn
+							.size()]);
 			tests.add(new DescriptionOfTest(forClass, testingClass, testname,
-					testStatic, testNonStatic, testReflective, exceptions));
+					testStatic, testNonStatic, testReflective, runtime, checked));
 		}
 
 		private void checkSet(Object oldValue, Object newValue, String name) {
@@ -77,21 +90,30 @@ public class DescriptionOfTest {
 	private final String testname;
 	private final boolean testStatic;
 	private final boolean testReflective;
-	private final EnumSet<ExceptionExpectedOn> exceptionExpectedOn;
+	private final EnumSet<ExceptionExpectedOn> runtimeExceptionExpectedOn;
+	private final EnumSet<ExceptionExpectedOn> checkedExceptionExpectedOn;
 	private final boolean testNonStatic;
 
 	public DescriptionOfTest(Class<?> testClass, Class<?> classUnderTest,
 			String testname, boolean testStatic, boolean testNonStatic,
-			boolean testReflective, ExceptionExpectedOn... exceptionExpectedOn) {
+			boolean testReflective,
+			ExceptionExpectedOn[] runtimeExceptionExpectedOn,
+			ExceptionExpectedOn[] checkedExceptionExpectedOn) {
 		this.testClass = testClass;
 		this.classUnderTest = classUnderTest;
 		this.testname = testname;
 		this.testStatic = testStatic;
 		this.testNonStatic = testNonStatic;
 		this.testReflective = testReflective;
-		this.exceptionExpectedOn = EnumSet.noneOf(ExceptionExpectedOn.class);
-		for (ExceptionExpectedOn ex : exceptionExpectedOn) {
-			this.exceptionExpectedOn.add(ex);
+		this.runtimeExceptionExpectedOn = EnumSet
+				.noneOf(ExceptionExpectedOn.class);
+		for (ExceptionExpectedOn ex : runtimeExceptionExpectedOn) {
+			this.runtimeExceptionExpectedOn.add(ex);
+		}
+		this.checkedExceptionExpectedOn = EnumSet
+				.noneOf(ExceptionExpectedOn.class);
+		for (ExceptionExpectedOn ex : checkedExceptionExpectedOn) {
+			this.runtimeExceptionExpectedOn.add(ex);
 		}
 	}
 
@@ -115,8 +137,12 @@ public class DescriptionOfTest {
 		return testReflective;
 	}
 
-	public EnumSet<ExceptionExpectedOn> getExceptionExpectedOn() {
-		return exceptionExpectedOn;
+	public EnumSet<ExceptionExpectedOn> getRuntimeExceptionExpectedOn() {
+		return runtimeExceptionExpectedOn;
+	}
+
+	public EnumSet<ExceptionExpectedOn> getCheckedExceptionExpectedOn() {
+		return this.checkedExceptionExpectedOn;
 	}
 
 	public boolean isTestNonStatic() {
@@ -124,19 +150,21 @@ public class DescriptionOfTest {
 	}
 
 	public boolean exceptionExpectedOnNonStaticAccess() {
-		return this.getExceptionExpectedOn().contains(ExceptionExpectedOn.GET)
-				|| this.getExceptionExpectedOn().contains(
+		return this.getRuntimeExceptionExpectedOn().contains(
+				ExceptionExpectedOn.GET)
+				|| this.getRuntimeExceptionExpectedOn().contains(
 						ExceptionExpectedOn.PUT);
 	}
 
 	public boolean exceptionExpectedOnStaticAccess() {
-		return this.getExceptionExpectedOn().contains(
+		return this.getRuntimeExceptionExpectedOn().contains(
 				ExceptionExpectedOn.GETSTATIC)
-				|| this.getExceptionExpectedOn().contains(
+				|| this.getRuntimeExceptionExpectedOn().contains(
 						ExceptionExpectedOn.PUTSTATIC);
 	}
 
 	public static DescriptionOfTestSentence createNew(String name) {
 		return new DescriptionOfTestSentence(name);
 	}
+
 }

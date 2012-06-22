@@ -1,10 +1,9 @@
-import incubator.cfa.AccessorAnnotationWrapper;
+import incubator.cfa.jdk.WrappedCheckedCompatiblityException;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,29 +25,53 @@ public class AllInOneTest {
 
 		List<DescriptionOfTest> tests = new ArrayList<DescriptionOfTest>();
 
+		// Define a Test that is called <<<OLD>>> that tests the class OLD via
+		// the testing class TestOld.
 		DescriptionOfTestSentence old = DescriptionOfTest
 				.createNew("<<<OLD>>>").forClass(TestOld.class)
 				.testing(OLD.class);
 
+		// Define a Test that is called <<<NEWSOL2>>> that tests the class
+		// NEWSOL2 via the testing class TestNewSolution2. This Test is only
+		// capable for Solution2.
 		DescriptionOfTestSentence newSol2 = DescriptionOfTest
 				.createNew("<<<NEWSOL2>>>").forClass(TestNewSolution2.class)
 				.testing(NEWSol2.class);
 
+		// Define a Test that is called <<<NEW2SOL12>>> that tests the class
+		// NEW2SOL12 via the testing class TestNew2Solution12. This Test is
+		// capable for Solution 1 and 2.
+		// It is expected to run into an RuntimeException while executing the
+		// PUT Instruction for the static and the non-static field.
 		DescriptionOfTestSentence new2Sol12 = DescriptionOfTest
 				.createNew("<<<NEW2SOL12>>>")
 				.forClass(TestNew2Solution12.class).testing(NEW2Sol12.class)
-				.exceptionOn(ExceptionExpectedOn.PUT)
-				.exceptionOn(ExceptionExpectedOn.PUTSTATIC);
+				.runtimeExceptionOn(ExceptionExpectedOn.PUT)
+				.runtimeExceptionOn(ExceptionExpectedOn.PUTSTATIC);
 
+		// Define a Test that is called <<<NEW3SOL12>>> that tests the class
+		// NEW3SOL12 via the testing class TestNew3Solution12. This Test is
+		// capable for Solution 1 and 2.
+		// It is expected to run into an CheckedException while executing the
+		// PUT Instruction for the static and the non-static field.
+		DescriptionOfTestSentence new3Sol12 = DescriptionOfTest
+				.createNew("<<<NEW3SOL12>>>")
+				.forClass(TestNew3Solution12.class).testing(NEW3Sol12.class)
+				.checkedExceptionOn(ExceptionExpectedOn.PUT)
+				.checkedExceptionOn(ExceptionExpectedOn.PUTSTATIC);
+
+		// Prepare the above defined Tests to turn on the features "testStatic",
+		// "testNonStatic","reflection" and add them all to the lists of to be
+		// executed tests.
 		List<DescriptionOfTestSentence> sentences = new ArrayList<>();
 		sentences.add(old);
 		sentences.add(newSol2);
 		sentences.add(new2Sol12);
+		sentences.add(new3Sol12);
 
 		for (DescriptionOfTestSentence sentence : sentences) {
 			if (testStatic) {
 				sentence.testStatic();
-				newSol2.testStatic();
 			}
 			if (testNonStatic) {
 				sentence.testNonStatic();
@@ -57,24 +80,16 @@ public class AllInOneTest {
 				sentence.testReflective();
 			}
 
+			// Add to the to be executed tests.
 			sentence.testIt(tests);
 		}
 
-		// tests.add(new DescriptionOfTest(TestOld.class, OLD.class,
-		// "<<<OLD>>>",
-		// testStatic, testNonStatic, reflect));
-		// tests.add(new DescriptionOfTest(TestNewSolution2.class,
-		// NEWSol2.class,
-		// "<<<NEWSOL2>>>", testStatic, testNonStatic, reflect));
-		// tests.add(new DescriptionOfTest(TestNew2Solution12.class,
-		// NEW2Sol12.class, "<<<NEW2SOL12>>>", testStatic, testNonStatic,
-		// reflect, ExceptionExpectedOn.PUT, ExceptionExpectedOn.PUTSTATIC));
-
+		// Execute each test
 		for (DescriptionOfTest testDescription : tests) {
 			try {
 				testit(testDescription);
 			} catch (Throwable th) {
-				System.err.println("TestOld failed");
+				System.err.println(testDescription.getTestname() + " failed");
 				th.printStackTrace();
 			} finally {
 				System.out.flush();
@@ -108,12 +123,13 @@ public class AllInOneTest {
 	private static void testStaticReflective(DescriptionOfTest desc) {
 		try {
 			Field field = desc.getClassUnderTest().getField("staticField");
+			testAnnotationOfField(desc, field, true);
 			System.out.println(field.get(null));
 			field.set(null, "NEW_VALUE");
 			System.out.println(field.get(null));
-			if (desc.getExceptionExpectedOn().contains(
+			if (desc.getRuntimeExceptionExpectedOn().contains(
 					ExceptionExpectedOn.GETSTATIC)
-					|| desc.getExceptionExpectedOn().contains(
+					|| desc.getRuntimeExceptionExpectedOn().contains(
 							ExceptionExpectedOn.PUTSTATIC)) {
 				throw new RuntimeException("Exception expected");
 			}
@@ -127,61 +143,30 @@ public class AllInOneTest {
 
 	private static void checkExceptionExpectation(DescriptionOfTest desc,
 			Throwable th) {
+		th.printStackTrace();
+		boolean runtimeExceptionExpected = isRuntime(th);
 		ExceptionExpectedOn why = extractWhy(th);
 		// Check if the why parameter matches the expected
 		// Exceptioncause.
-		if (desc.getExceptionExpectedOn().contains(why)) {
+		if (desc.getRuntimeExceptionExpectedOn().contains(why)) {
+			System.out.println("Everything is fine: ***" + th);
+		} else if (desc.getCheckedExceptionExpectedOn().contains(why)) {
 			System.out.println("Everything is fine: ***" + th);
 		} else {
 			throw new RuntimeException(th);
 		}
 	}
 
+	private static boolean isRuntime(Throwable th) {
+		return th instanceof RUNTIME;
+	}
+
 	private static void testNonStaticReflective(DescriptionOfTest desc) {
 		try {
 			Object instance = desc.getClassUnderTest().newInstance();
 			Field field = desc.getClassUnderTest().getField("cause");
+			testAnnotationOfField(desc, field, false);
 			System.out.println(field.get(instance));
-
-			Annotation[] annotations = field.getAnnotations();
-			if (annotations.length == 1) {
-				OldFieldAnnotationForTesting anno = (OldFieldAnnotationForTesting) annotations[0];
-				// String
-				String sValue = anno.s();
-				if (!sValue.equals("DEMO_NON-STATIC-FIELD for "
-						+ desc.getTestname())) {
-					throw new RuntimeException(
-							"Unexpected Value in AnnotationParameter s "
-									+ sValue);
-				}
-				boolean bValue = anno.b();
-				if (!bValue) {
-					throw new RuntimeException(
-							"Unexpected Value in AnnotationParameter b "
-									+ bValue);
-				}
-				Documented[] aValue = anno.a();
-				if (aValue.length != 2) {
-					throw new RuntimeException(
-							"Unexpected Size of Array in AnnotationParameter a "
-									+ bValue);
-				}
-				if (!aValue[0].annotationType().equals(Documented.class)) {
-					throw new RuntimeException(
-							"Unexpected Annotationtype in AnnotationParameter a[0] "
-									+ aValue[0].annotationType());
-				}
-				if (!aValue[1].annotationType().equals(Documented.class)) {
-					throw new RuntimeException(
-							"Unexpected Annotationtype in AnnotationParameter a[1] "
-									+ aValue[1].annotationType());
-				}
-				System.out.println("Everything is fine with the annoatation");
-			} else {
-				throw new RuntimeException(
-						"Each field in this test needs to be annotated by 1 annotation.");
-			}
-
 			RuntimeException newCause = new RuntimeException("Reflective");
 			field.set(instance, newCause);
 			System.out.println(field.get(instance));
@@ -195,6 +180,49 @@ public class AllInOneTest {
 			checkExceptionExpectation(desc, th);
 		}
 
+	}
+
+	private static void testAnnotationOfField(DescriptionOfTest desc,
+			Field field, boolean staticFieldVariant) {
+		Annotation[] annotations = field.getAnnotations();
+		if (annotations.length == 1) {
+			OldFieldAnnotationForTesting anno = (OldFieldAnnotationForTesting) annotations[0];
+			// String
+			String sValue = anno.s();
+			String expectedValue = "DEMO_"
+					+ (staticFieldVariant ? "STATIC-FIELD" : "NON-STATIC-FIELD")
+					+ " for " + desc.getTestname();
+			if (!sValue.equals(expectedValue)) {
+				throw new RuntimeException(
+						"Unexpected Value in AnnotationParameter s " + sValue);
+			}
+			boolean bValue = anno.b();
+			if (bValue == staticFieldVariant) {
+				throw new RuntimeException(
+						"Unexpected Value in AnnotationParameter b " + bValue);
+			}
+			Documented[] aValue = anno.a();
+			if (aValue.length != (staticFieldVariant ? 1 : 2)) {
+				throw new RuntimeException(
+						"Unexpected Size of Array in AnnotationParameter a "
+								+ bValue);
+			}
+			if (!aValue[0].annotationType().equals(Documented.class)) {
+				throw new RuntimeException(
+						"Unexpected Annotationtype in AnnotationParameter a[0] "
+								+ aValue[0].annotationType());
+			}
+			if (!staticFieldVariant
+					&& !aValue[1].annotationType().equals(Documented.class)) {
+				throw new RuntimeException(
+						"Unexpected Annotationtype in AnnotationParameter a[1] "
+								+ aValue[1].annotationType());
+			}
+			System.out.println("Everything is fine with the annoatation");
+		} else {
+			throw new RuntimeException(
+					"Each field in this test needs to be annotated by 1 annotation.");
+		}
 	}
 
 	private static void testStatic(DescriptionOfTest desc) {
@@ -225,7 +253,6 @@ public class AllInOneTest {
 	 */
 	private static void testNonStatic(DescriptionOfTest desc) {
 		try {
-
 			desc.getTestClass().getMethod("testIt").invoke(null);
 			if (desc.exceptionExpectedOnNonStaticAccess()) {
 				throw new RuntimeException("Exception expected");
@@ -247,6 +274,7 @@ public class AllInOneTest {
 	 * @param th
 	 *            Throwable that should be either RUNTIME or CHECKED of
 	 *            ExceptionExpectedOn
+	 * @param runtimeExceptionExpected
 	 * @return the Result of the Methodcall getWhy() on the RUNTIME or CHECK
 	 *         Exception.
 	 * @throws ClassCastException
@@ -257,11 +285,12 @@ public class AllInOneTest {
 			throws ClassCastException {
 		// The only expected Exceptiontypes are
 		// ExceptionExpectedOn.RUNTIME or ExceptionExpectedOn.CHECKED
-		if (th instanceof RUNTIME) {
+		if (isRuntime(th)) {
 			RUNTIME ex = (RUNTIME) th;
 			return ex.getWhy();
 		} else {
-			CHECKED ex = (CHECKED) th;
+			WrappedCheckedCompatiblityException wrapper = (WrappedCheckedCompatiblityException) th;
+			CHECKED ex = (CHECKED) wrapper.getCause();
 			return ex.getWhy();
 		}
 	}

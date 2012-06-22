@@ -1,7 +1,7 @@
 import java.lang.annotation.Documented;
 
-import incubator.cfa.AccessorAnnotationWrapper;
 import incubator.cfa.jdk.Accessor;
+import incubator.cfa.jdk.AccessorAnnotationWrapper;
 
 public class NEWSol2 {
 

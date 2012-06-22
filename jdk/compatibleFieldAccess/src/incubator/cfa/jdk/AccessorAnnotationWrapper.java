@@ -1,4 +1,4 @@
-package incubator.cfa;
+package incubator.cfa.jdk;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,9 +1,11 @@
 package incubator.cfa;
+
 import incubator.cfa.jdk.Accessor;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
@@ -42,7 +44,11 @@ public class Bootstrapper {
 						? lookup.findStatic(clazz, method.getName(), mt)
 								: lookup.findVirtual(clazz, method.getName(),
 										mt);
-						return new ConstantCallSite(ret.asType(type));
+//						return new ConstantCallSite(ret.asType(type));
+						MethodHandle ex = MethodHandles.throwException(
+								type.returnType(), RuntimeException.class);
+						MethodHandle insertArguments = MethodHandles.insertArguments(ex, 0, new RuntimeException());
+						return new ConstantCallSite(insertArguments.asType(type));
 					}
 				}
 			}
@@ -82,8 +88,8 @@ public class Bootstrapper {
 						MethodType mt = MethodType.methodType(void.class,
 								method.getParameterTypes());
 						MethodHandle ret = staticProperty ? lookup.findStatic(
-								clazz, method.getName(), mt) : lookup.findVirtual(clazz,
-								method.getName(), mt);
+								clazz, method.getName(), mt) : lookup
+								.findVirtual(clazz, method.getName(), mt);
 						return new ConstantCallSite(ret.asType(type));
 					}
 				}
