@@ -4,60 +4,68 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import util.DescriptionOfTest.TestDescriptionBuilder;
+
 public class DescriptionOfTest {
 
-	public static class DescriptionOfTestSentence {
+	public static class TestDescriptionBuilder {
 
 		private Class testingClass;
 		private Class forClass;
 		private boolean testStatic;
 		private boolean testNonStatic;
 		private boolean testReflective;
+		private boolean testAnnotation;
 		private final String testname;
 		private List<ExceptionExpectedOn> runtimeExceptionExpectedOn;
 		private List<ExceptionExpectedOn> checkedExceptionExpectedOn;
 
-		public DescriptionOfTestSentence(String name) {
+		public TestDescriptionBuilder(String name) {
 			this.testname = name;
 			runtimeExceptionExpectedOn = new ArrayList<>(2);
 			checkedExceptionExpectedOn = new ArrayList<>(2);
 
 		}
 
-		public DescriptionOfTestSentence forClass(Class forClass) {
+		public TestDescriptionBuilder forClass(Class forClass) {
 			checkSet(this.forClass, forClass, "forClass");
 			this.forClass = forClass;
 			return this;
 		}
 
-		public DescriptionOfTestSentence testing(Class testingClass) {
+		public TestDescriptionBuilder testing(Class testingClass) {
 			checkSet(this.testingClass, testingClass, "testingClass");
 			this.testingClass = testingClass;
 			return this;
 		}
 
-		public DescriptionOfTestSentence testStatic() {
+		public TestDescriptionBuilder checkAnnotation() {
+			this.testAnnotation = true;
+			return this;
+		}
+
+		public TestDescriptionBuilder testStatic() {
 			this.testStatic = true;
 			return this;
 		}
 
-		public DescriptionOfTestSentence testNonStatic() {
+		public TestDescriptionBuilder testNonStatic() {
 			this.testNonStatic = true;
 			return this;
 		}
 
-		public DescriptionOfTestSentence testReflective() {
+		public TestDescriptionBuilder testReflective() {
 			this.testReflective = true;
 			return this;
 		}
 
-		public DescriptionOfTestSentence runtimeExceptionOn(
+		public TestDescriptionBuilder runtimeExceptionOn(
 				ExceptionExpectedOn ex) {
 			this.runtimeExceptionExpectedOn.add(ex);
 			return this;
 		}
 
-		public DescriptionOfTestSentence checkedExceptionOn(
+		public TestDescriptionBuilder checkedExceptionOn(
 				ExceptionExpectedOn ex) {
 			this.checkedExceptionExpectedOn.add(ex);
 			return this;
@@ -71,7 +79,8 @@ public class DescriptionOfTest {
 					.toArray(new ExceptionExpectedOn[checkedExceptionExpectedOn
 							.size()]);
 			tests.add(new DescriptionOfTest(forClass, testingClass, testname,
-					testStatic, testNonStatic, testReflective, runtime, checked));
+					testStatic, testNonStatic, testReflective, testAnnotation,
+					runtime, checked));
 		}
 
 		private void checkSet(Object oldValue, Object newValue, String name) {
@@ -93,10 +102,11 @@ public class DescriptionOfTest {
 	private final EnumSet<ExceptionExpectedOn> runtimeExceptionExpectedOn;
 	private final EnumSet<ExceptionExpectedOn> checkedExceptionExpectedOn;
 	private final boolean testNonStatic;
+	private final boolean testAnnotation;
 
 	public DescriptionOfTest(Class<?> testClass, Class<?> classUnderTest,
 			String testname, boolean testStatic, boolean testNonStatic,
-			boolean testReflective,
+			boolean testReflective, boolean testAnnotations,
 			ExceptionExpectedOn[] runtimeExceptionExpectedOn,
 			ExceptionExpectedOn[] checkedExceptionExpectedOn) {
 		this.testClass = testClass;
@@ -105,6 +115,7 @@ public class DescriptionOfTest {
 		this.testStatic = testStatic;
 		this.testNonStatic = testNonStatic;
 		this.testReflective = testReflective;
+		this.testAnnotation = testAnnotations;
 		this.runtimeExceptionExpectedOn = EnumSet
 				.noneOf(ExceptionExpectedOn.class);
 		for (ExceptionExpectedOn ex : runtimeExceptionExpectedOn) {
@@ -163,8 +174,12 @@ public class DescriptionOfTest {
 						ExceptionExpectedOn.PUTSTATIC);
 	}
 
-	public static DescriptionOfTestSentence createNew(String name) {
-		return new DescriptionOfTestSentence(name);
+	public static TestDescriptionBuilder createNew(String name) {
+		return new TestDescriptionBuilder(name);
+	}
+
+	public boolean isAnnoationTestCapable() {
+		return testAnnotation;
 	}
 
 }
