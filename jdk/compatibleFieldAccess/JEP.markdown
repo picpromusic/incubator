@@ -62,7 +62,7 @@ Motivation
 This will enable the OpenJDK-Contibutors to make some changes to the APIs and implementations that would otherwise be not binary compatible.
 Futhermore all Java Library Projects can introduce more changes in a binary compatible way.
 It is not a must have for Library Projects but a good investment in existing Java Software.
-The only competitor to TSCVM i had seen are some suggestions to make changes to Java*(The Language)* to enable source-level use to accessor-methods via field/property access syntax.
+The only competitor to TSCVM I had seen are some suggestions to make changes to Java*(The Language)* to enable source-level use to accessor-methods via field/property access syntax.
 TSCVM does not want to change the language. Anyway a change to Java*(The Language)* that enables the use of accessor-methods via field/property access syntax should also observe binary compatibility in some way. 
 
 Description
@@ -219,14 +219,14 @@ Alternatives
 
 I had implemented a very small concept-prototype with bytecode-manipulation through the PreMain-Hook.
 We can simply transform all loaded classes to use lasy linkage through invokedynamic for field accesses.
-The implementation level impact would be much smaller, but i think the runtime costs would be to high for this approach.
+The implementation level impact would be much smaller, but I think the runtime costs would be to high for this approach.
 We could limit lasy linkage(invokedynamic) for field access only for fields that are not visible/accessible at classload time(ex. the target class is not loaded yet), leave accessible field as they are and change field access that are not directly accesible but are
 accessible through access-methods to calling the access methods. 
 
 We could also handle every field access as an call to an accessor-method in first place and only if there is a field that is directly accessible from the callsite change this to direct field access.
 This solution has even bigger performance costs, because field access to private fields is naturally much more common.
 
-Another problem i see with bytecode transformation is signed/sealed code. I don't think that this code should be changed.
+Another problem I see with bytecode transformation is signed/sealed code. I don't think that this code should be changed.
 But maybe it is prefareable for signed/seald not to change the bytecode semantics as well. 
 
 Testing
