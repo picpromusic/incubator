@@ -1,0 +1,6 @@
+[submodule "jgit"]
+	path = jgit
+	url = https://git.eclipse.org/r/p/jgit/jgit.git
+[submodule "gerrit"]
+	path = gerrit
+	url = https://code.google.com/p/gerrit/
