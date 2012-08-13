@@ -1,10 +1,8 @@
 import java.lang.annotation.Documented;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Objects;
 
-import org.objectweb.asm.commons.StaticInitMerger;
 
 public class Test {
 	public static void main(String[] args) throws NoSuchFieldException,
@@ -20,13 +18,13 @@ public class Test {
 			throw new AssertionError(Objects.toString(oldRef.cause));
 		}
 
-		if (!oldRef.staticField.equals("ORIG_VALUE")) {
-			throw new AssertionError(Objects.toString(oldRef.staticField));
+		if (!OLD.staticField.equals("ORIG_VALUE")) {
+			throw new AssertionError(Objects.toString(OLD.staticField));
 		}
 
 		OLD.staticField = new String("NEW Static");
-		if (!oldRef.staticField.equals("NEW Static")) {
-			throw new AssertionError(Objects.toString(oldRef.staticField));
+		if (!OLD.staticField.equals("NEW Static")) {
+			throw new AssertionError(Objects.toString(OLD.staticField));
 		}
 
 		oldRef = OLD.class.newInstance();
