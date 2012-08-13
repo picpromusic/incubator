@@ -1,11 +1,9 @@
 import java.lang.annotation.Documented;
 
-import util.ExceptionExpectedOn;
-
 import incubator.cfa.jdk.Accessor;
 import incubator.cfa.jdk.AccessorAnnotationWrapper;
 
-public class NEW3Sol12 {
+public class OLD {
 
 	// This is the privately defined Annotation wrapper, mentioned below.
 	// It is Annotated with an AccessorAnnotationWrapper to mark that this
@@ -33,7 +31,7 @@ public class NEW3Sol12 {
 
 	@Accessor("cause")
 	public void initCause(Throwable cause) throws Throwable {
-		ExceptionExpectedOn.PUT.throwCHECKED();
+		throw new Exception("Put not allowed anymore");
 	}
 
 	// Because we cannot annotate the Method with the annotation
@@ -48,7 +46,7 @@ public class NEW3Sol12 {
 
 	@Accessor("staticField")
 	public static void setFoo(Object value) throws Throwable {
-		ExceptionExpectedOn.PUTSTATIC.throwCHECKED();
+		throw new Exception("PutStatic not allowed anymore");
 	}
 
 }

@@ -1,11 +1,6 @@
-import java.lang.annotation.Documented;
-
-import util.ExceptionExpectedOn;
-
 import incubator.cfa.jdk.Accessor;
-import incubator.cfa.jdk.AccessorAnnotationWrapper;
 
-public class NEW2Sol12 {
+public class OLD {
 
 	private Throwable inner_cause = new RuntimeException("INIT_NEW2");
 	private static Object inner_staticField = "FINAL VALUE";
@@ -17,7 +12,7 @@ public class NEW2Sol12 {
 
 	@Accessor("cause")
 	public void initCause(Throwable cause) {
-		ExceptionExpectedOn.PUT.throwRTE();
+		throw new RuntimeException("Put not allowed anymore");
 	}
 
 	@Accessor("staticField")
@@ -27,7 +22,7 @@ public class NEW2Sol12 {
 
 	@Accessor("staticField")
 	public static void setFoo(Object value) {
-		ExceptionExpectedOn.PUTSTATIC.throwRTE();
+		throw new RuntimeException("PutStatic not allowed anymore");
 	}
 
 }

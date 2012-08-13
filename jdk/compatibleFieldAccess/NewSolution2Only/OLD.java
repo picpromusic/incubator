@@ -3,7 +3,7 @@ import java.lang.annotation.Documented;
 import incubator.cfa.jdk.Accessor;
 import incubator.cfa.jdk.AccessorAnnotationWrapper;
 
-public class NEWSol2 {
+public class OLD {
 
 	private Throwable cause = new RuntimeException("INIT_NEW");
 	private static Object staticField = "ORIG_VALUE_NEW";

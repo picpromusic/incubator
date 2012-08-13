@@ -8,25 +8,66 @@
           target: default              
          ================================= -->
 	<target name="test" depends="test-disabled,test-enabled" description="description" />
-	
+
 	<target name="test-disabled" depends="jar,compile-test">
-		<mkdir dir="tmp" />
-		<java classname="AllInOneTest" fork="true">
+		<echo message="OLD(disabled)"/>
+		<java classname="Test">
 			<classpath>
 				<path location="output-test" />
-				<path location="gen" />
+			</classpath>
+		</java>
+		<echo message="NEW(disabled)"/>
+		<java classname="Test">
+			<classpath>
+				<path location="output-test1" />
+			</classpath>
+		</java>
+		<echo message="NEW2(disabled)"/>
+		<java classname="Test">
+			<classpath>
+				<path location="output-test2" />
+			</classpath>
+		</java>
+		<echo message="NEW3(disabled)"/>
+		<java classname="Test">
+			<classpath>
+				<path location="output-test3" />
 			</classpath>
 		</java>
 	</target>
+
 	<target name="test-enabled" depends="jar,compile-test">
-		<mkdir dir="tmp" />
-		<java classname="AllInOneTest" fork="true">
-			<jvmarg line="-javaagent:transformer.jar" />
+		<echo message="OLD(enabled)"/>
+		<java classname="Test" fork="true">
 			<classpath>
 				<path location="output-test" />
-				<path location="gen" />
-				<path refid="libs" />
+				<path location="libs/asm-debug-all-4.0.jar"/>
 			</classpath>
+			<jvmarg line="-javaagent:transformer.jar" />
+		</java>
+		<echo message="NEW(enabled)"/>
+		<java classname="Test" fork="true">
+			<classpath>
+				<path location="output-test1" />
+				<path location="libs/asm-debug-all-4.0.jar"/>
+			</classpath>
+			<jvmarg line="-javaagent:transformer.jar" />
+		</java>
+		<echo message="NEW2(enabled)"/>
+		<java classname="Test" fork="true">
+			<classpath>
+				<path location="output-test2" />
+				<path location="libs/asm-debug-all-4.0.jar"/>
+			</classpath>
+			<jvmarg line="-javaagent:transformer.jar" />
+		</java>
+		<echo message="NEW3(enabled)"/>
+		<java classname="Test" fork="true">
+			<classpath>
+				<path location="output-test3" />
+				<path location="libs/asm-debug-all-4.0.jar"/>
+			</classpath>
+			<jvmarg line="-javaagent:transformer.jar" />
 		</java>
 	</target>
 
@@ -45,13 +86,61 @@
 		</fileset>
 	</path>
 
-	<target name="compile-test" depends="jar,generate">
+	<target name="compile-test" depends="jar">
+		<deltree dir="output-test" />
+		<deltree dir="output-test1" />
+		<deltree dir="output-test2" />
+		<deltree dir="output-test3" />
 		<mkdir dir="output-test" />
+		<mkdir dir="output-test1" />
+		<mkdir dir="output-test2" />
+		<mkdir dir="output-test3" />
+		<javac includeantruntime="false" srcdir="OldSolution" destdir="output-test" debug="on">
+		</javac>
 		<javac includeantruntime="false" srcdir="testsrc" destdir="output-test" debug="on">
+		</javac>
+		<copy todir="output-test1">
+			<fileset dir="output-test">
+				<include name="**/*" />
+				<exclude name="OLD.class" />
+			</fileset>
+		</copy>
+		<copy todir="output-test2">
+			<fileset dir="output-test">
+				<include name="**/*" />
+				<exclude name="OLD.class" />
+			</fileset>
+		</copy>
+		<copy todir="output-test3">
+			<fileset dir="output-test">
+				<include name="**/*" />
+				<exclude name="OLD.class" />
+			</fileset>
+		</copy>
+		<javac includeantruntime="false" srcdir="NewSolution2Only" destdir="output-test1" debug="on">
 			<classpath>
-				<path location="gen">
+				<fileset dir="output-test1">
+					<include name="**/*" />
+				</fileset>
+				<path location="transformer.jar">
 				</path>
-				<path location="output">
+			</classpath>
+		</javac>
+		<javac includeantruntime="false" srcdir="New2Solution1And2" destdir="output-test2" debug="on">
+			<classpath>
+				<fileset dir="output-test2">
+					<include name="**/*" />
+				</fileset>
+				<path location="transformer.jar">
+				</path>
+			</classpath>
+		</javac>
+		<javac includeantruntime="false" srcdir="New3Solution1And2" destdir="output-test3" debug="on">
+			<classpath>
+				<fileset dir="output-test3">
+					<include name="**/*" />
+				</fileset>
+				<path location="transformer.jar">
 				</path>
 			</classpath>
 		</javac>
@@ -60,21 +149,6 @@
 	<target name="compile">
 		<mkdir dir="output" />
 		<javac includeantruntime="false" srcdir="src" destdir="output" classpathref="libs" debug="on" />
-	</target>
-
-	<target name="generate" depends="compile-generator">
-		<mkdir dir="gen" />
-		<java fork="true" classname="GEN">
-			<classpath>
-				<path refid="libs" />
-				<path location="output-generator" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="compile-generator">
-		<mkdir dir="output-generator" />
-		<javac includeantruntime="false" srcdir="generator" destdir="output-generator" classpathref="libs" debug="on" />
 	</target>
 
 	<target name="clean" description="clean">
