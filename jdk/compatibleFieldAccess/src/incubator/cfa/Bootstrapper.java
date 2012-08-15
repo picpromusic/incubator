@@ -29,7 +29,7 @@ public class Bootstrapper {
 			return new ConstantCallSite(ret);
 		} catch (Exception e) { // Should be ReflectiveOperationException |
 								// IllegalAccessException
-			System.out.println("Expected MethodType:"+type);
+//			System.out.println("Expected MethodType:"+type);
 			Method[] methods = clazz.getMethods();
 			for (Method method : methods) {
 				if (Modifier.isStatic(method.getModifiers()) == staticProperty
@@ -40,12 +40,12 @@ public class Bootstrapper {
 						// + Arrays.toString(method.getAnnotations()));
 						MethodType mt = MethodType
 								.methodType(type.returnType());
-						System.out.println("Created MethodType:"+mt);
+//						System.out.println("Created MethodType:"+mt);
 						MethodHandle ret = staticProperty //
 						? lookup.findStatic(clazz, method.getName(), mt)
 								: lookup.findVirtual(clazz, method.getName(),
 										mt);
-						System.out.println("Loaded MethodHandle:"+ret);
+//						System.out.println("Loaded MethodHandle:"+ret);
 						
 						
 //						MethodHandle ex = MethodHandles.throwException(
