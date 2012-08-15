@@ -16,7 +16,7 @@ public class OLD {
 	}
 
 	private Throwable inner_cause = new RuntimeException("INIT_NEW3");
-	private static Object inner_staticField = "FINAL VALUE";
+	private static Object inner_staticField = "ORIG_VALUE_NEW3";
 
 	// Because we cannot annotate the Method with the annotation
 	// OldFieldAnnotationForTesting we must wrap the Annotation with an

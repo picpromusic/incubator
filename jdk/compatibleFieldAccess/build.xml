@@ -4,10 +4,12 @@
             description
     </description>
 
-	<property name="DebugOLD" value="y"/>
+	<property name="DebugOLD" value="n"/>
 	<property name="DebugNEW" value="n"/>
 	<property name="DebugNEW2" value="n"/>
 	<property name="DebugNEW3" value="n"/>
+	
+	<property name="ReflectionSupportNotImplemented" value="true"/>
 	<!-- ================================= 
           target: default              
          ================================= -->
@@ -54,7 +56,6 @@
 			</classpath>
 			<jvmarg line="-javaagent:transformer.jar" />
 			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugOLD},address=8000" />
-			<jvmarg line="-verbose"/>
 		</java>
 		<echo message="NEW(enabled)" />
 		<java classname="Test" fork="true">
@@ -64,7 +65,8 @@
 				<path location="libs/asm-debug-all-4.0.jar" />
 			</classpath>
 			<jvmarg line="-javaagent:transformer.jar" />
-			<jvmarg line="-DnoReflectionPossible=true" />
+			<jvmarg line="-DnoReflectionPossible=${ReflectionSupportNotImplemented}" />
+			<jvmarg line="-DnoAnnotationAvaiable=true" />
 			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugNEW},address=8000" />
 		</java>
 		<echo message="NEW2(enabled)" />
@@ -75,7 +77,7 @@
 				<path location="libs/asm-debug-all-4.0.jar" />
 			</classpath>
 			<jvmarg line="-javaagent:transformer.jar" />
-			<jvmarg line="-DnoReflectionPossible=true" />
+			<jvmarg line="-DnoReflectionPossible=${ReflectionSupportNotImplemented}" />
 			<jvmarg line="-DnoAnnotationAvaiable=true" />
 			<jvmarg line="-DputNotPossible=true" />
 			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugNEW2},address=8000" />
@@ -88,7 +90,8 @@
 				<path location="libs/asm-debug-all-4.0.jar" />
 			</classpath>
 			<jvmarg line="-javaagent:transformer.jar" />
-			<jvmarg line="-DnoReflectionPossible=true" />
+			<jvmarg line="-DnoReflectionPossible=${ReflectionSupportNotImplemented}" />
+			<jvmarg line="-DputNotPossible=true" />
 			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugNEW3},address=8000" />
 		</java>
 	</target>
