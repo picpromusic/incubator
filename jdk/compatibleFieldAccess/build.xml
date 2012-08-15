@@ -4,36 +4,40 @@
             description
     </description>
 
+	<property name="DebugOLD" value="y"/>
+	<property name="DebugNEW" value="n"/>
+	<property name="DebugNEW2" value="n"/>
+	<property name="DebugNEW3" value="n"/>
 	<!-- ================================= 
           target: default              
          ================================= -->
 	<target name="test" depends="test-disabled,test-enabled" description="description" />
 
 	<target name="test-disabled" depends="jar,compile-test">
-		<echo message="OLD(disabled)"/>
+		<echo message="OLD(disabled)" />
 		<java classname="Test">
-			<arg value="OLD"/>
+			<arg value="OLD" />
 			<classpath>
 				<path location="output-test" />
 			</classpath>
 		</java>
-		<echo message="NEW(disabled)"/>
+		<echo message="NEW(disabled)" />
 		<java classname="Test">
-			<arg value="NEW"/>
+			<arg value="NEW" />
 			<classpath>
 				<path location="output-test1" />
 			</classpath>
 		</java>
-		<echo message="NEW2(disabled)"/>
+		<echo message="NEW2(disabled)" />
 		<java classname="Test">
-			<arg value="NEW2"/>
+			<arg value="NEW2" />
 			<classpath>
 				<path location="output-test2" />
 			</classpath>
 		</java>
-		<echo message="NEW3(disabled)"/>
+		<echo message="NEW3(disabled)" />
 		<java classname="Test">
-			<arg value="NEW3"/>
+			<arg value="NEW3" />
 			<classpath>
 				<path location="output-test3" />
 			</classpath>
@@ -41,49 +45,51 @@
 	</target>
 
 	<target name="test-enabled" depends="jar,compile-test">
-		<echo message="OLD(enabled)"/>
+		<echo message="OLD(enabled)" />
 		<java classname="Test" fork="true">
-			<arg value="OLD"/>
+			<arg value="OLD" />
 			<classpath>
 				<path location="output-test" />
-				<path location="libs/asm-debug-all-4.0.jar"/>
+				<path location="libs/asm-debug-all-4.0.jar" />
 			</classpath>
 			<jvmarg line="-javaagent:transformer.jar" />
+			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugOLD},address=8000" />
+			<jvmarg line="-verbose"/>
 		</java>
-		<echo message="NEW(enabled)"/>
+		<echo message="NEW(enabled)" />
 		<java classname="Test" fork="true">
-			<arg value="NEW"/>
+			<arg value="NEW" />
 			<classpath>
 				<path location="output-test1" />
-				<path location="libs/asm-debug-all-4.0.jar"/>
+				<path location="libs/asm-debug-all-4.0.jar" />
 			</classpath>
 			<jvmarg line="-javaagent:transformer.jar" />
 			<jvmarg line="-DnoReflectionPossible=true" />
-<!--			
-			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" />
--->
+			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugNEW},address=8000" />
 		</java>
-		<echo message="NEW2(enabled)"/>
+		<echo message="NEW2(enabled)" />
 		<java classname="Test" fork="true">
-			<arg value="NEW2"/>
+			<arg value="NEW2" />
 			<classpath>
 				<path location="output-test2" />
-				<path location="libs/asm-debug-all-4.0.jar"/>
+				<path location="libs/asm-debug-all-4.0.jar" />
 			</classpath>
 			<jvmarg line="-javaagent:transformer.jar" />
 			<jvmarg line="-DnoReflectionPossible=true" />
 			<jvmarg line="-DnoAnnotationAvaiable=true" />
 			<jvmarg line="-DputNotPossible=true" />
+			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugNEW2},address=8000" />
 		</java>
-		<echo message="NEW3(enabled)"/>
+		<echo message="NEW3(enabled)" />
 		<java classname="Test" fork="true">
-			<arg value="NEW3"/>
+			<arg value="NEW3" />
 			<classpath>
 				<path location="output-test3" />
-				<path location="libs/asm-debug-all-4.0.jar"/>
+				<path location="libs/asm-debug-all-4.0.jar" />
 			</classpath>
 			<jvmarg line="-javaagent:transformer.jar" />
 			<jvmarg line="-DnoReflectionPossible=true" />
+			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugNEW3},address=8000" />
 		</java>
 	</target>
 
