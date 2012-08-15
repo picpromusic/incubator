@@ -6,6 +6,6 @@ public class OLD {
 	public Throwable cause = new RuntimeException("INIT_OLD");
 
 	@OldFieldAnnotationForTesting(a = { @Documented }, b = false, s = "DEMO_STATIC-FIELD for <<<OLD>>>")
-	public static Object staticField = "ORIG_VALUE";
+	public static Object staticField = "ORIG_VALUE_OLD";
 
 }
