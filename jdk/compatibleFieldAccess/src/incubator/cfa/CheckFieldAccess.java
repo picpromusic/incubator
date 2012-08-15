@@ -1,4 +1,5 @@
 package incubator.cfa;
+
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -59,55 +60,47 @@ public class CheckFieldAccess {
 				FieldInsnNode fins = (FieldInsnNode) next;
 				if (isAccessable(fins))
 					continue;
-				if (!fins.owner.equals(classNode.name)) {
-					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
-							fins.name,//
-							"(L" + fins.owner + ";)" + fins.desc,//
-							BOOTSTRAP_GET,//
-							fins.owner.replace('/','.'), //
-							NON_MODIFIER);
-					iterator.set(getInsnNode);
-				}
+				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
+						fins.name,//
+						"(L" + fins.owner + ";)" + fins.desc,//
+						BOOTSTRAP_GET,//
+						fins.owner.replace('/', '.'), //
+						NON_MODIFIER);
+				iterator.set(getInsnNode);
 			} else if (next.getOpcode() == Opcodes.PUTFIELD) {
 				FieldInsnNode fins = (FieldInsnNode) next;
 				if (isAccessable(fins))
 					continue;
-				if (!fins.owner.equals(classNode.name)) {
-					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
-							fins.name,//
-							"(L" + fins.owner + ";" + fins.desc + ")V",//
-							BOOTSTRAP_SET,//
-							fins.owner.replace('/','.'), //
-							NON_MODIFIER);
-					iterator.set(getInsnNode);
-				}
+				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
+						fins.name,//
+						"(L" + fins.owner + ";" + fins.desc + ")V",//
+						BOOTSTRAP_SET,//
+						fins.owner.replace('/', '.'), //
+						NON_MODIFIER);
+				iterator.set(getInsnNode);
 
 			} else if (next.getOpcode() == Opcodes.GETSTATIC) {
 				FieldInsnNode fins = (FieldInsnNode) next;
 				if (isAccessable(fins))
 					continue;
-				if (!fins.owner.equals(classNode.name)) {
-					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
-							fins.name,//
-							"()" + fins.desc,//
-							BOOTSTRAP_GET,//
-							fins.owner.replace('/','.'), //
-							Modifier.STATIC);
-					iterator.set(getInsnNode);
-				}
+				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
+						fins.name,//
+						"()" + fins.desc,//
+						BOOTSTRAP_GET,//
+						fins.owner.replace('/', '.'), //
+						Modifier.STATIC);
+				iterator.set(getInsnNode);
 			} else if (next.getOpcode() == Opcodes.PUTSTATIC) {
 				FieldInsnNode fins = (FieldInsnNode) next;
 				if (isAccessable(fins))
 					continue;
-				if (!fins.owner.equals(classNode.name)) {
-					AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
-							fins.name,//
-							"(" + fins.desc + ")V",//
-							BOOTSTRAP_SET,//
-							fins.owner.replace('/','.'),//
-							Modifier.STATIC);
-					iterator.set(getInsnNode);
-				}
+				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
+						fins.name,//
+						"(" + fins.desc + ")V",//
+						BOOTSTRAP_SET,//
+						fins.owner.replace('/', '.'),//
+						Modifier.STATIC);
+				iterator.set(getInsnNode);
 
 			}
 		}
@@ -115,6 +108,9 @@ public class CheckFieldAccess {
 
 	private boolean isAccessable(FieldInsnNode fins) {
 		try {
+			if (fins.owner.equals(this.classNode.name)) {
+				return true;
+			}
 			Class<?> clazz = Class.forName(fins.owner);
 			Field field = clazz.getField(fins.name);
 			// Public check isn't enough, but should work here for demonstation.
