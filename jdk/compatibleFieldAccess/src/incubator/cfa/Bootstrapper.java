@@ -29,33 +29,18 @@ public class Bootstrapper {
 			return new ConstantCallSite(ret);
 		} catch (Exception e) { // Should be ReflectiveOperationException |
 								// IllegalAccessException
-//			System.out.println("Expected MethodType:"+type);
 			Method[] methods = clazz.getMethods();
 			for (Method method : methods) {
 				if (Modifier.isStatic(method.getModifiers()) == staticProperty
 						&& method.getReturnType().equals(type.returnType())) {
 					Accessor annotation = method.getAnnotation(Accessor.class);
 					if (annotation != null && annotation.value().equals(name)) {
-						// System.out.println(method + " "
-						// + Arrays.toString(method.getAnnotations()));
 						MethodType mt = MethodType
 								.methodType(type.returnType());
-//						System.out.println("Created MethodType:"+mt);
 						MethodHandle ret = staticProperty //
 						? lookup.findStatic(clazz, method.getName(), mt)
 								: lookup.findVirtual(clazz, method.getName(),
 										mt);
-//						System.out.println("Loaded MethodHandle:"+ret);
-						
-						
-//						MethodHandle ex = MethodHandles.throwException(
-//								type.returnType(), RuntimeException.class);
-//						System.out.println("MethodHandle Throw:"+ex);
-//						MethodHandle x = MethodHandles.dropArguments(ex, 0, type.parameterArray()[0]);
-//						System.out.println("MethodHandle Throw:"+x);
-//						MethodHandle insertArguments = MethodHandles.insertArguments(x, 0, new RuntimeException());
-//						System.out.println("MethodHandle insertedArg:"+insertArguments);
-//						return new ConstantCallSite(insertArguments.asType(type));
 						return new ConstantCallSite(ret.asType(type));
 					}
 				}
@@ -91,8 +76,6 @@ public class Bootstrapper {
 						&& method.getReturnType().equals(void.class)) {
 					Accessor annotation = method.getAnnotation(Accessor.class);
 					if (annotation != null && annotation.value().equals(name)) {
-						// System.out.println(method + " "
-						// + Arrays.toString(method.getAnnotations()));
 						MethodType mt = MethodType.methodType(void.class,
 								method.getParameterTypes());
 						MethodHandle ret = staticProperty ? lookup.findStatic(

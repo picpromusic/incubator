@@ -4,12 +4,12 @@
             description
     </description>
 
-	<property name="DebugOLD" value="n"/>
-	<property name="DebugNEW" value="n"/>
-	<property name="DebugNEW2" value="n"/>
-	<property name="DebugNEW3" value="n"/>
-	
-	<property name="ReflectionSupportNotImplemented" value="true"/>
+	<property name="DebugOLD" value="n" />
+	<property name="DebugNEW" value="n" />
+	<property name="DebugNEW2" value="n" />
+	<property name="DebugNEW3" value="n" />
+
+	<property name="ReflectionSupportNotImplemented" value="true" />
 	<!-- ================================= 
           target: default              
          ================================= -->
@@ -29,6 +29,8 @@
 			<classpath>
 				<path location="output-test1" />
 			</classpath>
+			<jvmarg line="-DnoReflectionPossible=${ReflectionSupportNotImplemented}" />
+			<jvmarg line="-DnoAnnotationAvaiable=true" />
 		</java>
 		<echo message="NEW2(disabled)" />
 		<java classname="Test">
@@ -36,6 +38,9 @@
 			<classpath>
 				<path location="output-test2" />
 			</classpath>
+			<jvmarg line="-DnoReflectionPossible=${ReflectionSupportNotImplemented}" />
+			<jvmarg line="-DnoAnnotationAvaiable=true" />
+			<jvmarg line="-DputNotPossible=true" />
 		</java>
 		<echo message="NEW3(disabled)" />
 		<java classname="Test">
@@ -43,6 +48,8 @@
 			<classpath>
 				<path location="output-test3" />
 			</classpath>
+			<jvmarg line="-DnoReflectionPossible=${ReflectionSupportNotImplemented}" />
+			<jvmarg line="-DputNotPossible=true" />
 		</java>
 	</target>
 
@@ -112,10 +119,10 @@
 	</path>
 
 	<target name="compile-test" depends="jar">
-		<deltree dir="output-test" />
-		<deltree dir="output-test1" />
-		<deltree dir="output-test2" />
-		<deltree dir="output-test3" />
+		<delete dir="output-test" />
+		<delete dir="output-test1" />
+		<delete dir="output-test2" />
+		<delete dir="output-test3" />
 		<mkdir dir="output-test" />
 		<mkdir dir="output-test1" />
 		<mkdir dir="output-test2" />
@@ -177,17 +184,11 @@
 	</target>
 
 	<target name="clean" description="clean">
-		<delete dir="gen">
-		</delete>
-		<delete dir="output">
-		</delete>
-		<delete dir="output-transformer">
-		</delete>
-		<delete dir="output-test">
-		</delete>
-		<delete dir="output-generator">
-		</delete>
-		<delete dir="tmp">
-		</delete>
+		<delete dir="tmp" />
+		<delete dir="output" />
+		<delete dir="output-test" />
+		<delete dir="output-test1" />
+		<delete dir="output-test2" />
+		<delete dir="output-test3" />
 	</target>
 </project>
