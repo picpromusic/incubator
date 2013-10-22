@@ -13,6 +13,10 @@
 				<path location="test" />
 				<path location="lib.jar" />
 			</classpath>
+			<jvmarg line="-javaagent:transformer.jar" />
+			<jvmarg line="-DnoReflectionPossible=${ReflectionSupportNotImplemented}" />
+			<jvmarg line="-DputNotPossible=true" />
+			<jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=${DebugNEW3},address=8000" />
 		</java>
 		
 	</target>
@@ -60,7 +64,7 @@
 				<path location="test" />
 				<path location="lib2.jar" />
 			</classpath>
-		</java>
+		</javac>
 	</target>
 
 	<target name="jar-poc" depends="compile-poc">
