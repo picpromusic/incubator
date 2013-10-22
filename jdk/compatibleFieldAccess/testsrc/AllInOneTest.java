@@ -21,5 +21,18 @@ public class AllInOneTest {
 				System.out.println(field.get(n));
 			}
 		}
+		
+		System.out.println(SubjectToChange.staticField);
+		SubjectToChange.staticField = "NEW STATIC VALUE"; 
+		System.out.println(SubjectToChange.staticField);
+		
+		if (testReflect) {
+			for (int i = 0; i < TIMES; i++) {
+				Field field = SubjectToChange.class.getField("staticField");
+				System.out.println(field.get(null));
+				field.set(null, "NEW STATIC REFLECTIVE VALUE");
+				System.out.println(field.get(null));
+			}			
+		}
 	}
 }

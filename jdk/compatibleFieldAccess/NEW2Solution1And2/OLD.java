@@ -1,3 +1,5 @@
+import java.lang.annotation.Documented;
+
 import incubator.cfa.jdk.Accessor;
 
 public class OLD {
@@ -15,6 +17,11 @@ public class OLD {
 		throw new RuntimeException("Put not allowed anymore");
 	}
 
+	// Because we cannot annotate the Method with the annotation
+	// OldFieldAnnotationForTesting we must wrap the Annotation with an
+	// privately defined Annotations (here: PrivatelyDefindedFieldAnnotation)
+	// that wraps the needed Annotation.
+	@PrivatelyDefindedFieldAnnotation(@OldFieldAnnotationForTesting(a = { @Documented }, b = false, s = "DEMO_STATIC-FIELD <<<NEW3SOL12>>>"))
 	@Accessor("staticField")
 	public static Object getFoo() {
 		return inner_staticField;

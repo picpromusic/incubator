@@ -11,95 +11,80 @@ import java.lang.instrument.Instrumentation;
  */
 public class Premain {
 
-	/**
-	 * This method is called by the vm.
-	 * 
-	 * @param agentArgs
-	 *            The agent Arguments that are definied at command line
-	 * @param inst
-	 *            ServiceObject for initializing Instrumentation in the VM
-	 * @throws FileNotFoundException
-	 */
-	public static void premain(String agentArgs, Instrumentation inst) {
-		// Evalutate which feature should be disabled
-		// boolean disableStatic = isDisabled("Static");
-		// boolean disableConstructor = isDisabled("Constructor");
-		// boolean disableThread = isDisabled("Thread");
-		// boolean disabledThreadLocalConfiguration =
-		// isDisabled("ThreadLocalConfiguration");
-		// if (disabledThreadLocalConfiguration) {
-		// if (disableThread) {
-		// Internal.switchToGlobalConfigurationObjects();
-		// } else {
-		// System.err
-		// .println("It is only valid to disable the ThreadLocalConfiguration if -DMIdisableThread is set");
-		// System.exit(0);
-		// }
-		// }
-		// boolean disableTestAnnotation = isDisabled("TestAnnotation");
+    /**
+     * This method is called by the vm.
+     * 
+     * @param agentArgs
+     *            The agent Arguments that are definied at command line
+     * @param inst
+     *            ServiceObject for initializing Instrumentation in the VM
+     * @throws FileNotFoundException
+     */
+    public static void premain(String agentArgs, Instrumentation inst) {
+            String temp = System.getProperty("BCT_OUTFILE");
+            String solution = System.getProperty("SolutionList");
+            boolean sol1 = solution != null ? solution.contains("1") : false; // Field
+                                                                                                                                                    // resolution
+                                                                                                                                                    // ambiguous
+            boolean sol2 = solution != null ? solution.contains("2") : false; // Field
+                                                                                                                                                    // resolution
+                                                                                                                                                    // unambiguous
+            boolean solBoot = solution != null ? solution.contains("B") : false; // Field
+                                                                                                                                                            // resolution
+                                                                                                                                                            // Bootstrap
 
-		// Evalutate the optional OutputFile
-		String temp = System.getProperty("MI_OUTFILE");
+            if (sol1 && sol2) {
+                    throw new IllegalStateException(
+                                    "Solution 1 and 2 cannot be used together");
+            }
 
-		/*
-		 * Opens a PrintStream to the OutputFile or get System.out as Output
-		 * destination
-		 */
-		PrintStream pw;
-		if (temp != null) {
-			try {
-				pw = new PrintStream(temp);
-			} catch (FileNotFoundException e) {
-				pw = System.out;
-			}
-		} else {
-			pw = System.out;
-		}
+            /*
+             * Opens a PrintStream to the OutputFile or get System.out as Output
+             * destination
+             */
+            PrintStream pw;
+            if (temp != null) {
+                    try {
+                            pw = new PrintStream(temp);
+                    } catch (FileNotFoundException e) {
+                            pw = System.out;
+                    }
+            } else {
+                    pw = System.out;
+            }
 
-		pw.println("MOCKINJECT BCI");
+            pw.println("ByteCodeTransformation 1=" + sol1 + " 2=" + sol2
+                            + " Bootstrap=" + solBoot);
 
-		// Eveluate the Tracelevel. The Default-Tracelevel is 0
-		int traceLevel = 0;
-		temp = System.getProperty("MI_TRACE_LEVEL");
-		if (temp != null) {
-			pw.println("Tracelevel:" + temp);
-			traceLevel = Integer.parseInt(temp);
-		}
+            // Eveluate the Tracelevel. The Default-Tracelevel is 0
+            int traceLevel = 0;
+            temp = System.getProperty("BCT_TRACE_LEVEL");
+            if (temp != null) {
+                    pw.println("Tracelevel:" + temp);
+                    traceLevel = Integer.parseInt(temp);
+            }
 
-		/*
-		 * Initialize and add the ClassFileTransformer to the
-		 * Instrumentation-Service
-		 */
-		ClassFileTransformer classFileTransformer = new MyClassFileTransformer();
-		inst.addTransformer(classFileTransformer);
+            /*
+             * Initialize and add the ClassFileTransformer to the
+             * Instrumentation-Service
+             */
+            MyClassFileTransformer classFileTransformer = new MyClassFileTransformer();
+            classFileTransformer.setSolution1(sol1);
+            classFileTransformer.setSolution2(sol2);
+            classFileTransformer.setSolutionBootstrap(solBoot);
+            classFileTransformer.setTraceOutput(pw);
+            classFileTransformer.setTraceLevel(traceLevel);
+            inst.addTransformer(classFileTransformer);
 
-		// Register a ShutdownHook to close the optional OutputFile
-		final PrintStream fpw = pw;
-		if (pw != System.out) {
-			Runtime.getRuntime().addShutdownHook(new Thread() {
-				@Override
-				public void run() {
-					fpw.close();
-				}
-			});
-		}
-	}
-
-	private static boolean isEnabled(String feature) {
-		String disableString = System.getProperty("MIenable" + feature);
-		return disableString != null;
-	}
-
-	/**
-	 * Chekcs if the features is disabled. A feature is disabled if there is a
-	 * System Property with the Name "MIdisbale[featurename]"
-	 * 
-	 * @param feature
-	 *            the name of the Feature
-	 * @return true if the feature should be diasbled
-	 */
-	private static boolean isDisabled(String feature) {
-		String disableString = System.getProperty("MIdisable" + feature);
-		return disableString != null;
-	}
+            // Register a ShutdownHook to close the optional OutputFile
+            final PrintStream fpw = pw;
+            if (pw != System.out) {
+                    Runtime.getRuntime().addShutdownHook(new Thread() {
+                            @Override
+                            public void run() {
+                                    fpw.close();
+                            }
+                    });
+            }
+    }
 }
