@@ -1,2 +1,10 @@
 libs/*.jar
+
 *.jar
+/common
+/lib
+/lib2
+/libs
+/poc
+/test
+/tmp
