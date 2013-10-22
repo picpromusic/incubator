@@ -1,12 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="compatibleFieldAccess" default="test">
+<project name="compatibleFieldAccess" default="test-original">
 	<description>
             description
     </description>
 
+	<target name="test-original" depends="compile-test,jar-poc" description="test-original">
+		<mkdir dir="tmp" />
+		<java classname="AllInOneTest" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<jvmarg line="-Dtest-reflection=true"/>
+			<classpath>
+				<path location="test" />
+				<path location="lib.jar" />
+			</classpath>
+		</java>
+		
+	</target>
+
+	<target name="compile-test" depends="jar-original">
+		<mkdir dir="test" />
+		<javac srcdir="testsrc" destdir="test" classpath="lib.jar" debug="true" target="1.7">
+			<filename name="AllInOneTest.java" />
+		</javac>
+	</target>
+
+
+	<target name="jar-original" depends="compile-original">
+		<jar destfile="lib.jar">
+			<fileset dir="lib">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile-original">
+		<mkdir dir="lib" />
+		<javac srcdir="libsrc" destdir="lib" debug="true" target="1.7">
+			<filename name="SubjectToChange.java" />
+		</javac>
+	</target>
+
+	<target name="test-new-lib2" depends="compile-test,jar-new-lib2,jar-poc" description="test-new-lib2">
+		<mkdir dir="tmp" />
+		<java classname="AllInOneTest" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<classpath>
+				<path location="test" />
+				<path location="lib2.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test-new-lib2-with-reflect" depends="compile-test,jar-new-lib2,jar-poc" description="test-new-lib2">
+		<mkdir dir="tmp" />
+		<java classname="AllInOneTest" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<jvmarg line="-Dtest-reflection=true"/>
+			<classpath>
+				<path location="test" />
+				<path location="lib2.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="jar-poc" depends="compile-poc">
+		<jar destfile="poc.jar" manifest="MANIFEST.MF">
+			<fileset dir="poc">
+				<include name="**/*" />
+			</fileset>
+			<fileset dir="common">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile-poc" depends="compile-common">
+		<mkdir dir="poc" />
+		<javac srcdir="pocsrc" destdir="poc" classpath="common;libs/asm-debug-all-4.2.jar" debug="true" target="1.7">
+			<filename name="*.java" />
+		</javac>
+	</target>
+
+	<target name="jar-new-lib2" depends="compile-new-lib2">
+		<jar destfile="lib2.jar">
+			<fileset dir="lib2">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile-new-lib2" depends="compile-common">
+		<mkdir dir="lib2" />
+		<javac srcdir="libsrc2" destdir="lib2" classpath="common" debug="true" target="1.7">
+			<filename name="SubjectToChange.java" />
+		</javac>
+	</target>
+
+	<target name="compile-common">
+		<mkdir dir="common" />
+		<javac srcdir="commonsrc" destdir="common" debug="true" target="1.7">
+			<filename name="Accessor.java" />
+		</javac>
+	</target>
+
 	<!-- ================================= 
           target: default              
          ================================= -->
+	<!--
 	<target name="test" depends="jar,compile-test" description="description">
 		<mkdir dir="tmp" />
 		<java classname="Main" fork="true">
@@ -72,11 +172,18 @@
 	</target>
 
 	<target name="clean" description="clean">
-		<delete dir="gen"></delete>
-		<delete dir="output"></delete>
-		<delete dir="output-transformer"></delete>
-		<delete dir="output-test"></delete>
-		<delete dir="output-generator"></delete>
-		<delete dir="tmp"></delete>
+		<delete dir="gen">
+		</delete>
+		<delete dir="output">
+		</delete>
+		<delete dir="output-transformer">
+		</delete>
+		<delete dir="output-test">
+		</delete>
+		<delete dir="output-generator">
+		</delete>
+		<delete dir="tmp">
+		</delete>
 	</target>
+-->
 </project>

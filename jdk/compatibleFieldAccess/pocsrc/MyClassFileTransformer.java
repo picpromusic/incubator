@@ -43,7 +43,7 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		ClassNode classNode = new ClassNode();
 		cr.accept(classNode, ClassReader.EXPAND_FRAMES);
 		CheckFieldAccess inserter = new CheckFieldAccess(classNode);
-		if (className.startsWith("Test")) {
+		if (className.startsWith("AllInOneTest")) {
 			inserter.makeItSo();
 		}
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS) {
@@ -58,7 +58,7 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		// analyse(classNode);
 
 		byte[] byteArray = cw.toByteArray();
-		if (className.startsWith("Test")) {
+		if (className.startsWith("AllInOneTest")) {
 			FileOutputStream fout = new FileOutputStream("tmp/" + className
 					+ ".class");
 			fout.write(byteArray);

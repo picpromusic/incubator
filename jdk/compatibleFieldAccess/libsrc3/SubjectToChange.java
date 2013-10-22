@@ -1,14 +1,14 @@
 
-public class NEW2 {
+public class SubjectToChange {
 
 	private Throwable inner_cause = new RuntimeException("INIT_NEW2");
 	
-	@AccessorMethod("cause")
+	@Accessor("cause")
 	public Throwable getCause() {
 		return inner_cause;
 	}
 	
-	@AccessorMethod("cause")
+	@Accessor("cause")
 	public void initCause(Throwable cause) {
 		throw new IllegalStateException("Not allowed to change");
 	}

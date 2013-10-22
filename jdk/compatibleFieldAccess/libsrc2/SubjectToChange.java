@@ -1,14 +1,14 @@
 
-public class NEW {
+public class SubjectToChange {
 
 	private Throwable cause = new RuntimeException("INIT_NEW");
 	
-	@AccessorMethod("cause")
+	@Accessor("cause")
 	public Throwable getCause() {
 		return cause;
 	}
 	
-	@AccessorMethod("cause")
+	@Accessor("cause")
 	public void initCause(Throwable cause) {
 		this.cause = cause;
 	}

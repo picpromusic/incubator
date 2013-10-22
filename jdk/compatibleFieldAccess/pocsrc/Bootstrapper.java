@@ -20,7 +20,7 @@ public class Bootstrapper {
 			Method[] methods = clazz.getMethods();
 			for (Method method : methods) {
 				if (method.getReturnType().equals(type.returnType())) {
-					AccessorMethod annotation = method.getAnnotation(AccessorMethod.class);
+					Accessor annotation = method.getAnnotation(Accessor.class);
 					if (annotation != null && annotation.value().equals(name)) {
 						// System.out.println(method + " "
 						// + Arrays.toString(method.getAnnotations()));
@@ -50,7 +50,7 @@ public class Bootstrapper {
 			Method[] methods = clazz.getMethods();
 			for (Method method : methods) {
 				if (method.getReturnType().equals(void.class)) {
-					AccessorMethod annotation = method.getAnnotation(AccessorMethod.class);
+					Accessor annotation = method.getAnnotation(Accessor.class);
 					if (annotation != null && annotation.value().equals(name)) {
 						// System.out.println(method + " "
 						// + Arrays.toString(method.getAnnotations()));
