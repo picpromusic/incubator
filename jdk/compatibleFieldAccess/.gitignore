@@ -1,5 +1,4 @@
 libs/*.jar
-
 *.jar
 /common
 /lib
@@ -8,3 +7,4 @@ libs/*.jar
 /poc
 /test
 /tmp
+/bin
