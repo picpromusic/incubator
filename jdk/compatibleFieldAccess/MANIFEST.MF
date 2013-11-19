@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 Premain-Class: Premain
+Can-Retransform-Classes: true
 Boot-Class-Path: libs/asm-debug-all-4.2.jar

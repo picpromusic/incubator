@@ -8,18 +8,22 @@
 		<mkdir dir="tmp" />
 		<java classname="AllInOneTest" fork="true">
 			<jvmarg line="-javaagent:poc.jar" />
-			<jvmarg line="-Dtest-reflection=true"/>
+			<jvmarg line="-Dtest-reflection=true" />
 			<classpath>
 				<path location="test" />
+				<path location="dep" />
 				<path location="lib.jar" />
 			</classpath>
 		</java>
 	</target>
 
-	<target name="compile-test" depends="jar-original">
+	<target name="compile-test" depends="jar-original,compile-dep">
 		<mkdir dir="test" />
 		<javac srcdir="testsrc" destdir="test" classpath="lib.jar" debug="true" target="1.7">
 			<filename name="AllInOneTest.java" />
+			<classpath>
+				<path location="dep" />
+			</classpath>
 		</javac>
 	</target>
 
@@ -35,9 +39,9 @@
 	<target name="compile-original" depends="compile-common">
 		<mkdir dir="lib" />
 		<javac srcdir="libsrc" destdir="lib" debug="true" target="1.7">
-			<filename name="SubjectToChange.java" />
+			<filename name="**/*.java" />
 			<classpath>
-				<path location="common"/>
+				<path location="common" />
 			</classpath>
 		</javac>
 	</target>
@@ -48,6 +52,7 @@
 			<jvmarg line="-javaagent:poc.jar" />
 			<classpath>
 				<path location="test" />
+				<path location="dep" />
 				<path location="lib2.jar" />
 			</classpath>
 		</java>
@@ -57,9 +62,10 @@
 		<mkdir dir="tmp" />
 		<java classname="AllInOneTest" fork="true">
 			<jvmarg line="-javaagent:poc.jar" />
-			<jvmarg line="-Dtest-reflection=true"/>
+			<jvmarg line="-Dtest-reflection=true" />
 			<classpath>
 				<path location="test" />
+				<path location="dep" />
 				<path location="lib2.jar" />
 			</classpath>
 		</java>
@@ -91,10 +97,15 @@
 		</jar>
 	</target>
 
-	<target name="compile-new-lib2" depends="compile-common">
+	<target name="compile-new-lib2" depends="compile-common,compile-dep">
 		<mkdir dir="lib2" />
+		<echo message="aa"/>
 		<javac srcdir="libsrc2" destdir="lib2" classpath="common" debug="true" target="1.7">
-			<filename name="SubjectToChange.java" />
+			<filename name="**/*.java" />
+			<classpath>
+				<path location="common" />
+				<path location="dep" />
+			</classpath>
 		</javac>
 	</target>
 
@@ -105,12 +116,23 @@
 		</javac>
 	</target>
 
+	<target name="compile-dep" depends="compile-original">
+		<mkdir dir="dep" />
+		<javac srcdir="depsrc" destdir="dep" debug="true" target="1.7">
+			<filename name="**/*.java" />
+			<classpath>
+				<path location="lib" />
+			</classpath>
+		</javac>
+	</target>
+
 	<target name="test-new-lib3" depends="compile-test,jar-new-lib3,jar-poc" description="test-new-lib3">
 		<mkdir dir="tmp" />
 		<java classname="AllInOneTest" fork="true">
 			<jvmarg line="-javaagent:poc.jar" />
 			<classpath>
 				<path location="test" />
+				<path location="dep" />
 				<path location="lib3.jar" />
 			</classpath>
 		</java>
@@ -120,9 +142,10 @@
 		<mkdir dir="tmp" />
 		<java classname="AllInOneTest" fork="true">
 			<jvmarg line="-javaagent:poc.jar" />
-			<jvmarg line="-Dtest-reflection=true"/>
+			<jvmarg line="-Dtest-reflection=true" />
 			<classpath>
 				<path location="test" />
+				<path location="dep" />
 				<path location="lib3.jar" />
 			</classpath>
 		</java>
@@ -139,7 +162,7 @@
 	<target name="compile-new-lib3" depends="compile-common">
 		<mkdir dir="lib3" />
 		<javac srcdir="libsrc3" destdir="lib3" classpath="common" debug="true" target="1.7">
-			<filename name="SubjectToChange.java" />
+			<filename name="**/*.java" />
 		</javac>
 	</target>
 
@@ -149,6 +172,7 @@
 			<jvmarg line="-javaagent:poc.jar" />
 			<classpath>
 				<path location="test" />
+				<path location="dep" />
 				<path location="lib4.jar" />
 			</classpath>
 		</java>
@@ -158,9 +182,10 @@
 		<mkdir dir="tmp" />
 		<java classname="AllInOneTest" fork="true">
 			<jvmarg line="-javaagent:poc.jar" />
-			<jvmarg line="-Dtest-reflection=true"/>
+			<jvmarg line="-Dtest-reflection=true" />
 			<classpath>
 				<path location="test" />
+				<path location="dep" />
 				<path location="lib4.jar" />
 			</classpath>
 		</java>
@@ -177,7 +202,7 @@
 	<target name="compile-new-lib4" depends="compile-common">
 		<mkdir dir="lib4" />
 		<javac srcdir="libsrc4" destdir="lib4" classpath="common" debug="true" target="1.7">
-			<filename name="SubjectToChange.java" />
+			<filename name="**/*.java" />
 		</javac>
 	</target>
 

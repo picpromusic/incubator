@@ -1,3 +1,8 @@
+import incubator.B;
+import incubator.C;
+import incubator.StcA;
+import incubator.SubjectToChange;
+
 import java.lang.reflect.Field;
 
 public class AllInOneTest {
@@ -7,7 +12,11 @@ public class AllInOneTest {
 			SecurityException, IllegalArgumentException {
 		SubjectToChange stc = new SubjectToChange();
 		System.out.println(stc.cause);
-		stc.cause = new RuntimeException("NEW");
+		try {
+			stc.cause = new RuntimeException("NEW");
+		} catch (IllegalStateException ex) {
+			System.out.println("Exception aufgetreten" + ex.getMessage());
+		}
 		System.out.println(stc.cause);
 
 		boolean testReflect = Boolean.getBoolean("test-reflection");
@@ -21,18 +30,34 @@ public class AllInOneTest {
 				System.out.println(field.get(n));
 			}
 		}
-		
+
 		System.out.println(SubjectToChange.staticField);
-		SubjectToChange.staticField = "NEW STATIC VALUE"; 
+		try {
+			SubjectToChange.staticField = "NEW STATIC VALUE";
+		} catch (IllegalStateException ex) {
+			System.out.println("Exception aufgetreten" + ex.getMessage());
+		}
 		System.out.println(SubjectToChange.staticField);
-		
+
 		if (testReflect) {
 			for (int i = 0; i < TIMES; i++) {
 				Field field = SubjectToChange.class.getField("staticField");
 				System.out.println(field.get(null));
 				field.set(null, "NEW STATIC REFLECTIVE VALUE");
 				System.out.println(field.get(null));
-			}			
+			}
 		}
+
+		StcA sa = new StcA();
+		System.out.println("Expected: " + "StcA:5");
+		System.out.println("Reality : " + sa);
+
+		B b = new B();
+		System.out.println("Expected: " + "StcA:2	B:2 Super:2");
+		System.out.println("Reality : " + b);
+
+		C c = new C();
+		System.out.println("Expected: " + "StcA:12	B:12 Super:12	C:7 Super:12");
+		System.out.println("Reality : " + c);
 	}
 }

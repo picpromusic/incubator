@@ -1,8 +1,11 @@
+package incubator;
 import java.lang.annotation.Documented;
 
 import incubator.FieldAnnotationForTesting; 
 import java.lang.annotation.Documented;
 import javalang.ref.AccessorAnnotationWrapper;
+import javalang.ref.Accessor;
+
 
 public class SubjectToChange {
 
@@ -28,7 +31,7 @@ public class SubjectToChange {
 	
 	@Accessor("cause")
 	public void initCause(Throwable cause) {
-		throw new IllegalStateException("Not allowed to change");
+		throw new IllegalStateException("Not allowed to change the cause. This message is intendend");
 	}
 	
 	@PrivatelyDefindedFieldAnnotation(@FieldAnnotationForTesting(a = { @Documented }, b = false, s = "DEMO_STATIC-FIELD <<<NEW3SOL12>>>"))
@@ -39,6 +42,6 @@ public class SubjectToChange {
 
 	@Accessor("staticField")
 	public static void setFoo(Object value) {
-		throw new RuntimeException("PutStatic not allowed anymore");
+		throw new IllegalStateException("PutStatic of staticField not allowed anymore. This message is intendend");
 	}
 }
