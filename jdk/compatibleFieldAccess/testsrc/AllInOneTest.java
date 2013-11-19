@@ -15,7 +15,7 @@ public class AllInOneTest {
 		try {
 			stc.cause = new RuntimeException("NEW");
 		} catch (IllegalStateException ex) {
-			System.out.println("Exception aufgetreten" + ex.getMessage());
+			System.out.println("Exception occured " + ex.getMessage());
 		}
 		System.out.println(stc.cause);
 
@@ -35,7 +35,7 @@ public class AllInOneTest {
 		try {
 			SubjectToChange.staticField = "NEW STATIC VALUE";
 		} catch (IllegalStateException ex) {
-			System.out.println("Exception aufgetreten" + ex.getMessage());
+			System.out.println("Exception occured " + ex.getMessage());
 		}
 		System.out.println(SubjectToChange.staticField);
 
@@ -56,8 +56,14 @@ public class AllInOneTest {
 		System.out.println("Expected: " + "StcA:2	B:2 Super:2");
 		System.out.println("Reality : " + b);
 
-		C c = new C();
-		System.out.println("Expected: " + "StcA:12	B:12 Super:12	C:7 Super:12");
-		System.out.println("Reality : " + c);
+		try {
+			C c = new C();
+			System.out.println("Expected: "
+					+ "StcA:12	B:12 Super:12	C:7 Super:12");
+			System.out.println("Reality : " + c);
+		} catch (IllegalStateException ex) {
+			System.out.println("Exception occured " + ex.getMessage());
+		}
+
 	}
 }
