@@ -3,7 +3,9 @@ package incubator;
 public class B extends StcA {
 	
 	public B() {
-		super.field-=3;
+		// This "this" (instead of "super") is intended. Because Bytecode differs in both situations.
+		// The class C contains the super test-case 
+		this.field-=3;
 	}
 
 	@Override

@@ -25,6 +25,7 @@ public class CheckFieldAccess {
 	private static final Handle BOOTSTRAP_GET;
 	private static final Handle BOOTSTRAP_SET;
 	private ClassLoader loader;
+	private static final boolean DISABLE_BCI;
 
 	static {
 		BOOTSTRAP_GET = new Handle(
@@ -38,6 +39,8 @@ public class CheckFieldAccess {
 				"Bootstrapper",
 				"setFunction",
 				"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;I)Ljava/lang/invoke/CallSite;");
+
+		DISABLE_BCI = Boolean.getBoolean("disable-bci");
 	}
 
 	public CheckFieldAccess(ClassNode classNode, ClassLoader loader) {
@@ -46,8 +49,10 @@ public class CheckFieldAccess {
 	}
 
 	public void makeItSo() {
-		for (MethodNode method : (List<MethodNode>) classNode.methods) {
-			checkFieldAccess(method);
+		if (!DISABLE_BCI) {
+			for (MethodNode method : (List<MethodNode>) classNode.methods) {
+				checkFieldAccess(method);
+			}
 		}
 	}
 
@@ -58,7 +63,7 @@ public class CheckFieldAccess {
 			AbstractInsnNode next = iterator.next();
 			if (next.getOpcode() == Opcodes.GETFIELD) {
 				FieldInsnNode fins = (FieldInsnNode) next;
-				if (isAccessable(fins))
+				if (isAccessable(fins)) 
 					continue;
 				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
 						fins.name,//
@@ -116,7 +121,7 @@ public class CheckFieldAccess {
 				}
 			}
 
-			AnalyseClass ac = new AnalyseClass(classNode.superName, loader);
+			AnalyseClass ac = new AnalyseClass(classNode.name, loader);
 			ac = ac.findInClassHirachie(fins.owner);
 			boolean foundInHierachie = ac != null;
 			if (!foundInHierachie) {
@@ -132,7 +137,7 @@ public class CheckFieldAccess {
 							: af.isPublicAccessable();
 				}
 
-			} while (!accessable && af == null && ac != null);
+			} while (!(accessable || ac == null));
 
 			return accessable;
 

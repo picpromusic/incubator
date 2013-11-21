@@ -8,6 +8,7 @@ public class StcA {
 
 	@Accessor("field")
 	protected void setField(int value) {
+		System.out.println("setField Method of class StcA accessed");
 		this.field = value;
 	}
 

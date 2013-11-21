@@ -17,6 +17,33 @@
 		</java>
 	</target>
 
+	<target name="test-original-disable-transform" depends="compile-test,jar-poc" description="test-original-disable-transform">
+		<mkdir dir="tmp" />
+		<java classname="AllInOneTest" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<jvmarg line="-Dtest-reflection=true" />
+			<jvmarg line="-Ddisable-bci=true" />
+			<classpath>
+				<path location="test" />
+				<path location="dep" />
+				<path location="lib.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test-original-without-bci" depends="compile-test" description="test-original-without-bci">
+		<mkdir dir="tmp" />
+		<java classname="AllInOneTest" fork="true">
+			<jvmarg line="-Dtest-reflection=true" />
+			<classpath>
+				<path location="test" />
+				<path location="dep" />
+				<path location="lib.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	
 	<target name="compile-test" depends="jar-original,compile-dep">
 		<mkdir dir="test" />
 		<javac srcdir="testsrc" destdir="test" classpath="lib.jar" debug="true" target="1.7">
