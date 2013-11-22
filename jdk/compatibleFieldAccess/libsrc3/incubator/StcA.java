@@ -5,21 +5,6 @@ import javalang.ref.Accessor;
 public class StcA {
 
 	private int field;
-	private int setCounter = 1;
-
-	@Accessor("field")
-	protected void setField(int value) {
-		System.out.println("setField Method of class StcA accessed");
-		if (setCounter-- == 0) {
-			throw new IllegalStateException("Not allowed to change the field more than once. This message is intendend");
-		}
-		this.field = value;
-	}
-
-	@Accessor("field")
-	protected int getField() {
-		return this.field;
-	}
 	
 	public StcA() {
 		this.field = 5;
