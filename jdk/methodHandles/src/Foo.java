@@ -1,5 +1,6 @@
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.invoke.MethodHandles.Lookup;
 
 public class Foo extends Bar {
@@ -34,7 +35,7 @@ public class Foo extends Bar {
 				e.printStackTrace();
 			}
 			// Nice. But wait. myPrivateField is not my field. In fact it is
-			// the field of BarBase. 
+			// the field of BarBase.
 			// Commented out in order to show the result of toString()
 			// throw new AssertionError(
 			// "Should not access a private field in super class");
@@ -77,6 +78,24 @@ public class Foo extends Bar {
 		}
 	}
 
+	private void bamm() {
+		try {
+			MethodHandle registerNatives = MethodHandles.lookup().findStatic(
+					Foo.class,
+					"registerNatives",
+					MethodType.fromMethodDescriptorString("()V",
+							Foo.class.getClassLoader()));
+			registerNatives.invoke();
+		} catch (NoSuchMethodException | IllegalAccessException
+				| IllegalArgumentException | TypeNotPresentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "Foo () extends Bar(" + super.toString() + ")";
@@ -85,5 +104,6 @@ public class Foo extends Bar {
 	public static void main(String[] args) {
 		Foo foo = new Foo();
 		System.out.println(foo);
+		foo.bamm();
 	}
 }
