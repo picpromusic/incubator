@@ -3,7 +3,10 @@ package inc;
 import static lambdaActors.ActorSystem.nothing;
 import static lambdaActors.ActorSystem.thrownException;
 import static lambdaActors.ActorSystem.value;
+import inc.myFirstActor.ConfigureLambda;
+import inc.myFirstActor.ExternalLambda;
 import inc.myFirstActor.GetSomeNumber;
+import inc.myFirstActor.MyFirstActorInterface;
 import inc.myFirstActor.PrintMe;
 import inc.myFirstActor.ThrowsException;
 

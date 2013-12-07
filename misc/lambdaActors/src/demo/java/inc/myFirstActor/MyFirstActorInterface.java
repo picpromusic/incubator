@@ -1,8 +1,5 @@
-package inc;
+package inc.myFirstActor;
 
-import inc.myFirstActor.GetSomeNumber;
-import inc.myFirstActor.PrintMe;
-import inc.myFirstActor.ThrowsException;
 
 public interface MyFirstActorInterface extends //
 		PrintMe,//

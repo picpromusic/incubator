@@ -1,6 +1,7 @@
 package inc;
 
 import inc.MyFirstActorImpl.Data;
+import inc.myFirstActor.MyFirstActorInterface;
 
 import java.io.IOException;
 import java.util.ArrayList;

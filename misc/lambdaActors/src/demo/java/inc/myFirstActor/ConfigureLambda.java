@@ -1,4 +1,4 @@
-package inc;
+package inc.myFirstActor;
 
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
