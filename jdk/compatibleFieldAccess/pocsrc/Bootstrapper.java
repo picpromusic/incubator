@@ -3,6 +3,7 @@ import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -20,11 +21,15 @@ public class Bootstrapper {
 		} else {
 			clazz = Class.forName(declaringClass);
 		}
-		while (!clazz.equals("java/lang/Object")) {
+		while (!clazz.getCanonicalName().equals("java.lang.Object")) {
 			try {
 				MethodHandle ret = staticProperty //
 				? lookup.findStaticGetter(clazz, name, type.returnType())
 						: lookup.findGetter(clazz, name, type.returnType());
+				// Workaround till findStaticGetter/findGetter is fixed
+				if (!clazz.getField(name).isAccessible()) {
+					Field declaredField = clazz.getDeclaredField(name);
+				}
 				return new ConstantCallSite(ret);
 			} catch (Exception e) { // Should be ReflectiveOperationException |
 									// IllegalAccessException
@@ -70,7 +75,10 @@ public class Bootstrapper {
 				MethodHandle ret = staticProperty //
 				? lookup.findStaticSetter(clazz, name, type.parameterType(0))
 						: lookup.findSetter(clazz, name, type.parameterType(1));
-
+				// Workaround till findStaticSetter/findSetter is fixed
+				if (!clazz.getField(name).isAccessible()) {
+					Field declaredField = clazz.getDeclaredField(name);
+				}
 				return new ConstantCallSite(ret);
 			} catch (Exception e) { // Should be ReflectiveOperationException |
 									// IllegalAccessException
