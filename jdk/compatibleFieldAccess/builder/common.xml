@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="compatibleFieldAccess" default="info">
+	<description>
+            description
+    </description>
+
+	<target name="info">
+		<echo message="abstract common.xml" />
+	</target>
+
+
+
+
+	<target name="compile-test" depends="jar-original,compile-dep">
+		<mkdir dir="target/test" />
+		<javac srcdir="testsrc" destdir="target/test" classpath="lib.jar" debug="true" target="1.7">
+			<filename name="**/*.java" />
+			<classpath>
+				<path location="target/dep" />
+			</classpath>
+		</javac>
+	</target>
+
+
+	<target name="jar-original" depends="compile-original">
+		<jar destfile="lib.jar">
+			<fileset dir="target/lib">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile-original" depends="compile-common">
+		<mkdir dir="target/lib" />
+		<javac srcdir="libsrc" destdir="target/lib" debug="true" target="1.7">
+			<filename name="**/*.java" />
+			<classpath>
+				<path location="target/common" />
+			</classpath>
+		</javac>
+	</target>
+
+
+	<target name="jar-poc" depends="compile-poc">
+		<jar destfile="poc.jar" manifest="MANIFEST.MF">
+			<fileset dir="target/poc">
+				<include name="**/*" />
+			</fileset>
+			<fileset dir="target/common">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile-poc" depends="compile-common">
+		<mkdir dir="target/poc" />
+		<javac srcdir="pocsrc" destdir="target/poc" classpath="target/common;libs/asm-debug-all-4.2.jar" debug="true" target="1.7">
+			<filename name="**/*.java" />
+		</javac>
+	</target>
+
+	<target name="jar-new-lib2" depends="compile-new-lib2">
+		<jar destfile="lib2.jar">
+			<fileset dir="target/lib2">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile-new-lib2" depends="compile-common,compile-dep">
+		<mkdir dir="target/lib2" />
+		<javac srcdir="libsrc2" destdir="target/lib2" classpath="target/common" debug="true" target="1.7">
+			<filename name="**/*.java" />
+			<classpath>
+				<path location="target/common" />
+				<path location="target/dep" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="compile-common">
+		<mkdir dir="target/common" />
+		<javac srcdir="commonsrc" destdir="target/common" debug="true" target="1.7">
+			<filename name="**/*.java" />
+		</javac>
+	</target>
+
+	<target name="compile-dep" depends="compile-original">
+		<mkdir dir="target/dep" />
+		<javac srcdir="depsrc" destdir="target/dep" debug="true" target="1.7">
+			<filename name="**/*.java" />
+			<classpath>
+				<path location="target/lib" />
+			</classpath>
+		</javac>
+	</target>
+
+
+	<target name="jar-new-lib3" depends="compile-new-lib3">
+		<jar destfile="lib3.jar">
+			<fileset dir="target/lib3">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile-new-lib3" depends="compile-common">
+		<mkdir dir="target/lib3" />
+		<javac srcdir="libsrc3" destdir="target/lib3" classpath="target/common" debug="true" target="1.7">
+			<filename name="**/*.java" />
+		</javac>
+	</target>
+
+	<target name="jar-new-lib4" depends="compile-new-lib4">
+		<jar destfile="lib4.jar">
+			<fileset dir="target/lib4">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile-new-lib4" depends="compile-common">
+		<mkdir dir="target/lib4" />
+		<javac srcdir="libsrc4" destdir="target/lib4" classpath="target/common" debug="true" target="1.7">
+			<filename name="**/*.java" />
+		</javac>
+	</target>
+
+	<target name="test-original" depends="compile-test,jar-poc" description="test-original">
+		<mkdir dir="tmp" />
+		<java classname="${mainclass}" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<jvmarg line="-Dtest-reflection=true" />
+			<classpath>
+				<path location="target/test" />
+				<path location="target/dep" />
+				<path location="lib.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test-original-disable-transform" depends="compile-test,jar-poc" description="test-original-disable-transform">
+		<mkdir dir="tmp" />
+		<java classname="${mainclass}" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<jvmarg line="-Dtest-reflection=true" />
+			<jvmarg line="-Ddisable-bci=true" />
+			<classpath>
+				<path location="target/test" />
+				<path location="target/dep" />
+				<path location="lib.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test-original-without-bci" depends="compile-test" description="test-original-without-bci">
+		<mkdir dir="tmp" />
+		<java classname="${mainclass}" fork="true">
+			<jvmarg line="-Dtest-reflection=true" />
+			<classpath>
+				<path location="target/test" />
+				<path location="target/dep" />
+				<path location="lib.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test-new-lib2" depends="compile-test,jar-new-lib2,jar-poc" description="test-new-lib2">
+		<mkdir dir="tmp" />
+		<java classname="${mainclass}" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<classpath>
+				<path location="target/test" />
+				<path location="target/dep" />
+				<path location="lib2.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test-new-lib2-disable-transform" depends="compile-test,jar-new-lib2,jar-poc" description="test-new-lib2">
+		<mkdir dir="tmp" />
+		<java classname="${mainclass}" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<jvmarg line="-Ddisable-bci=true" />
+			<classpath>
+				<path location="target/test" />
+				<path location="target/dep" />
+				<path location="lib2.jar" />
+			</classpath>
+		</java>
+	</target>
+
+
+</project>

@@ -77,8 +77,11 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		inserter.setTraceLevel(traceLevel);
 
 		boolean transformed = false;
-		if (className.equals("AllInOneTest") || className.equals("incubator/B")
-				|| className.equals("incubator/C") || className.equals("Testing")) {
+		if (className.equals("AllInOneTest") || className.equals("SimpleTest")
+				|| className.equals("incubator/B")
+				|| className.equals("incubator/C")
+				|| className.equals("Testing")
+				|| className.startsWith("incubator/tests/")) {
 			System.out.println("Transform " + className);
 			inserter.makeItSo();
 			transformed = true;
@@ -139,7 +142,5 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		this.traceLevel = traceLevel;
 
 	}
-	
-	
 
 }
