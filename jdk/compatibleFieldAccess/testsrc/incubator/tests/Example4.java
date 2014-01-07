@@ -2,23 +2,23 @@ package incubator.tests;
 
 import javalang.ref.AsymeticAcessorError;
 import javalang.ref.UnambiguousFieldError;
-import example2.SubjectToChange;
+import example3.SubjectToChange;
 
-public class Example2 {
+public class Example4 {
 	public static void main(String[] args) {
 		boolean expectError = Boolean.getBoolean("cfa.changedVersion");
 		try {
 			testIt();
 			if (expectError) {
-				throw new AssertionError("AsymeticAcessorError expected");
+				throw new AssertionError("UnambiguousFieldError expected");
 			}
 		} catch (BootstrapMethodError e) {
 			if (!expectError) {
 				throw new AssertionError("Error not expected", e);
-			} else if (! (e.getCause() instanceof AsymeticAcessorError)) {
+			} else if (! (e.getCause() instanceof UnambiguousFieldError)) {
 				throw new AssertionError("Error not expected", e);
 			}
-		} catch (AsymeticAcessorError e) {
+		} catch (UnambiguousFieldError e) {
 			if (!expectError) {
 				throw new AssertionError("Error not expected", e);
 			}
@@ -26,7 +26,7 @@ public class Example2 {
 	}
 
 	private static void testIt() {
-		SubjectToChange stc = new SubjectToChange(5);
-		System.out.println(stc.publicField);
+		SubjectToChange stc = new SubjectToChange(7);
+		stc.value = 8;
 	}
 }

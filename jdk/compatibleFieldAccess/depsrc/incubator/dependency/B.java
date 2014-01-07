@@ -1,4 +1,6 @@
-package incubator;
+package incubator.dependency;
+
+import incubator.StcA;
 
 public class B extends StcA {
 	

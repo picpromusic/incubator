@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
-import java.lang.instrument.UnmodifiableClassException;
 import java.security.CodeSigner;
 import java.security.ProtectionDomain;
 
@@ -20,17 +19,11 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 
 	private static final int TRACE_CLASSNAME = 4;
 	private static final int TRACE_SIGNED_MESSAGE = 1;
-	private boolean sol1;
-	private boolean sol2;
-	private boolean solBoot;
 	private int traceLevel;
 	private PrintStream tracer;
 	private Instrumentation inst;
 
 	public MyClassFileTransformer(Instrumentation inst) {
-		sol1 = false;
-		sol2 = false;
-		solBoot = false;
 		traceLevel = 0;
 		tracer = System.out;
 		this.inst = inst;
@@ -70,17 +63,11 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		ClassNode classNode = new ClassNode();
 		cr.accept(classNode, ClassReader.EXPAND_FRAMES);
 		CheckFieldAccess inserter = new CheckFieldAccess(classNode, loader);
-		inserter.setSolution1(sol1);
-		inserter.setSolution2(sol2);
-		inserter.setSolutionBootstrap(solBoot);
 		inserter.setTraceOutput(tracer);
 		inserter.setTraceLevel(traceLevel);
 
 		boolean transformed = false;
-		if (className.equals("AllInOneTest") || className.equals("SimpleTest")
-				|| className.equals("incubator/B")
-				|| className.equals("incubator/C")
-				|| className.equals("Testing")
+		if (className.startsWith("incubator/dependency")
 				|| className.startsWith("incubator/tests/")) {
 			System.out.println("Transform " + className);
 			inserter.makeItSo();
@@ -118,19 +105,6 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		TraceClassVisitor traceClassVisitor = new TraceClassVisitor(pw);
 		classReader.accept(traceClassVisitor, ClassReader.EXPAND_FRAMES);
 		pw.close();
-
-	}
-
-	public void setSolution1(boolean enabled) {
-		this.sol1 = enabled;
-	}
-
-	public void setSolution2(boolean enabled) {
-		this.sol2 = enabled;
-	}
-
-	public void setSolutionBootstrap(boolean enabled) {
-		this.solBoot = enabled;
 
 	}
 

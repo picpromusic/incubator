@@ -1,4 +1,4 @@
-Place asm-debug-all-4.0.jar in libs dir and run
+Place asm-debug-all-4.2.jar in libs dir and run
 ant clean
 ant test-enabled
 

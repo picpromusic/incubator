@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="example4" default="info" basedir="../..">
+	<description>
+            description
+    </description>
+
+	<import file="../common.xml" />
+
+	<property name="mainclass" value="incubator.tests.Example4" />
+
+	<target name="info" description="info">
+		<echo message="test-original" />
+	</target>
+
+
+</project>

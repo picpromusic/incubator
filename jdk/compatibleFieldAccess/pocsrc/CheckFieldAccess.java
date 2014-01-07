@@ -17,9 +17,6 @@ public class CheckFieldAccess {
 
 	private static final int NON_MODIFIER = 0x0;
 	private final ClassNode classNode;
-	private boolean sol1;
-	private boolean sol2;
-	private boolean solBoot;
 	private int traceLevel;
 	private PrintStream tracer;
 	private static final Handle BOOTSTRAP_GET;
@@ -63,7 +60,7 @@ public class CheckFieldAccess {
 			AbstractInsnNode next = iterator.next();
 			if (next.getOpcode() == Opcodes.GETFIELD) {
 				FieldInsnNode fins = (FieldInsnNode) next;
-				if (isAccessable(fins)) 
+				if (isAccessable(fins))
 					continue;
 				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
 						fins.name,//
@@ -144,18 +141,6 @@ public class CheckFieldAccess {
 		} catch (SecurityException e) {
 		}
 		return false;
-	}
-
-	public void setSolution1(boolean enabled) {
-		this.sol1 = enabled;
-	}
-
-	public void setSolution2(boolean enabled) {
-		this.sol2 = enabled;
-	}
-
-	public void setSolutionBootstrap(boolean enabled) {
-		this.solBoot = enabled;
 	}
 
 	public void setTraceOutput(PrintStream tracer) {

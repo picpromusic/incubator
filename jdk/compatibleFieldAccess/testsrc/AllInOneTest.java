@@ -1,7 +1,7 @@
-import incubator.B;
-import incubator.C;
 import incubator.StcA;
 import incubator.SubjectToChange;
+import incubator.dependency.B;
+import incubator.dependency.C;
 
 import java.lang.reflect.Field;
 

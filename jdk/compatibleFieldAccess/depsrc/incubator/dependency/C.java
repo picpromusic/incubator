@@ -1,4 +1,4 @@
-package incubator;
+package incubator.dependency;
 
 public class C extends B{
 
