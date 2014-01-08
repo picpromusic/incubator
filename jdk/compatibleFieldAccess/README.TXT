@@ -28,3 +28,10 @@ test-enabled:
      [java] TestConfiguration: noReflectionPossible. Skip ReflectionTest
      [java] Everything is fine
 BUILD SUCCESSFUL
+
+
+Example1: Everything is fine.
+Example2: AsymeticAcessorError Detection
+Example3: UnambiguousFieldError Detection for get Accessor
+Example4: UnambiguousFieldError Detection for set Accessor
+Example5: Static non static chane Detection    

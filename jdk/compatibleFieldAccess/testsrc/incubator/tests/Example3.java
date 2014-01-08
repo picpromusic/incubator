@@ -5,7 +5,11 @@ import example4.SubjectToChange;
 
 public class Example3 {
 	public static void main(String[] args) {
-		boolean expectError = Boolean.getBoolean("cfa.changedVersion");
+		String solution = System.getProperty("SolutionList");
+		boolean sol2 = solution != null ? solution.contains("2") : false;
+
+		boolean expectError = Boolean.getBoolean("cfa.changedVersion") & sol2;
+		
 		try {
 			testIt();
 			if (expectError) {

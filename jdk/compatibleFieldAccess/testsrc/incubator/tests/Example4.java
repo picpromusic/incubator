@@ -1,12 +1,15 @@
 package incubator.tests;
 
-import javalang.ref.AsymeticAcessorError;
 import javalang.ref.UnambiguousFieldError;
 import example3.SubjectToChange;
 
 public class Example4 {
 	public static void main(String[] args) {
-		boolean expectError = Boolean.getBoolean("cfa.changedVersion");
+		String solution = System.getProperty("SolutionList");
+		boolean sol2 = solution != null ? solution.contains("2") : false;
+
+		boolean expectError = Boolean.getBoolean("cfa.changedVersion") & sol2;
+
 		try {
 			testIt();
 			if (expectError) {
@@ -15,7 +18,7 @@ public class Example4 {
 		} catch (BootstrapMethodError e) {
 			if (!expectError) {
 				throw new AssertionError("Error not expected", e);
-			} else if (! (e.getCause() instanceof UnambiguousFieldError)) {
+			} else if (!(e.getCause() instanceof UnambiguousFieldError)) {
 				throw new AssertionError("Error not expected", e);
 			}
 		} catch (UnambiguousFieldError e) {

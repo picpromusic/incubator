@@ -1,4 +1,4 @@
-package example1;
+package example5;
 
 public class SubjectToChange {
 	public int publicField;

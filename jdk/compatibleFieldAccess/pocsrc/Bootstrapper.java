@@ -6,6 +6,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import javalang.ref.Accessor;
@@ -38,9 +39,6 @@ public class Bootstrapper {
 					"Solution B cannot be used together with one of 1 or 2");
 		}
 
-		if (sol1) {
-			throw new RuntimeException("SOL1 NYI");
-		}
 		if (solBoot) {
 			throw new RuntimeException("SOL_BOOT NYI");
 		}
@@ -64,7 +62,7 @@ public class Bootstrapper {
 			Lookup lookup, String name, MethodType type, String declaringClass,
 			int mod) throws NoSuchMethodException, IllegalAccessException,
 			ClassNotFoundException {
-		if (sol2) {
+		if (sol2 | sol1) {
 			boolean staticProperty = Modifier.isStatic(mod);
 			Class<?> clazz;
 			if (!staticProperty) {
@@ -84,7 +82,7 @@ public class Bootstrapper {
 							throw new UnambiguousFieldError();
 						}
 					} else {
-						if (!symetryCheck) {
+						if (!symetryCheck && sol2) {
 							for (Field f : clazz.getDeclaredFields()) {
 								potentialUnambiguousFieldDetected |= f
 										.getName().equals(name);
@@ -95,7 +93,7 @@ public class Bootstrapper {
 								: lookup.findGetter(clazz, name, fieldType);
 						// Workaround till findStaticGetter/findGetter is fixed
 						if (!clazz.getField(name).isAccessible()) {
-							Field declaredField = clazz.getDeclaredField(name);
+							clazz.getDeclaredField(name);
 						}
 						return new ConstantCallSite(ret);
 					}
@@ -128,10 +126,16 @@ public class Bootstrapper {
 		Method[] methods = clazz.getDeclaredMethods();
 		Class<?> expectedRetType = get ? type.returnType() : void.class;
 		for (Method method : methods) {
-			if (Modifier.isStatic(method.getModifiers()) == staticProperty
-					&& method.getReturnType().equals(expectedRetType)) {
+			if (method.getReturnType().equals(expectedRetType)) {
 				Accessor annotation = method.getAnnotation(Accessor.class);
 				if (annotation != null && annotation.value().equals(name)) {
+					if (Modifier.isStatic(method.getModifiers()) != staticProperty) {
+						String message = MessageFormat.format(
+								"{0}-Field {1} is not accessable in a {2} way",
+								(staticProperty ? "Instance" : "Static"), name,
+								(staticProperty ? "static" : "non-static"));
+						throw new IncompatibleClassChangeError(message);
+					}
 					MethodType mt = get ? MethodType.methodType(fieldType)
 							: MethodType.methodType(void.class,
 									method.getParameterTypes());
@@ -140,33 +144,6 @@ public class Bootstrapper {
 							: lookup.findVirtual(clazz, method.getName(), mt);
 					if (!symetryCheck) {
 						symetryCheck(false, lookup, name, mod, staticProperty,
-								clazz, fieldType);
-					}
-					return new ConstantCallSite(ret.asType(type));
-				}
-			}
-		}
-		return null;
-	}
-
-	private static CallSite findAccesorSetMethod(boolean symetryCheck,
-			Lookup lookup, String name, MethodType type, int mod,
-			boolean staticProperty, Class<?> clazz, Class<?> fieldType)
-			throws NoSuchMethodException, IllegalAccessException,
-			ClassNotFoundException, AsymeticAcessorError {
-		Method[] methods = clazz.getDeclaredMethods();
-		for (Method method : methods) {
-			if (Modifier.isStatic(method.getModifiers()) == staticProperty
-					&& method.getReturnType().equals(void.class)) {
-				Accessor annotation = method.getAnnotation(Accessor.class);
-				if (annotation != null && annotation.value().equals(name)) {
-					MethodType mt = MethodType.methodType(void.class,
-							method.getParameterTypes());
-					MethodHandle ret = staticProperty ? lookup.findStatic(
-							clazz, method.getName(), mt) : lookup.findVirtual(
-							clazz, method.getName(), mt);
-					if (!symetryCheck) {
-						symetryCheck(true, lookup, name, mod, staticProperty,
 								clazz, fieldType);
 					}
 					return new ConstantCallSite(ret.asType(type));
@@ -192,14 +169,14 @@ public class Bootstrapper {
 			callSite = innerGetFunction(true, lookup,//
 					name,//
 					MethodType.methodType(rType, ptypes),//
-					clazz.getCanonicalName().replace('.', '/'),//
+					clazz.getCanonicalName(),//
 					mod);
 		} else {
 			ptypes.add(fieldType);
 			callSite = innerSetFunction(true, lookup,//
 					name,//
 					MethodType.methodType(rType, ptypes),//
-					clazz.getCanonicalName().replace('.', '/'),//
+					clazz.getCanonicalName(),//
 					mod);
 		}
 		if (callSite == null) {
@@ -231,7 +208,7 @@ public class Bootstrapper {
 		} else {
 			clazz = Class.forName(declaringClass);
 		}
-		if (sol2) {
+		if (sol2 | sol1) {
 			boolean potentialUnambiguousFieldDetected = false;
 			while (!clazz.getCanonicalName().equals("java.lang.Object")) {
 				Class<?> fieldType = type.parameterType(staticProperty ? 0 : 1);
@@ -244,7 +221,7 @@ public class Bootstrapper {
 							throw new UnambiguousFieldError();
 						}
 					} else {
-						if (!symetryCheck) {
+						if (!symetryCheck && sol2) {
 							for (Field f : clazz.getDeclaredFields()) {
 								potentialUnambiguousFieldDetected |= f
 										.getName().equals(name);
@@ -255,15 +232,16 @@ public class Bootstrapper {
 								: lookup.findSetter(clazz, name, fieldType);
 						// Workaround till findStaticSetter/findSetter is fixed
 						if (!clazz.getField(name).isAccessible()) {
-							Field declaredField = clazz.getDeclaredField(name);
+							clazz.getDeclaredField(name);
 						}
 						return new ConstantCallSite(ret);
 					}
 				} catch (Exception e) { // Should be
 										// ReflectiveOperationException |
 										// IllegalAccessException
-					CallSite cs = findAccesorMethod(symetryCheck, false, lookup,
-							name, type, mod, staticProperty, clazz, fieldType);
+					CallSite cs = findAccesorMethod(symetryCheck, false,
+							lookup, name, type, mod, staticProperty, clazz,
+							fieldType);
 					if (cs != null) {
 						if (!symetryCheck && potentialUnambiguousFieldDetected) {
 							throw new UnambiguousFieldError();

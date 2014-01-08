@@ -1,4 +1,4 @@
-package example1;
+package example5;
 
 import javalang.ref.Accessor;
 
@@ -11,23 +11,23 @@ public class SubjectToChange {
 	}
 	
 	@Accessor("publicField")
-	public int getValue() {
-		return value;
-	}
-	
-	@Accessor("publicField")
-	public void setValue(int value) {
-		this.value = value;
-	}
-	
-	@Accessor("publicStaticField")
-	public static int getStatic() {
+	public static int getValue() {
 		return privateStaticField;
 	}
 	
+	@Accessor("publicField")
+	public static void setValue(int value) {
+		privateStaticField = value;
+	}
+	
 	@Accessor("publicStaticField")
-	public static void setStatic(int newValue) {
-		privateStaticField = newValue;
+	public int getStatic() {
+		return value;
+	}
+	
+	@Accessor("publicStaticField")
+	public void setStatic(int newValue) {
+		value = newValue;
 	}
 
 }
