@@ -1,4 +1,3 @@
-import java.io.PrintStream;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.ListIterator;
@@ -17,8 +16,6 @@ public class CheckFieldAccess {
 
 	private static final int NON_MODIFIER = 0x0;
 	private final ClassNode classNode;
-	private int traceLevel;
-	private PrintStream tracer;
 	private static final Handle BOOTSTRAP_GET;
 	private static final Handle BOOTSTRAP_SET;
 	private ClassLoader loader;
@@ -128,10 +125,12 @@ public class CheckFieldAccess {
 			boolean accessable = false;
 			do {
 				af = ac.findField(fins.name);
+				String packageName = getPackage(ac.getClassName());
 				ac = ac.getSuperClass();
 				if (af != null) {
 					accessable |= foundInHierachie ? af.isProtectAccessable()
 							: af.isPublicAccessable();
+					accessable |= getPackage(classNode.name).equals(packageName) && af.isPackageAccessable();
 				}
 
 			} while (!(accessable || ac == null));
@@ -139,15 +138,14 @@ public class CheckFieldAccess {
 			return accessable;
 
 		} catch (SecurityException e) {
+		} catch (ClassNotFoundException e) {
+			return false;
 		}
 		return false;
 	}
 
-	public void setTraceOutput(PrintStream tracer) {
-		this.tracer = tracer;
+	private String getPackage(String name) {
+		return name.substring(0,name.lastIndexOf('/'));
 	}
 
-	public void setTraceLevel(int traceLevel) {
-		this.traceLevel = traceLevel;
-	}
 }

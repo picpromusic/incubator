@@ -21,12 +21,10 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 	private static final int TRACE_SIGNED_MESSAGE = 1;
 	private int traceLevel;
 	private PrintStream tracer;
-	private Instrumentation inst;
 
 	public MyClassFileTransformer(Instrumentation inst) {
 		traceLevel = 0;
 		tracer = System.out;
-		this.inst = inst;
 	}
 
 	@Override
@@ -63,12 +61,13 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		ClassNode classNode = new ClassNode();
 		cr.accept(classNode, ClassReader.EXPAND_FRAMES);
 		CheckFieldAccess inserter = new CheckFieldAccess(classNode, loader);
-		inserter.setTraceOutput(tracer);
-		inserter.setTraceLevel(traceLevel);
 
 		boolean transformed = false;
+		boolean isExtensionOrFriend = className.endsWith("Friend")
+				|| className.endsWith("Extension");
 		if (className.startsWith("incubator/dependency")
-				|| className.startsWith("incubator/tests/")) {
+				|| className.startsWith("incubator/tests/")
+				|| (className.startsWith("example6/") && isExtensionOrFriend)) {
 			System.out.println("Transform " + className);
 			inserter.makeItSo();
 			transformed = true;

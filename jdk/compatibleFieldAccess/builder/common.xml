@@ -8,12 +8,13 @@
 		<echo message="abstract common.xml" />
 	</target>
 
-
-
+    <target name="clean" description="clean">
+       <delete dir="target"/>
+    </target>
 
 	<target name="compile-test" depends="jar-original,compile-dep">
 		<mkdir dir="target/test" />
-		<javac srcdir="testsrc" destdir="target/test" classpath="lib.jar" debug="true" target="1.7">
+		<javac srcdir="testsrc" destdir="target/test" classpath="target/lib.jar" debug="true" target="1.7">
 			<filename name="**/*.java" />
 			<classpath>
 				<path location="target/dep" />
@@ -24,7 +25,7 @@
 
 
 	<target name="jar-original" depends="compile-original">
-		<jar destfile="lib.jar">
+		<jar destfile="target/lib.jar">
 			<fileset dir="target/lib">
 				<include name="**/*" />
 			</fileset>
@@ -61,7 +62,7 @@
 	</target>
 
 	<target name="jar-new-lib2" depends="compile-new-lib2">
-		<jar destfile="lib2.jar">
+		<jar destfile="target/lib2.jar">
 			<fileset dir="target/lib2">
 				<include name="**/*" />
 			</fileset>
@@ -92,28 +93,29 @@
 			<filename name="**/*.java" />
 			<classpath>
 				<path location="target/lib" />
+				<path location="target/common" />
 			</classpath>
 		</javac>
 	</target>
 
 
-	<target name="jar-new-lib3" depends="compile-new-lib3">
-		<jar destfile="lib3.jar">
-			<fileset dir="target/lib3">
+	<target name="jar-new-lib1" depends="compile-new-lib1">
+		<jar destfile="target/lib1.jar">
+			<fileset dir="target/lib1">
 				<include name="**/*" />
 			</fileset>
 		</jar>
 	</target>
 
-	<target name="compile-new-lib3" depends="compile-common">
-		<mkdir dir="target/lib3" />
-		<javac srcdir="libsrc3" destdir="target/lib3" classpath="target/common" debug="true" target="1.7">
+	<target name="compile-new-lib1" depends="compile-common">
+		<mkdir dir="target/lib1" />
+		<javac srcdir="libsrc1" destdir="target/lib1" classpath="target/common" debug="true" target="1.7">
 			<filename name="**/*.java" />
 		</javac>
 	</target>
 
 	<target name="jar-new-lib4" depends="compile-new-lib4">
-		<jar destfile="lib4.jar">
+		<jar destfile="target/lib4.jar">
 			<fileset dir="target/lib4">
 				<include name="**/*" />
 			</fileset>
@@ -136,7 +138,7 @@
 				<path location="target/test" />
 				<path location="target/dep" />
 				<path location="target/common" />
-				<path location="lib.jar" />
+				<path location="target/lib.jar" />
 			</classpath>
 		</java>
 	</target>
@@ -151,7 +153,7 @@
 				<path location="target/test" />
 				<path location="target/dep" />
 				<path location="target/common" />
-				<path location="lib.jar" />
+				<path location="target/lib.jar" />
 			</classpath>
 		</java>
 	</target>
@@ -164,7 +166,7 @@
 				<path location="target/test" />
 				<path location="target/dep" />
 				<path location="target/common" />
-				<path location="lib.jar" />
+				<path location="target/lib.jar" />
 			</classpath>
 		</java>
 	</target>
@@ -178,7 +180,7 @@
 			<classpath>
 				<path location="target/test" />
 				<path location="target/dep" />
-				<path location="lib2.jar" />
+				<path location="target/lib2.jar" />
 			</classpath>
 		</java>
 	</target>
@@ -192,12 +194,40 @@
 			<classpath>
 				<path location="target/test" />
 				<path location="target/dep" />
-				<path location="lib2.jar" />
+				<path location="target/lib2.jar" />
 			</classpath>
 		</java>
 	</target>
 
-	<target name="test" depends="test-original-without-bci,test-original,test-new-lib2" description="test">
+	<target name="test-new-lib1" depends="compile-test,jar-new-lib1,jar-poc" description="test-new-lib1">
+		<mkdir dir="tmp" />
+		<java classname="${mainclass}" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<jvmarg line="-Dcfa.changedVersion=true" />
+			<jvmarg line="-DSolutionList=1" />
+			<classpath>
+				<path location="target/test" />
+				<path location="target/dep" />
+				<path location="target/lib1.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test-new-lib1-disable-transform" depends="compile-test,jar-new-lib1,jar-poc" description="test-new-lib2">
+		<mkdir dir="tmp" />
+		<java classname="${mainclass}" fork="true">
+			<jvmarg line="-javaagent:poc.jar" />
+			<jvmarg line="-Ddisable-bci=true" />
+			<jvmarg line="-Dcfa.changedVersion=true" />
+			<classpath>
+				<path location="target/test" />
+				<path location="target/dep" />
+				<path location="target/lib1.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test" depends="test-original-without-bci,test-original,test-new-lib2,test-new-lib1" description="test">
 	</target>
 
 </project>

@@ -1,6 +1,5 @@
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 
 /**

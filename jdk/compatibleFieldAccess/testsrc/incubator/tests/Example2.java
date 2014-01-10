@@ -1,7 +1,6 @@
 package incubator.tests;
 
 import javalang.ref.AsymeticAcessorError;
-import javalang.ref.UnambiguousFieldError;
 import example2.SubjectToChange;
 
 public class Example2 {
