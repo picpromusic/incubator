@@ -11,40 +11,44 @@ import example6.sub.SubjectToChangeExtension;
 
 public class Example6 {
 	public static void main(String[] args) {
+		boolean changedVersion = Boolean.getBoolean("cfa.changedVersion");
 
 		String solution = System.getProperty("SolutionList");
 		boolean sol2 = solution != null ? solution.contains("2") : false;
 
-		testItExtension(sol2);
-		testItFriend(sol2);
-		testItExtensionFriend(sol2);
+		testItExtension(sol2, changedVersion);
+		testItFriend(sol2, changedVersion);
+		testItExtensionFriend(sol2, changedVersion);
 	}
 
-	private static void testItExtensionFriend(boolean sol2) {
-		MethodTracer.checkCallCountAndClean();
+	private static void testItExtensionFriend(boolean sol2,
+			boolean changedVersion) {
+		MethodTracer.checkCallCountAndClean("testItExtensionFriend");
 		SubjectToChangeExtension extend = new SubjectToChangeGoodFriend(51966);
 		SubjectToChange stc = extend;
+
 		System.out.println(stc.publicToProtectedField);
+		MethodTracer.checkIf("SubjectToChange.getPublicToProtectedField()",changedVersion);
+
 		System.out.println(stc.publicToPackageField);
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",changedVersion);
+
 		System.out.println(extend.getProtectedValueAsHexString());
-		System.out.println(extend.getPublicToPackageFieldAsHexString());
-		System.out.println(extend.getPublicToProtectedFieldAsHexString());
-		MethodTracer.check("SubjectToChange.getPublicToProtectedField()");
-		MethodTracer.check("SubjectToChange.getPublicToPackageField()");
 		MethodTracer
 				.check("SubjectToChangeGoodFriend.getProtectedValueAsHexString()");
-		MethodTracer.check("SubjectToChange.getProtectedField()");
+		MethodTracer.checkIf("SubjectToChange.getProtectedField()",changedVersion);
+
+		System.out.println(extend.getPublicToPackageFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeGoodFriend.getPublicToPackageFieldAsHexString()");
-		if (!sol2) {
-			// No call to SubjectToChange.getPublicToPackageField() because
-			// package access is allowed for extending class in same pacakge
-		} else {
-			// The above fact feels quite naturally, but in solution 2. Where it
-			// is not possible to have fields with the same name as the
-			// accessor-Methods. The calls goes through the public method
-			MethodTracer.check("SubjectToChange.getPublicToPackageField()");
-		}
+		// No call to SubjectToChange.getPublicToPackageField() because
+		// package access is allowed for extending class in same pacakge
+		// The above fact feels quite naturally, but in solution 2. Where it
+		// is not possible to have fields with the same name as the
+		// accessor-Methods. The calls goes through the public method
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",sol2);
+
+		System.out.println(extend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeGoodFriend.getPublicToProtectedFieldAsHexString()");
 		if (!sol2) {
@@ -56,66 +60,74 @@ public class Example6 {
 			// accessor-Methods. The calls goes through the public method
 			MethodTracer.check("SubjectToChange.getPublicToProtectedField()");
 		}
-		MethodTracer.checkCallCountAndClean();
+		MethodTracer.checkCallCountAndClean("");
 	}
 
-	private static void testItExtension(boolean sol2) {
-		MethodTracer.checkCallCountAndClean();
+	private static void testItExtension(boolean sol2, boolean changedVersion) {
+		MethodTracer.checkCallCountAndClean("testItExtension");
+
 		SubjectToChangeExtension extend = new SubjectToChangeExtension(51966);
 		SubjectToChange stc = extend;
 		System.out.println(stc.publicToProtectedField);
+		MethodTracer.checkIf("SubjectToChange.getPublicToProtectedField()",
+				changedVersion);
+
 		System.out.println(stc.publicToPackageField);
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
+				changedVersion);
+
 		System.out.println(extend.getProtectedValueAsHexString());
-		System.out.println(extend.getPublicToPackageFieldAsHexString());
-		System.out.println(extend.getPublicToProtectedFieldAsHexString());
-		MethodTracer.check("SubjectToChange.getPublicToProtectedField()");
-		MethodTracer.check("SubjectToChange.getPublicToPackageField()");
 		MethodTracer
 				.check("SubjectToChangeExtension.getProtectedValueAsHexString()");
-		MethodTracer.check("SubjectToChange.getProtectedField()");
+		MethodTracer.checkIf("SubjectToChange.getProtectedField()",
+				changedVersion);
+
+		System.out.println(extend.getPublicToPackageFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeExtension.getPublicToPackageFieldAsHexString()");
-		MethodTracer.check("SubjectToChange.getPublicToPackageField()");
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
+				changedVersion);
+
+		System.out.println(extend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeExtension.getPublicToProtectedFieldAsHexString()");
-		if (!sol2) {
-			// No call to SubjectToChange.getPublicToProtectedField() because
-			// package access is allowed for extending class
-		} else {
-			// The above fact feels quite naturally, but in solution 2. Where it
-			// is not possible to have fields with the same name as the
-			// accessor-Methods. The calls goes through the public method
-			MethodTracer.check("SubjectToChange.getPublicToProtectedField()");
-		}
-		MethodTracer.checkCallCountAndClean();
+		// No call to SubjectToChange.getPublicToProtectedField() because
+		// package access is allowed for extending class
+		// The above fact feels quite naturally, but in solution 2. Where it
+		// is not possible to have fields with the same name as the
+		// accessor-Methods. The calls goes through the public method
+		MethodTracer.checkIf("SubjectToChange.getPublicToProtectedField()",
+				changedVersion && sol2);
+
+		MethodTracer.checkCallCountAndClean("");
 	}
 
-	private static void testItFriend(boolean sol2) {
-		MethodTracer.checkCallCountAndClean();
+	private static void testItFriend(boolean sol2, boolean changedVersion) {
+		MethodTracer.checkCallCountAndClean("testItFriend");
 		SubjectToChange stc = new SubjectToChange(47806);
 		SubjectToChangeFriend friend = new SubjectToChangeFriend(stc);
 		System.out.println(friend.getPackageValueAsHexString());
-		System.out.println(friend.getPublicToPackageFieldAsHexString());
-		System.out.println(friend.getPublicToProtectedFieldAsHexString());
-		int index = 0;
 		MethodTracer
 				.check("SubjectToChangeFriend.getPackageValueAsHexString()");
-		MethodTracer.check("SubjectToChange.getPackageField()");
+		MethodTracer.checkIf("SubjectToChange.getPackageField()",
+				changedVersion);
+
+		System.out.println(friend.getPublicToPackageFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeFriend.getPublicToPackageFieldAsHexString()");
-		if (!sol2) {
-			// No call to SubjectToChange.getPublicToPackageField() because
-			// package access is allowed for frieds
-		} else {
-			// The above fact feels quite naturally, but in solution 2. Where it
-			// is not possible to have fields with the same name as the
-			// accessor-Methods. The calls goes through the public method
-			MethodTracer.check("SubjectToChange.getPublicToPackageField()");
-		}
+		// No call to SubjectToChange.getPublicToPackageField() because
+		// package access is allowed for frieds
+		// The above fact feels quite naturally, but in solution 2. Where it
+		// is not possible to have fields with the same name as the
+		// accessor-Methods. The calls goes through the public method
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()", sol2);
+
+		System.out.println(friend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeFriend.getPublicToProtectedFieldAsHexString()");
-		MethodTracer.check("SubjectToChange.getPublicToProtectedField()");
-		MethodTracer.checkCallCountAndClean();
+		MethodTracer.checkIf("SubjectToChange.getPublicToProtectedField()",
+				changedVersion);
+		MethodTracer.checkCallCountAndClean("");
 	}
 
 }
