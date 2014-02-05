@@ -4,6 +4,8 @@
             description
     </description>
 
+	<property name="bct_trace" value="6" />
+
 	<target name="info">
 		<echo message="abstract common.xml" />
 	</target>
@@ -134,6 +136,8 @@
 		<java classname="${mainclass}" fork="true">
 			<jvmarg line="-javaagent:poc.jar" />
 			<jvmarg line="-Dtest-reflection=true" />
+			<jvmarg line="-DBCT_OUTFILE=tmp/${mainclass}.test-original.bctlog.txt" />
+			<jvmarg line="-DBCT_TRACE_LEVEL=${bct_trace}" />
 			<classpath>
 				<path location="target/test" />
 				<path location="target/dep" />
@@ -149,6 +153,8 @@
 			<jvmarg line="-javaagent:poc.jar" />
 			<jvmarg line="-Dtest-reflection=true" />
 			<jvmarg line="-Ddisable-bci=true" />
+			<jvmarg line="-DBCT_OUTFILE=tmp/${mainclass}.test-original-disable-transform.bctlog.txt" />
+			<jvmarg line="-DBCT_TRACE_LEVEL=${bct_trace}" />
 			<classpath>
 				<path location="target/test" />
 				<path location="target/dep" />
@@ -177,6 +183,8 @@
 			<jvmarg line="-javaagent:poc.jar" />
 			<jvmarg line="-Dcfa.changedVersion=true" />
 			<jvmarg line="-DSolutionList=2" />
+			<jvmarg line="-DBCT_OUTFILE=tmp/${mainclass}.test-new-lib2.bctlog.txt" />
+			<jvmarg line="-DBCT_TRACE_LEVEL=${bct_trace}" />
 			<classpath>
 				<path location="target/test" />
 				<path location="target/dep" />
@@ -191,6 +199,8 @@
 			<jvmarg line="-javaagent:poc.jar" />
 			<jvmarg line="-Ddisable-bci=true" />
 			<jvmarg line="-Dcfa.changedVersion=true" />
+			<jvmarg line="-DBCT_OUTFILE=tmp/${mainclass}.test-new-lib2-disable-transform.bctlog.txt" />
+			<jvmarg line="-DBCT_TRACE_LEVEL=${bct_trace}" />
 			<classpath>
 				<path location="target/test" />
 				<path location="target/dep" />
@@ -205,6 +215,8 @@
 			<jvmarg line="-javaagent:poc.jar" />
 			<jvmarg line="-Dcfa.changedVersion=true" />
 			<jvmarg line="-DSolutionList=1" />
+			<jvmarg line="-DBCT_OUTFILE=tmp/${mainclass}.test-new-lib1.bctlog.txt" />
+			<jvmarg line="-DBCT_TRACE_LEVEL=${bct_trace}" />
 			<classpath>
 				<path location="target/test" />
 				<path location="target/dep" />
@@ -219,6 +231,8 @@
 			<jvmarg line="-javaagent:poc.jar" />
 			<jvmarg line="-Ddisable-bci=true" />
 			<jvmarg line="-Dcfa.changedVersion=true" />
+			<jvmarg line="-DBCT_OUTFILE=tmp/${mainclass}.test-new-lib1-disable-transform.bctlog.txt" />
+			<jvmarg line="-DBCT_TRACE_LEVEL=${bct_trace}" />
 			<classpath>
 				<path location="target/test" />
 				<path location="target/dep" />

@@ -17,6 +17,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 public class MyClassFileTransformer implements ClassFileTransformer {
 
+	private static final int TRACE_ALL_CLASSNAME = 5;
 	private static final int TRACE_CLASSNAME = 4;
 	private static final int TRACE_SIGNED_MESSAGE = 1;
 	private int traceLevel;
@@ -31,7 +32,7 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 	public byte[] transform(ClassLoader loader, String className,
 			Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
 			byte[] classfileBuffer) throws IllegalClassFormatException {
-		if (traceLevel > TRACE_CLASSNAME) {
+		if (traceLevel > TRACE_ALL_CLASSNAME) {
 			tracer.println(className);
 		}
 		try {
@@ -40,7 +41,7 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 						.getCodeSigners();
 				if (codeSigners != null && codeSigners.length == 0) {
 					if (traceLevel > TRACE_SIGNED_MESSAGE) {
-						tracer.println("This code is ");
+						tracer.println("This code ("+className+")is signed");
 					}
 					return classfileBuffer;
 				}
@@ -61,14 +62,18 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		ClassNode classNode = new ClassNode();
 		cr.accept(classNode, ClassReader.EXPAND_FRAMES);
 		CheckFieldAccess inserter = new CheckFieldAccess(classNode, loader);
+		inserter.setTraceOutput(tracer);
+		inserter.setTraceLevel(traceLevel);
 
 		boolean transformed = false;
 		boolean isExtensionOrFriend = className.endsWith("Friend")
 				|| className.endsWith("Extension");
 		if (className.startsWith("incubator/dependency")
 				|| className.startsWith("incubator/tests/")
-				|| (className.startsWith("example6/") && isExtensionOrFriend)) {
-			System.out.println("Transform " + className);
+				|| (className.startsWith("example") && isExtensionOrFriend)) {
+			if (traceLevel > TRACE_CLASSNAME) {
+				tracer.println("Transform " + className);
+			}
 			inserter.makeItSo();
 			transformed = true;
 		}

@@ -1,38 +1,6 @@
-Title: Enable changes in visibility of non private fields in a binary compatible way
+# Compatible Field Access #
 
-Author: SponsorRequired, Sebastian Sickelmann
-
-Owner: SponsorRequired, Sebastian Sickelmann
-
-Created: 2012/MM/DD
-
-Type: Feature/Research
-
-State: Draft
-
-Exposure: Open
-
-Component: --/--
-
-Scope: SE
-
-JSR: TBD
-
-Discussion: jk8 dash dev at openjdk dot java dot net
-
-Start: 2012/Q3
-
-Effort: L
-
-Duration: XL
-
-Template: 1.0
-
-Reviewed-by: TBD
-
-Endorsed-by: TBD
-
-Funded-by: Sebastian Sickelmann, Other contributors are welcome
+A change to the jvm to enable changes to the visibility(reducing) of fields without breaking binary compatiblity 
 
 Summary
 -------

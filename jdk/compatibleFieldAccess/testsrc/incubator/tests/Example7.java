@@ -4,27 +4,28 @@ import java.util.Iterator;
 import java.util.List;
 
 import incubator.MethodTracer;
-import example6.SubjectToChange;
-import example6.SubjectToChangeFriend;
-import example6.SubjectToChangeGoodFriend;
-import example6.sub.SubjectToChangeExtension;
+import example7.SubjectToChange;
+import example7.SubjectToChangeFriend;
+import example7.SubjectToChangeGoodFriend;
+import example7.sub.SubjectToChangeExtension;
 
-public class Example6 {
+public class Example7 {
 	public static void main(String[] args) {
 		boolean changedVersion = Boolean.getBoolean("cfa.changedVersion");
 
 		String solution = System.getProperty("SolutionList");
 		boolean sol2 = solution != null ? solution.contains("2") : false;
+		boolean sol1 = solution != null ? solution.contains("1") : false;
 
 		testItExtension(sol2, changedVersion);
 		testItFriend(sol2, changedVersion);
-		testItExtensionFriend(sol2, changedVersion);
+		testItExtensionFriend(sol1, sol2, changedVersion);
 	}
 
-	private static void testItExtensionFriend(boolean sol2,
+	private static void testItExtensionFriend(boolean sol1, boolean sol2,
 			boolean changedVersion) {
 		MethodTracer.checkCallCountAndClean("testItExtensionFriend");
-		SubjectToChangeGoodFriend extend = new SubjectToChangeGoodFriend(51966);
+		SubjectToChangeExtension extend = new SubjectToChangeGoodFriend(51966);
 		SubjectToChange stc = extend;
 
 		System.out.println(stc.publicToProtectedField);
@@ -35,19 +36,11 @@ public class Example6 {
 		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
 				changedVersion);
 
-		System.out.println(extend.getProtectedValueAsHexString());
+		System.out.println(extend.getProtectedToPackageFieldAsHexString());
 		MethodTracer
-				.check("SubjectToChangeGoodFriend.getProtectedValueAsHexString()");
-		MethodTracer.checkIf(
-				"SubjectToChange.getProtectedFieldWithProtectedAccessor()",
-				changedVersion);
-
-		System.out.println(extend.getPackageValueAsHexString());
-		MethodTracer
-				.check("SubjectToChangeGoodFriend.getPackageValueAsHexString()");
-		MethodTracer.checkIf(
-				"SubjectToChange.getPackageFieldWithPackageAccessor()",
-				changedVersion);
+				.check("SubjectToChangeGoodFriend.getProtectedToPackageFieldAsHexString()");
+		MethodTracer.checkIf("SubjectToChange.getProtectedToPackageField()",
+				changedVersion && sol2);
 
 		System.out.println(extend.getPublicToPackageFieldAsHexString());
 		MethodTracer
@@ -57,7 +50,14 @@ public class Example6 {
 		// The above fact feels quite naturally, but in solution 2. Where it
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
-		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()", sol2);
+		if (changedVersion) {
+			MethodTracer
+					.checkIf(
+							"SubjectToChange.getPublicToPackageFieldPackageLevelAccess()",
+							sol1);
+			MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
+					sol2);
+		}
 
 		System.out.println(extend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
@@ -87,11 +87,10 @@ public class Example6 {
 		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
 				changedVersion);
 
-		System.out.println(extend.getProtectedValueAsHexString());
+		System.out.println(extend.getProtectedToPackageFieldAsHexString());
 		MethodTracer
-				.check("SubjectToChangeExtension.getProtectedValueAsHexString()");
-		MethodTracer.checkIf(
-				"SubjectToChange.getProtectedFieldWithProtectedAccessor()",
+				.check("SubjectToChangeExtension.getProtectedToPackageFieldAsHexString()");
+		MethodTracer.checkIf("SubjectToChange.getProtectedToPackageField()",
 				changedVersion);
 
 		System.out.println(extend.getPublicToPackageFieldAsHexString());
@@ -118,11 +117,10 @@ public class Example6 {
 		MethodTracer.checkCallCountAndClean("testItFriend");
 		SubjectToChange stc = new SubjectToChange(47806);
 		SubjectToChangeFriend friend = new SubjectToChangeFriend(stc);
-		System.out.println(friend.getPackageValueAsHexString());
+		System.out.println(friend.getPackageToProtectedFieldAsHexString());
 		MethodTracer
-				.check("SubjectToChangeFriend.getPackageValueAsHexString()");
-		MethodTracer.checkIf(
-				"SubjectToChange.getPackageFieldWithPackageAccessor()",
+				.check("SubjectToChangeFriend.getPackageToProtectedFieldAsHexString()");
+		MethodTracer.checkIf("SubjectToChange.getPackageToProtectedField()",
 				changedVersion);
 
 		System.out.println(friend.getPublicToPackageFieldAsHexString());

@@ -4,53 +4,70 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AllExamples {
 
+	public static final boolean PRINT_ON_OK = false;
+	private static final int MAX = 7;
+
 	public static void main(String[] args) {
 		PrintStream out = System.out;
-		Buffer b1 = new Buffer();
-		Buffer b2 = new Buffer();
-		Buffer b3 = new Buffer();
-		Buffer b4 = new Buffer();
-		Buffer b5 = new Buffer();
-		Buffer b6 = new Buffer();
-		boolean erg1 = test(Example1.class, args, b1);
-		boolean erg2 = test(Example2.class, args, b2);
-		boolean erg3 = test(Example3.class, args, b3);
-		boolean erg4 = test(Example4.class, args, b4);
-		boolean erg5 = test(Example5.class, args, b5);
-		boolean erg6 = test(Example6.class, args, b6);
-		System.setOut(out);
-		printErg(Example1.class, erg1, b1);
-		printErg(Example2.class, erg2, b2);
-		printErg(Example3.class, erg3, b3);
-		printErg(Example4.class, erg4, b4);
-		printErg(Example5.class, erg5, b5);
-		printErg(Example6.class, erg6, b6);
-	}
-
-	private static void printErg(Class<?> clazz, boolean erg1, Buffer buffer) {
-		if (erg1) {
-			System.out.println(clazz + " OK");
-		} else {
-			System.out.println(clazz + " NOK");
-			System.out.println(buffer.toString());
+		List<ExampleRun> runner = new ArrayList<>();
+		for (int i = 1; i <= MAX; i++) {
+			runner.add(new ExampleRun(i).test(args));
+		}
+		for (ExampleRun exampleRun : runner) {
+			exampleRun.printResult();
 		}
 	}
 
-	private static boolean test(Class<?> clazz, String[] args, Buffer buffer) {
-		System.setOut(buffer);
-		try {
-			clazz.getMethod("main", String[].class).invoke(null, (Object)args);
-			return true;
-		} catch (Throwable th) {
-			return false;
-		} finally {
-			buffer.close();
+	public static class ExampleRun {
+		public final Buffer b;
+		public final int num;
+		public boolean result;
+
+		public ExampleRun(int num) {
+			this.num = num;
+			b = new Buffer();
+			result = false;
 		}
+
+		public ExampleRun test(String[] args) {
+			PrintStream old = System.out;
+			try {
+				System.setOut(b);
+				Class clazz = Class.forName(getClassName());
+				clazz.getMethod("main", String[].class).invoke(null,
+						(Object) args);
+				result = true;
+			} catch (Throwable th) {
+				result = false;
+				th.printStackTrace(b);
+			} finally {
+				b.close();
+				System.setOut(old);
+			}
+			return this;
+		}
+
+		private String getClassName() {
+			return "incubator.tests.Example" + num;
+		}
+
+		public void printResult() {
+			if (result) {
+				System.out.println(getClassName() + " OK");
+				if (PRINT_ON_OK) {
+					System.out.println(b.toString());
+				}
+			} else {
+				System.out.println(getClassName() + " NOK");
+				System.out.println(b.toString());
+			}
+		}
+
 	}
 
 	public static class Buffer extends PrintStream {

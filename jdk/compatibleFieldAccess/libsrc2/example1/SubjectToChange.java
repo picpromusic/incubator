@@ -10,13 +10,13 @@ public class SubjectToChange {
 		this.value = value;
 	}
 	
-	@Accessor("publicField")
-	public int getValue() {
+	@Accessor()
+	public int getPublicField() {
 		return value;
 	}
 	
-	@Accessor("publicField")
-	public void setValue(int value) {
+	@Accessor()
+	public void setPublicField(int value) {
 		this.value = value;
 	}
 	

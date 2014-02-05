@@ -42,26 +42,26 @@ public class SubjectToChange {
 	}
 
 	@Accessor("protectedField")
-	public int getProtectedField() {
-		MethodTracer.trace("SubjectToChange.getProtectedField()");
+	protected int getProtectedFieldWithProtectedAccessor() {
+		MethodTracer.trace("SubjectToChange.getProtectedFieldWithProtectedAccessor()");
 		return protectedField;
 	}
 
 	@Accessor("protectedField")
-	public void setProtectedField(int protectedField) {
-		MethodTracer.trace("SubjectToChange.setProtectedField()");
+	protected void setProtectedFieldWithProtectedAccessor(int protectedField) {
+		MethodTracer.trace("SubjectToChange.setProtectedFieldWithProtectedAccessor()");
 		this.protectedField = protectedField;
 	}
 
 	@Accessor("packageField")
-	public int getPackageField() {
-		MethodTracer.trace("SubjectToChange.getPackageField()");
+	int getPackageFieldWithPackageAccessor() {
+		MethodTracer.trace("SubjectToChange.getPackageFieldWithPackageAccessor()");
 		return packageField;
 	}
 
 	@Accessor("packageField")
-	public void setPackageField(int packageField) {
-		MethodTracer.trace("SubjectToChange.setPackageField()");
+	void setPackageFieldWithPackageAccessor(int packageField) {
+		MethodTracer.trace("SubjectToChange.setPackageFieldWithPackageAccessor()");
 		this.packageField = packageField;
 	}
 

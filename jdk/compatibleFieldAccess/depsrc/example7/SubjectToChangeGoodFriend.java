@@ -1,7 +1,7 @@
-package example6;
+package example7;
 
 import incubator.MethodTracer;
-import example6.sub.SubjectToChangeExtension;
+import example7.sub.SubjectToChangeExtension;
 
 public class SubjectToChangeGoodFriend extends SubjectToChangeExtension {
 
@@ -9,18 +9,17 @@ public class SubjectToChangeGoodFriend extends SubjectToChangeExtension {
 		super(value);
 	}
 
-	public String getProtectedValueAsHexString() {
+	public String getProtectedToPackageFieldAsHexString() {
 		MethodTracer
-				.trace("SubjectToChangeGoodFriend.getProtectedValueAsHexString()");
-		return Integer.toHexString(protectedField);
-	}
-	
-	public String getPackageValueAsHexString() {
-		MethodTracer
-				.trace("SubjectToChangeGoodFriend.getPackageValueAsHexString()");
-		return Integer.toHexString(((SubjectToChange)this).packageField);
+				.trace("SubjectToChangeGoodFriend.getProtectedToPackageFieldAsHexString()");
+		return Integer.toHexString(protectedToPackageField);
 	}
 
+	public String getPackageToProtectedFieldAsHexString() {
+		MethodTracer
+				.trace("SubjectToChangeGoodFriend.getPackageToProtectedFieldAsHexString()");
+		return Integer.toHexString(((SubjectToChange)this).packageToProtectedField);
+	}
 
 	public String getPublicToPackageFieldAsHexString() {
 		MethodTracer

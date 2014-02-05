@@ -3,11 +3,13 @@ import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import javalang.ref.Accessor;
 import javalang.ref.AsymeticAcessorError;
@@ -92,6 +94,11 @@ public class Bootstrapper {
 						? lookup.findStaticGetter(clazz, name, fieldType)
 								: lookup.findGetter(clazz, name, fieldType);
 						// Workaround till findStaticGetter/findGetter is fixed
+						if (!isFieldAccessable(lookup, clazz, name)) {
+							throw new IllegalAccessException(clazz + "." + name
+									+ " is not accessable from "
+									+ lookup.lookupClass());
+						}
 						if (!clazz.getField(name).isAccessible()) {
 							clazz.getDeclaredField(name);
 						}
@@ -125,32 +132,159 @@ public class Bootstrapper {
 			ClassNotFoundException, AsymeticAcessorError {
 		Method[] methods = clazz.getDeclaredMethods();
 		Class<?> expectedRetType = get ? type.returnType() : void.class;
+		Method resolvedMethod = null;
+		MethodHandle resolvedHandle = null;
+		List<IllegalAccessException> suppressed = new ArrayList<>();
 		for (Method method : methods) {
+			String methodName = method.getName();
 			if (method.getReturnType().equals(expectedRetType)) {
 				Accessor annotation = method.getAnnotation(Accessor.class);
-				if (annotation != null && annotation.value().equals(name)) {
-					if (Modifier.isStatic(method.getModifiers()) != staticProperty) {
-						String message = MessageFormat.format(
-								"{0}-Field {1} is not accessable in a {2} way",
-								(staticProperty ? "Instance" : "Static"), name,
-								(staticProperty ? "static" : "non-static"));
-						throw new IncompatibleClassChangeError(message);
+				if (annotation != null) {
+					String fieldName;
+					if (annotation.value().isEmpty()) {
+						fieldName = methodName.startsWith(get ? "get" : "set") ? methodName
+								.substring(3) : "";
+						if (fieldName.length() > 1
+								&& Character.isUpperCase(fieldName.charAt(0))
+								&& Character.isLowerCase(fieldName.charAt(1))) {
+							fieldName = fieldName.substring(0, 1).toLowerCase()
+									+ fieldName.substring(1);
+						}
+					} else {
+						fieldName = annotation.value();
 					}
-					MethodType mt = get ? MethodType.methodType(fieldType)
-							: MethodType.methodType(void.class,
-									method.getParameterTypes());
-					MethodHandle ret = staticProperty //
-					? lookup.findStatic(clazz, method.getName(), mt)
-							: lookup.findVirtual(clazz, method.getName(), mt);
-					if (!symetryCheck) {
-						symetryCheck(false, lookup, name, mod, staticProperty,
-								clazz, fieldType);
+
+					if (fieldName.equals(name)) {
+						if (Modifier.isStatic(method.getModifiers()) != staticProperty) {
+							String message = MessageFormat
+									.format("{0}-Field {1} is not accessable in a {2} way",
+											(staticProperty ? "Instance"
+													: "Static"), name,
+											(staticProperty ? "static"
+													: "non-static"));
+							if (sol2) {
+								throw new IncompatibleClassChangeError(message);
+							}
+						}
+
+						MethodType mt = get ? MethodType.methodType(fieldType)
+								: MethodType.methodType(void.class,
+										method.getParameterTypes());
+						try {
+							MethodHandle tempHandle = staticProperty //
+							? lookup.findStatic(clazz, method.getName(), mt)
+									: lookup.findVirtual(clazz,
+											method.getName(), mt);
+							if (isMethodAccessable(lookup, method)) {
+								if (resolvedMethod == null
+										|| isMoreSpecific(resolvedMethod,
+												method,name)) {
+									resolvedMethod = method;
+									resolvedHandle = tempHandle;
+								}
+							} else {
+								throw new IllegalAccessException(method
+										+ " is not accessable from "
+										+ lookup.lookupClass());
+							}
+						} catch (IllegalAccessException e) {
+							if (sol2) {
+								throw e;
+							} else {
+								suppressed.add(e);
+							}
+						}
 					}
-					return new ConstantCallSite(ret.asType(type));
 				}
 			}
+		} // end for
+		if (resolvedHandle != null) {
+			if (!symetryCheck) {
+				symetryCheck(false, lookup, name, mod, staticProperty, clazz,
+						fieldType);
+			}
+			return new ConstantCallSite(resolvedHandle.asType(type));
+		} else {
+			if (!suppressed.isEmpty()) {
+				IllegalAccessException e = new IllegalAccessException(
+						"One or more IllegalAccessException thrown");
+				for (IllegalAccessException illegalAccessException : suppressed) {
+					e.addSuppressed(illegalAccessException);
+				}
+				throw e;
+			}
+			return null;
 		}
-		return null;
+	}
+
+	private static boolean isFieldAccessable(Lookup lookup, Class<?> clazz,
+			String name) {
+		try {
+			return isAccessable(lookup.lookupClass(), clazz,
+					clazz.getField(name).getModifiers());
+
+		} catch (NoSuchFieldException | SecurityException e) {
+			return false;
+		}
+	}
+
+	private static boolean isAccessable(Class<?> lookupClass, Class<?> clazz,
+			int mod) {
+		if (Modifier.isPublic(mod) || lookupClass.equals(clazz)) {
+			return true;
+		} else if (Modifier.isPrivate(mod)) {
+			return false;
+		} else if (Modifier.isProtected(mod)) {
+			if (clazz.isAssignableFrom(lookupClass)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else /* package */{
+			return lookupClass.getPackage().equals(clazz.getPackage());
+		}
+
+	}
+
+	private static boolean isMethodAccessable(Lookup lookup, Method method) {
+		return isAccessable(lookup.lookupClass(), method.getDeclaringClass(),
+				method.getModifiers());
+	}
+
+	private static boolean isMoreSpecific(Method resolvedMethod, Method method,
+			String fieldName) {
+		int actMod = resolvedMethod.getModifiers();
+		int newMod = method.getModifiers();
+		if ((actMod & newMod & Modifier.PUBLIC) != 0) {
+			throw new UnambiguousFieldError(sameVibilityMessage(fieldName,
+					Modifier.PUBLIC));
+		} else if ((actMod & newMod & Modifier.PROTECTED) != 0) {
+			throw new UnambiguousFieldError(sameVibilityMessage(fieldName,
+					Modifier.PROTECTED));
+		} else if ((actMod & newMod & Modifier.PRIVATE) != 0) {
+			throw new UnambiguousFieldError(sameVibilityMessage(fieldName,
+					Modifier.PRIVATE));
+		} else if (Modifier.isProtected(actMod) && isPackage(newMod)) {
+		}
+		return false;
+	}
+
+	private static boolean isPackage(int mod) {
+		return !Modifier.isPublic(mod) && !Modifier.isPrivate(mod)
+				&& !Modifier.isProtected(mod);
+	}
+
+	private static String sameVibilityMessage(String fieldName, int mod) {
+		return "Two Access-Methods with same visibility("
+				+ Modifier.toString(mod) + ") for field " + fieldName;
+	}
+
+	private static void throwSameVisibilityException(String fieldName,
+			int actMod) throws UnambiguousFieldError {
+		throw new UnambiguousFieldError(
+				"Two Access-Methods with same visibility("
+						+ Modifier.toString(actMod) + ") for field "
+						+ fieldName);
 	}
 
 	private static void symetryCheck(boolean checkGet, Lookup lookup,

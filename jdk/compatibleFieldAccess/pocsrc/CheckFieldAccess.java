@@ -1,3 +1,4 @@
+import java.io.PrintStream;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.ListIterator;
@@ -20,6 +21,10 @@ public class CheckFieldAccess {
 	private static final Handle BOOTSTRAP_SET;
 	private ClassLoader loader;
 	private static final boolean DISABLE_BCI;
+	private PrintStream tracer;
+	private int traceLevel;
+	private static final int TRACE_TRANSFORMED_METHOD = 4;
+	private static final int TRACE_TRANSFORMED_INSTR = 5;
 
 	static {
 		BOOTSTRAP_GET = new Handle(
@@ -53,6 +58,7 @@ public class CheckFieldAccess {
 	private void checkFieldAccess(MethodNode method) {
 		InsnList instructions = method.instructions;
 		ListIterator<AbstractInsnNode> iterator = instructions.iterator();
+		int transformed = 0;
 		while (iterator.hasNext()) {
 			AbstractInsnNode next = iterator.next();
 			if (next.getOpcode() == Opcodes.GETFIELD) {
@@ -66,6 +72,10 @@ public class CheckFieldAccess {
 						fins.owner.replace('/', '.'), //
 						NON_MODIFIER);
 				iterator.set(getInsnNode);
+				transformed++;
+				if (traceLevel > TRACE_TRANSFORMED_INSTR) {
+					tracer.println("GETFIELD " + fins.owner +":"+fins.name+" replaced");
+				}
 			} else if (next.getOpcode() == Opcodes.PUTFIELD) {
 				FieldInsnNode fins = (FieldInsnNode) next;
 				if (isAccessable(fins))
@@ -77,7 +87,10 @@ public class CheckFieldAccess {
 						fins.owner.replace('/', '.'), //
 						NON_MODIFIER);
 				iterator.set(getInsnNode);
-
+				transformed++;
+				if (traceLevel > TRACE_TRANSFORMED_INSTR) {
+					tracer.println("PUTFIELD " + fins.owner +":"+fins.name+" replaced");
+				}
 			} else if (next.getOpcode() == Opcodes.GETSTATIC) {
 				FieldInsnNode fins = (FieldInsnNode) next;
 				if (isAccessable(fins))
@@ -89,6 +102,10 @@ public class CheckFieldAccess {
 						fins.owner.replace('/', '.'), //
 						Modifier.STATIC);
 				iterator.set(getInsnNode);
+				transformed++;
+				if (traceLevel > TRACE_TRANSFORMED_INSTR) {
+					tracer.println("GETSTATIC " + fins.owner +":"+fins.name+" replaced");
+				}
 			} else if (next.getOpcode() == Opcodes.PUTSTATIC) {
 				FieldInsnNode fins = (FieldInsnNode) next;
 				if (isAccessable(fins))
@@ -100,8 +117,15 @@ public class CheckFieldAccess {
 						fins.owner.replace('/', '.'),//
 						Modifier.STATIC);
 				iterator.set(getInsnNode);
-
+				transformed++;
+				if (traceLevel > TRACE_TRANSFORMED_INSTR) {
+					tracer.println("PUTSTATIC " + fins.owner +":"+fins.name+" replaced");
+				}
 			}
+		}
+		if (traceLevel > TRACE_TRANSFORMED_METHOD && transformed > 0) {
+			tracer.println("Method (" + method.name + ") transformed at "
+					+ transformed + " positions.");
 		}
 	}
 
@@ -130,7 +154,8 @@ public class CheckFieldAccess {
 				if (af != null) {
 					accessable |= foundInHierachie ? af.isProtectAccessable()
 							: af.isPublicAccessable();
-					accessable |= getPackage(classNode.name).equals(packageName) && af.isPackageAccessable();
+					accessable |= getPackage(classNode.name)
+							.equals(packageName) && af.isPackageAccessable();
 				}
 
 			} while (!(accessable || ac == null));
@@ -145,7 +170,15 @@ public class CheckFieldAccess {
 	}
 
 	private String getPackage(String name) {
-		return name.substring(0,name.lastIndexOf('/'));
+		return name.substring(0, name.lastIndexOf('/'));
+	}
+
+	public void setTraceOutput(PrintStream tracer) {
+		this.tracer = tracer;
+	}
+
+	public void setTraceLevel(int traceLevel) {
+		this.traceLevel = traceLevel;
 	}
 
 }
