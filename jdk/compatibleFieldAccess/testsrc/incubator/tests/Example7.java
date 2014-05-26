@@ -1,8 +1,5 @@
 package incubator.tests;
 
-import java.util.Iterator;
-import java.util.List;
-
 import incubator.MethodTracer;
 import example7.SubjectToChange;
 import example7.SubjectToChangeFriend;
@@ -17,8 +14,8 @@ public class Example7 {
 		boolean sol2 = solution != null ? solution.contains("2") : false;
 		boolean sol1 = solution != null ? solution.contains("1") : false;
 
-		testItExtension(sol2, changedVersion);
-		testItFriend(sol2, changedVersion);
+		testItExtension(sol1, sol2, changedVersion);
+		testItFriend(sol1, sol2, changedVersion);
 		testItExtensionFriend(sol1, sol2, changedVersion);
 	}
 
@@ -51,10 +48,6 @@ public class Example7 {
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
 		if (changedVersion) {
-			MethodTracer
-					.checkIf(
-							"SubjectToChange.getPublicToPackageFieldPackageLevelAccess()",
-							sol1);
 			MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
 					sol2);
 		}
@@ -74,7 +67,8 @@ public class Example7 {
 		MethodTracer.checkCallCountAndClean("");
 	}
 
-	private static void testItExtension(boolean sol2, boolean changedVersion) {
+	private static void testItExtension(boolean sol1, boolean sol2,
+			boolean changedVersion) {
 		MethodTracer.checkCallCountAndClean("testItExtension");
 
 		SubjectToChangeExtension extend = new SubjectToChangeExtension(51966);
@@ -96,8 +90,14 @@ public class Example7 {
 		System.out.println(extend.getPublicToPackageFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeExtension.getPublicToPackageFieldAsHexString()");
-		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
-				changedVersion);
+		if (changedVersion) {
+			MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
+					sol2);
+			MethodTracer
+					.checkIf(
+							"SubjectToChange.getPublicToPackageFieldProtectedLevelAccess()",
+							sol1);
+		}
 
 		System.out.println(extend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
@@ -113,7 +113,7 @@ public class Example7 {
 		MethodTracer.checkCallCountAndClean("");
 	}
 
-	private static void testItFriend(boolean sol2, boolean changedVersion) {
+	private static void testItFriend(boolean sol1,boolean sol2, boolean changedVersion) {
 		MethodTracer.checkCallCountAndClean("testItFriend");
 		SubjectToChange stc = new SubjectToChange(47806);
 		SubjectToChangeFriend friend = new SubjectToChangeFriend(stc);
@@ -136,8 +136,16 @@ public class Example7 {
 		System.out.println(friend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeFriend.getPublicToProtectedFieldAsHexString()");
-		MethodTracer.checkIf("SubjectToChange.getPublicToProtectedField()",
-				changedVersion);
+		if (changedVersion) {
+			MethodTracer
+			.checkIf(
+					"SubjectToChange.getPublicToProtectedFieldPackageLevelAccess()",
+					sol1);
+			MethodTracer
+			.checkIf(
+					"SubjectToChange.getPublicToProtectedField()",
+					sol2);
+		}
 		MethodTracer.checkCallCountAndClean("");
 	}
 

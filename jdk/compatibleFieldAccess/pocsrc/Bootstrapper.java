@@ -178,7 +178,7 @@ public class Bootstrapper {
 							if (isMethodAccessable(lookup, method)) {
 								if (resolvedMethod == null
 										|| isMoreSpecific(resolvedMethod,
-												method,name)) {
+												method, name)) {
 									resolvedMethod = method;
 									resolvedHandle = tempHandle;
 								}
@@ -251,10 +251,29 @@ public class Bootstrapper {
 				method.getModifiers());
 	}
 
+	/**
+	 * <pre>
+	 * |pre  new->|public               |package              |protected            |private              |
+	 * ||         |                     |                     |                     |                     |
+	 * |v         |                     |                     |                     |                     |
+	 * ----------------------------------------------------------------------------------------------------
+	 * |public    |UnambiguousFieldError|true                 |true                 |true                 |
+	 * |package   |false                |UnambiguousFieldError|UnambiguousFieldError|true                 |
+	 * |protected |false                |UnambiguousFieldError|UnambiguousFieldError|true                 |
+	 * |private   |false                |false                |false                |UnambiguousFieldError|
+	 * </pre>
+	 * 
+	 * @param resolvedMethod
+	 * @param method
+	 * @param fieldName
+	 * @return
+	 */
 	private static boolean isMoreSpecific(Method resolvedMethod, Method method,
 			String fieldName) {
-		int actMod = resolvedMethod.getModifiers();
-		int newMod = method.getModifiers();
+		int visibilityMask = Modifier.PUBLIC | Modifier.PROTECTED
+				| Modifier.PRIVATE;
+		int actMod = resolvedMethod.getModifiers() & visibilityMask;
+		int newMod = method.getModifiers() & visibilityMask;
 		if ((actMod & newMod & Modifier.PUBLIC) != 0) {
 			throw new UnambiguousFieldError(sameVibilityMessage(fieldName,
 					Modifier.PUBLIC));
@@ -264,19 +283,42 @@ public class Bootstrapper {
 		} else if ((actMod & newMod & Modifier.PRIVATE) != 0) {
 			throw new UnambiguousFieldError(sameVibilityMessage(fieldName,
 					Modifier.PRIVATE));
-		} else if (Modifier.isProtected(actMod) && isPackage(newMod)) {
+		} else if (isPackage(actMod) && isPackage(newMod)) {
+			throw new UnambiguousFieldError(sameVibilityMessage(fieldName,
+					"<<Package-Visible>>"));
+		} else if ((Modifier.isProtected(actMod) && isPackage(newMod))
+				|| (Modifier.isProtected(newMod) && isPackage(actMod))) {
+			throw new UnambiguousFieldError(incompatibileVibilityMessage(
+					fieldName, Modifier.PROTECTED, "<<Package-Visible>>"));
+		} else if (Modifier.isPublic(actMod)) {
+			return true;
+		} else if (Modifier.isPrivate(actMod)) {
+			return false;
+		} else /* actMod == PACKAGE */{
+			return Modifier.isPrivate(newMod); // Public will be false
 		}
-		return false;
+	}
+
+	private static String sameVibilityMessage(String fieldName, int mod) {
+		return sameVibilityMessage(fieldName, Modifier.toString(mod));
+	}
+
+	private static String sameVibilityMessage(String fieldName,
+			String modAsstring) {
+		return "Two Access-Methods with same visibility(" + modAsstring
+				+ ") for field " + fieldName;
+	}
+
+	private static String incompatibileVibilityMessage(String fieldName,
+			int mod1, String mod2AsString) {
+		return "Two Access-Methods with incompatible visibility("
+				+ Modifier.toString(mod1) + " & " + mod2AsString
+				+ " ) for field " + fieldName;
 	}
 
 	private static boolean isPackage(int mod) {
 		return !Modifier.isPublic(mod) && !Modifier.isPrivate(mod)
 				&& !Modifier.isProtected(mod);
-	}
-
-	private static String sameVibilityMessage(String fieldName, int mod) {
-		return "Two Access-Methods with same visibility("
-				+ Modifier.toString(mod) + ") for field " + fieldName;
 	}
 
 	private static void throwSameVisibilityException(String fieldName,
