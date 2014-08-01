@@ -5,10 +5,10 @@ import javalang.ref.Accessor;
 
 public class SubjectToChange {
 
-	protected int innerPublicToProtectedField;
-	/* package */int innerPublicToPackageField;
-	/* package */int innerProtectedToPackageField;
-	protected int innerPackageToProtectedField;
+	private int innerPublicToProtectedField;
+	private int innerPublicToPackageField;
+	private int innerProtectedToPackageField;
+	private int innerPackageToProtectedField;
 
 	public SubjectToChange(int value) {
 		this.innerPublicToProtectedField = value;

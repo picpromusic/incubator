@@ -63,7 +63,7 @@ public class CheckFieldAccess {
 			AbstractInsnNode next = iterator.next();
 			if (next.getOpcode() == Opcodes.GETFIELD) {
 				FieldInsnNode fins = (FieldInsnNode) next;
-				if (isAccessable(fins))
+				if (noNeedToChangeAccess(fins, true, false))
 					continue;
 				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
 						fins.name,//
@@ -74,11 +74,12 @@ public class CheckFieldAccess {
 				iterator.set(getInsnNode);
 				transformed++;
 				if (traceLevel > TRACE_TRANSFORMED_INSTR) {
-					tracer.println("GETFIELD " + fins.owner +":"+fins.name+" replaced");
+					tracer.println("GETFIELD " + fins.owner + ":" + fins.name
+							+ " replaced");
 				}
 			} else if (next.getOpcode() == Opcodes.PUTFIELD) {
 				FieldInsnNode fins = (FieldInsnNode) next;
-				if (isAccessable(fins))
+				if (noNeedToChangeAccess(fins, false, false))
 					continue;
 				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
 						fins.name,//
@@ -89,11 +90,12 @@ public class CheckFieldAccess {
 				iterator.set(getInsnNode);
 				transformed++;
 				if (traceLevel > TRACE_TRANSFORMED_INSTR) {
-					tracer.println("PUTFIELD " + fins.owner +":"+fins.name+" replaced");
+					tracer.println("PUTFIELD " + fins.owner + ":" + fins.name
+							+ " replaced");
 				}
 			} else if (next.getOpcode() == Opcodes.GETSTATIC) {
 				FieldInsnNode fins = (FieldInsnNode) next;
-				if (isAccessable(fins))
+				if (noNeedToChangeAccess(fins, true, true))
 					continue;
 				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
 						fins.name,//
@@ -104,11 +106,12 @@ public class CheckFieldAccess {
 				iterator.set(getInsnNode);
 				transformed++;
 				if (traceLevel > TRACE_TRANSFORMED_INSTR) {
-					tracer.println("GETSTATIC " + fins.owner +":"+fins.name+" replaced");
+					tracer.println("GETSTATIC " + fins.owner + ":" + fins.name
+							+ " replaced");
 				}
 			} else if (next.getOpcode() == Opcodes.PUTSTATIC) {
 				FieldInsnNode fins = (FieldInsnNode) next;
-				if (isAccessable(fins))
+				if (noNeedToChangeAccess(fins, false, true))
 					continue;
 				AbstractInsnNode getInsnNode = new InvokeDynamicInsnNode(//
 						fins.name,//
@@ -119,7 +122,8 @@ public class CheckFieldAccess {
 				iterator.set(getInsnNode);
 				transformed++;
 				if (traceLevel > TRACE_TRANSFORMED_INSTR) {
-					tracer.println("PUTSTATIC " + fins.owner +":"+fins.name+" replaced");
+					tracer.println("PUTSTATIC " + fins.owner + ":" + fins.name
+							+ " replaced");
 				}
 			}
 		}
@@ -129,7 +133,8 @@ public class CheckFieldAccess {
 		}
 	}
 
-	private boolean isAccessable(FieldInsnNode fins) {
+	private boolean noNeedToChangeAccess(FieldInsnNode fins, boolean get,
+			boolean statics) {
 		try {
 			if (fins.owner.equals(this.classNode.name)) {
 				for (FieldNode fieldNode : classNode.fields) {
@@ -141,7 +146,7 @@ public class CheckFieldAccess {
 
 			AnalyseClass ac = new AnalyseClass(classNode.name, loader);
 			ac = ac.findInClassHirachie(fins.owner);
-			boolean foundInHierachie = ac != null;
+			final boolean foundInHierachie = ac != null;
 			if (!foundInHierachie) {
 				ac = new AnalyseClass(fins.owner, loader);
 			}
@@ -150,14 +155,27 @@ public class CheckFieldAccess {
 			do {
 				af = ac.findField(fins.name);
 				String packageName = getPackage(ac.getClassName());
-				ac = ac.getSuperClass();
 				if (af != null) {
 					accessable |= foundInHierachie ? af.isProtectAccessable()
 							: af.isPublicAccessable();
 					accessable |= getPackage(classNode.name)
 							.equals(packageName) && af.isPackageAccessable();
 				}
-
+				if (!accessable) {
+					int staticModifier = statics ? Modifier.STATIC : 0;
+					boolean exist = ac.accessorMethodExists(fins.name, get,
+							staticModifier
+									| (foundInHierachie ? Modifier.PROTECTED
+											: Modifier.PUBLIC));
+					exist |= getPackage(classNode.name)
+							.equals(packageName)
+							&& ac.accessorMethodExists(fins.name, get,
+									staticModifier);
+					if (exist) {
+						return false;
+					}
+				}
+				ac = ac.getSuperClass();
 			} while (!(accessable || ac == null));
 
 			return accessable;

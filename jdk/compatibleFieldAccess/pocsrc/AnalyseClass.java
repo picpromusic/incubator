@@ -1,9 +1,14 @@
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
 
 public class AnalyseClass {
 
@@ -28,7 +33,8 @@ public class AnalyseClass {
 		this.loader = loader;
 	}
 
-	public AnalyseClass findInClassHirachie(String owner) throws ClassNotFoundException {
+	public AnalyseClass findInClassHirachie(String owner)
+			throws ClassNotFoundException {
 		if (className.equals(owner)) {
 			return this;
 		} else {
@@ -48,7 +54,8 @@ public class AnalyseClass {
 				cr = new ClassReader(
 						loader.getResourceAsStream(getResourceNameOfClass()));
 			} catch (IOException e) {
-				throw new ClassNotFoundException("Could not analyse class: "+ className,e);
+				throw new ClassNotFoundException("Could not analyse class: "
+						+ className, e);
 			}
 		}
 		return cr;
@@ -121,5 +128,38 @@ public class AnalyseClass {
 
 	private String getResourceNameOfClass() {
 		return className + ".class";
+	}
+
+	public boolean accessorMethodExists(String name, boolean get, int modifier)
+			throws ClassNotFoundException {
+
+		ClassNode cNode = getClassNode();
+		if (cNode.methods != null) {
+			for (MethodNode m : cNode.methods) {
+				if (m.visibleAnnotations != null) {
+					for (AnnotationNode va : m.visibleAnnotations) {
+						if (va.desc.equals("Ljavalang/ref/Accessor;")) {
+							Map<Object, Object> values = new HashMap<>();
+							for (int i = 0; va.values != null
+									&& i < va.values.size() / 2; i++) {
+								values.put(va.values.get(i * 2),
+										va.values.get((i * 2) + 1));
+							}
+							String fieldName = (String) values.get("value");
+							fieldName = AccessorMethodUtil
+									.determineAccessedFieldname(get, m.name,
+											fieldName);
+							if (fieldName != null && fieldName.equals(name)) {
+								int access = m.access & (Opcodes.ACC_PUBLIC|Opcodes.ACC_PRIVATE|Opcodes.ACC_PROTECTED|Opcodes.ACC_STATIC); 
+								if (modifier == access) {
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

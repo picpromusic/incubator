@@ -140,19 +140,7 @@ public class Bootstrapper {
 			if (method.getReturnType().equals(expectedRetType)) {
 				Accessor annotation = method.getAnnotation(Accessor.class);
 				if (annotation != null) {
-					String fieldName;
-					if (annotation.value().isEmpty()) {
-						fieldName = methodName.startsWith(get ? "get" : "set") ? methodName
-								.substring(3) : "";
-						if (fieldName.length() > 1
-								&& Character.isUpperCase(fieldName.charAt(0))
-								&& Character.isLowerCase(fieldName.charAt(1))) {
-							fieldName = fieldName.substring(0, 1).toLowerCase()
-									+ fieldName.substring(1);
-						}
-					} else {
-						fieldName = annotation.value();
-					}
+					String fieldName = AccessorMethodUtil.determineAccessedFieldname(get, methodName, annotation.value());
 
 					if (fieldName.equals(name)) {
 						if (Modifier.isStatic(method.getModifiers()) != staticProperty) {

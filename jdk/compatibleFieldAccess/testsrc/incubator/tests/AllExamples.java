@@ -11,7 +11,7 @@ import java.util.List;
 public class AllExamples {
 
 	public static final boolean PRINT_ON_OK = false;
-	private static final int MAX = 7;
+	private static final int MAX = 8;
 
 	public static void main(String[] args) {
 		PrintStream out = System.out;

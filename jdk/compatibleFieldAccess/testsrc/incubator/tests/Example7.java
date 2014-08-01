@@ -36,6 +36,11 @@ public class Example7 {
 		System.out.println(extend.getProtectedToPackageFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeGoodFriend.getProtectedToPackageFieldAsHexString()");
+		// No call to SubjectToChange.getProtectedToPackageField() because
+		// package access is allowed for extending class in same package
+		// The above fact feels quite naturally, but in solution 2. Where it
+		// is not possible to have fields with the same name as the
+		// accessor-Methods. The calls goes through the public method
 		MethodTracer.checkIf("SubjectToChange.getProtectedToPackageField()",
 				changedVersion && sol2);
 
@@ -43,14 +48,12 @@ public class Example7 {
 		MethodTracer
 				.check("SubjectToChangeGoodFriend.getPublicToPackageFieldAsHexString()");
 		// No call to SubjectToChange.getPublicToPackageField() because
-		// package access is allowed for extending class in same pacakge
+		// package access is allowed for extending class in same package
 		// The above fact feels quite naturally, but in solution 2. Where it
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
-		if (changedVersion) {
-			MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
-					sol2);
-		}
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
+				changedVersion && sol2);
 
 		System.out.println(extend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
@@ -103,7 +106,7 @@ public class Example7 {
 		MethodTracer
 				.check("SubjectToChangeExtension.getPublicToProtectedFieldAsHexString()");
 		// No call to SubjectToChange.getPublicToProtectedField() because
-		// package access is allowed for extending class
+		// protected access is allowed for extending class
 		// The above fact feels quite naturally, but in solution 2. Where it
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
@@ -127,7 +130,7 @@ public class Example7 {
 		MethodTracer
 				.check("SubjectToChangeFriend.getPublicToPackageFieldAsHexString()");
 		// No call to SubjectToChange.getPublicToPackageField() because
-		// package access is allowed for frieds
+		// package access is allowed for friends
 		// The above fact feels quite naturally, but in solution 2. Where it
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
