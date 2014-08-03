@@ -16,7 +16,7 @@
 
 	<target name="compile-test" depends="jar-original,compile-dep">
 		<mkdir dir="target/test" />
-		<javac srcdir="testsrc" destdir="target/test" classpath="target/lib.jar" debug="true" target="1.7">
+		<javac srcdir="testsrc" destdir="target/test" classpath="target/lib.jar" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 			<classpath>
 				<path location="target/dep" />
@@ -36,7 +36,7 @@
 
 	<target name="compile-original" depends="compile-common">
 		<mkdir dir="target/lib" />
-		<javac srcdir="libsrc" destdir="target/lib" debug="true" target="1.7">
+		<javac srcdir="libsrc" destdir="target/lib" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 			<classpath>
 				<path location="target/common" />
@@ -58,7 +58,7 @@
 
 	<target name="compile-poc" depends="compile-common">
 		<mkdir dir="target/poc" />
-		<javac srcdir="pocsrc" destdir="target/poc" classpath="target/common;libs/asm-debug-all-4.2.jar" debug="true" target="1.7">
+		<javac srcdir="pocsrc" destdir="target/poc" classpath="target/common;libs/asm-debug-all-4.2.jar" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 		</javac>
 	</target>
@@ -73,7 +73,7 @@
 
 	<target name="compile-new-lib2" depends="compile-common,compile-dep">
 		<mkdir dir="target/lib2" />
-		<javac srcdir="libsrc2" destdir="target/lib2" classpath="target/common" debug="true" target="1.7">
+		<javac srcdir="libsrc2" destdir="target/lib2" classpath="target/common" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 			<classpath>
 				<path location="target/common" />
@@ -84,14 +84,14 @@
 
 	<target name="compile-common">
 		<mkdir dir="target/common" />
-		<javac srcdir="commonsrc" destdir="target/common" debug="true" target="1.7">
+		<javac srcdir="commonsrc" destdir="target/common" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 		</javac>
 	</target>
 
 	<target name="compile-dep" depends="compile-original">
 		<mkdir dir="target/dep" />
-		<javac srcdir="depsrc" destdir="target/dep" debug="true" target="1.7">
+		<javac srcdir="depsrc" destdir="target/dep" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 			<classpath>
 				<path location="target/lib" />
@@ -111,7 +111,7 @@
 
 	<target name="compile-new-lib1" depends="compile-common">
 		<mkdir dir="target/lib1" />
-		<javac srcdir="libsrc1" destdir="target/lib1" classpath="target/common" debug="true" target="1.7">
+		<javac srcdir="libsrc1" destdir="target/lib1" classpath="target/common" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 		</javac>
 	</target>
@@ -126,7 +126,7 @@
 
 	<target name="compile-new-lib4" depends="compile-common">
 		<mkdir dir="target/lib4" />
-		<javac srcdir="libsrc4" destdir="target/lib4" classpath="target/common" debug="true" target="1.7">
+		<javac srcdir="libsrc4" destdir="target/lib4" classpath="target/common" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 		</javac>
 	</target>
@@ -147,7 +147,7 @@
 		</java>
 	</target>
 
-	<target name="test-original-disable-transform" depends="compile-test,jar-poc" description="test-original-disable-transform">
+	<target name="test-original-without-bci" depends="compile-test,jar-poc" description="test-original-disable-transform">
 		<mkdir dir="tmp" />
 		<java classname="${mainclass}" fork="true">
 			<jvmarg line="-javaagent:poc.jar" />
@@ -164,7 +164,7 @@
 		</java>
 	</target>
 
-	<target name="test-original-without-bci" depends="compile-test" description="test-original-without-bci">
+	<target name="test-original-disable-transform" depends="compile-test" description="test-original-without-bci">
 		<mkdir dir="tmp" />
 		<java classname="${mainclass}" fork="true">
 			<jvmarg line="-Dtest-reflection=true" />
