@@ -29,5 +29,4 @@ public class SubjectToChange {
 	public void setStatic(int newValue) {
 		value = newValue;
 	}
-
 }

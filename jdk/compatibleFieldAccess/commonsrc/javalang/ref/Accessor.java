@@ -12,5 +12,6 @@ public @interface Accessor {
 	 * @return the name of the field.
 	 */
 	String value() default "";
+	boolean allowNonStaticAccess() default false;
 
 }

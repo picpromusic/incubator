@@ -1,6 +1,7 @@
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.AccessibleObject;
@@ -107,6 +108,7 @@ public class Bootstrapper {
 				} catch (Exception e) { // Should be
 										// ReflectiveOperationException |
 										// IllegalAccessException
+//					e.printStackTrace();
 					CallSite cs = findAccesorMethod(symetryCheck, true, lookup,
 							name, type, mod, staticProperty, clazz, fieldType);
 					if (cs != null) {
@@ -134,16 +136,35 @@ public class Bootstrapper {
 		Class<?> expectedRetType = get ? type.returnType() : void.class;
 		Method resolvedMethod = null;
 		MethodHandle resolvedHandle = null;
-		List<IllegalAccessException> suppressed = new ArrayList<>();
+		List<IllegalAccessException> suppressedIllegal = new ArrayList<>();
+		List<IncompatibleClassChangeError> suppressedIncompatible = new ArrayList<>();
 		for (Method method : methods) {
 			String methodName = method.getName();
 			if (method.getReturnType().equals(expectedRetType)) {
 				Accessor annotation = method.getAnnotation(Accessor.class);
 				if (annotation != null) {
-					String fieldName = AccessorMethodUtil.determineAccessedFieldname(get, methodName, annotation.value());
+					String fieldName = AccessorMethodUtil
+							.determineAccessedFieldname(get, methodName,
+									annotation.value());
 
 					if (fieldName.equals(name)) {
-						if (Modifier.isStatic(method.getModifiers()) != staticProperty) {
+						boolean differentProperty = staticProperty != Modifier
+								.isStatic(method.getModifiers());
+						boolean incompatibleNonStaticToStaticChange = differentProperty && !staticProperty
+						// Which is implicit given. Because differentProperty
+						// && Modifier.isStatic(method.getModifiers())
+								// But maybe it is allowd
+								&& !annotation.allowNonStaticAccess();
+						boolean incompatibleStaticToNonStaticChange = differentProperty && staticProperty
+						// Which is implicit given. Because differentProperty
+						// && !Modifier.isStatic(method.getModifiers())
+						;
+						if (incompatibleNonStaticToStaticChange || incompatibleStaticToNonStaticChange) {
+							// if (Modifier.isStatic(method.getModifiers()) !=
+							// staticProperty) {
+							// FIXIT: replace the to now fixed values to the
+							// Message Format. Remove parametes of MessageFormat
+							// which are now fixed
 							String message = MessageFormat
 									.format("{0}-Field {1} is not accessable in a {2} way",
 											(staticProperty ? "Instance"
@@ -152,34 +173,41 @@ public class Bootstrapper {
 													: "non-static"));
 							if (sol2) {
 								throw new IncompatibleClassChangeError(message);
+							} else {
+								suppressedIncompatible
+										.add(new IncompatibleClassChangeError(
+												message));
 							}
-						}
+						} else {
 
-						MethodType mt = get ? MethodType.methodType(fieldType)
-								: MethodType.methodType(void.class,
-										method.getParameterTypes());
-						try {
-							MethodHandle tempHandle = staticProperty //
-							? lookup.findStatic(clazz, method.getName(), mt)
-									: lookup.findVirtual(clazz,
-											method.getName(), mt);
-							if (isMethodAccessable(lookup, method)) {
-								if (resolvedMethod == null
-										|| isMoreSpecific(resolvedMethod,
-												method, name)) {
-									resolvedMethod = method;
-									resolvedHandle = tempHandle;
+							MethodType mt = get ? MethodType
+									.methodType(fieldType) : MethodType
+									.methodType(void.class,
+											method.getParameterTypes());
+							try {
+								MethodHandle tempHandle = Modifier
+										.isStatic(method.getModifiers()) //
+								? lookup.findStatic(clazz, method.getName(), mt)
+										: lookup.findVirtual(clazz,
+												method.getName(), mt);
+								if (isMethodAccessable(lookup, method)) {
+									if (resolvedMethod == null
+											|| isMoreSpecific(resolvedMethod,
+													method, name)) {
+										resolvedMethod = method;
+										resolvedHandle = tempHandle;
+									}
+								} else {
+									throw new IllegalAccessException(method
+											+ " is not accessable from "
+											+ lookup.lookupClass());
 								}
-							} else {
-								throw new IllegalAccessException(method
-										+ " is not accessable from "
-										+ lookup.lookupClass());
-							}
-						} catch (IllegalAccessException e) {
-							if (sol2) {
-								throw e;
-							} else {
-								suppressed.add(e);
+							} catch (IllegalAccessException e) {
+								if (sol2) {
+									throw e;
+								} else {
+									suppressedIllegal.add(e);
+								}
 							}
 						}
 					}
@@ -188,16 +216,28 @@ public class Bootstrapper {
 		} // end for
 		if (resolvedHandle != null) {
 			if (!symetryCheck) {
-				symetryCheck(false, lookup, name, mod, staticProperty, clazz,
+				symetryCheck(!get, lookup, name, mod, staticProperty, clazz,
 						fieldType);
+			}
+
+			if (!staticProperty
+					&& Modifier.isStatic(resolvedMethod.getModifiers())) {
+				resolvedHandle = MethodHandles.dropArguments(resolvedHandle, 0,
+						clazz);
 			}
 			return new ConstantCallSite(resolvedHandle.asType(type));
 		} else {
-			if (!suppressed.isEmpty()) {
+			if (!suppressedIncompatible.isEmpty()) {
+				IncompatibleClassChangeError e = new IncompatibleClassChangeError("One or more IncompatibleClassChangeErrors thrown");
+				for (IncompatibleClassChangeError supp : suppressedIncompatible) {
+					e.addSuppressed(supp);
+				}
+			}
+			if (!suppressedIllegal.isEmpty()) {
 				IllegalAccessException e = new IllegalAccessException(
 						"One or more IllegalAccessException thrown");
-				for (IllegalAccessException illegalAccessException : suppressed) {
-					e.addSuppressed(illegalAccessException);
+				for (IllegalAccessException supp : suppressedIllegal) {
+					e.addSuppressed(supp);
 				}
 				throw e;
 			}

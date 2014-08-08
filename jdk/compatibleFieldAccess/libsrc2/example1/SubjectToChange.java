@@ -3,20 +3,28 @@ package example1;
 import javalang.ref.Accessor;
 
 public class SubjectToChange {
+	
+	/**
+	 * An instance variable. Use to store the value
+	 * of publicField in the previous version of
+	 * example1.SubjectToChange. In Solution 2 it
+	 * is not allowed to have the property multiple
+	 * times. So we changed it from publicField to 
+	 * value
+	 */
 	private int value;
+
+	/**
+	 * An static variable. Use to store the value
+	 * of publicStaticField in the previous version
+	 * of example1.SubjectToChange. In Solution 2 it
+	 * is not allowed to have the property multiple 
+	 * times. So we changed it from publicStaticField 
+	 * to privateStaticField.
+	 */
 	private static int privateStaticField;
 	
 	public SubjectToChange(int value) {
-		this.value = value;
-	}
-	
-	@Accessor()
-	public int getPublicField() {
-		return value;
-	}
-	
-	@Accessor()
-	public void setPublicField(int value) {
 		this.value = value;
 	}
 	
@@ -28,6 +36,16 @@ public class SubjectToChange {
 	@Accessor("publicStaticField")
 	public static void setStatic(int newValue) {
 		privateStaticField = newValue;
+	}
+
+	@Accessor()
+	public int getPublicField() {
+		return value;
+	}
+	
+	@Accessor()
+	public void setPublicField(int value) {
+		this.value = value;
 	}
 
 }

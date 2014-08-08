@@ -2,18 +2,17 @@ package example10;
 
 import javalang.ref.Accessor;
 
-public class SubjectToChange10 {
+public class SubjectToChange10Extension extends SubjectToChange10 {
 
-	private int field;
+	private int myField;
 
 	@Accessor
 	public int getField() {
-		return field;
+		return myField;
 	}
 
 	@Accessor
 	public void setField(int value) {
-		field = value;
+		myField = value;
 	}
-
 }
