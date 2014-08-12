@@ -13,5 +13,6 @@ public @interface Accessor {
 	 */
 	String value() default "";
 	boolean allowNonStaticAccess() default false;
+	String instanceFactory() default "";
 
 }

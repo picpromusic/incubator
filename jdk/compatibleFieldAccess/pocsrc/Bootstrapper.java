@@ -4,13 +4,13 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+
 
 import javalang.ref.Accessor;
 import javalang.ref.AsymeticAcessorError;
@@ -136,6 +136,8 @@ public class Bootstrapper {
 		Class<?> expectedRetType = get ? type.returnType() : void.class;
 		Method resolvedMethod = null;
 		MethodHandle resolvedHandle = null;
+		MethodHandle factoryHandle = null;
+
 		List<IllegalAccessException> suppressedIllegal = new ArrayList<>();
 		List<IncompatibleClassChangeError> suppressedIncompatible = new ArrayList<>();
 		for (Method method : methods) {
@@ -159,6 +161,16 @@ public class Bootstrapper {
 						// Which is implicit given. Because differentProperty
 						// && !Modifier.isStatic(method.getModifiers())
 						;
+						
+						if (incompatibleStaticToNonStaticChange && !annotation.instanceFactory().isEmpty()) {
+							String factory = annotation.instanceFactory();
+							Method fmethod = clazz.getMethod(factory, new Class[]{});
+							if (Modifier.isStatic(fmethod.getModifiers())) {
+								incompatibleStaticToNonStaticChange = false;
+								MethodType mt = MethodType.methodType(clazz);
+								factoryHandle = lookup.findStatic(clazz, factory, mt);
+							}
+						}
 						if (incompatibleNonStaticToStaticChange || incompatibleStaticToNonStaticChange) {
 							// if (Modifier.isStatic(method.getModifiers()) !=
 							// staticProperty) {
@@ -224,6 +236,15 @@ public class Bootstrapper {
 					&& Modifier.isStatic(resolvedMethod.getModifiers())) {
 				resolvedHandle = MethodHandles.dropArguments(resolvedHandle, 0,
 						clazz);
+			}else if(staticProperty && !Modifier.isStatic(resolvedMethod.getModifiers()) && factoryHandle != null) {
+				resolvedHandle = MethodHandles.foldArguments(resolvedHandle, factoryHandle);
+//				try {
+//					nh1 = MethodHandles.insertArguments(resolvedHandle, 0, new Object[]{});
+//					System.out.println(nh1);
+//				} catch (Throwable e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 			}
 			return new ConstantCallSite(resolvedHandle.asType(type));
 		} else {

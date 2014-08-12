@@ -1,29 +1,37 @@
 package playground;
 
 import javalang.ref.Accessor;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlaygroundSubjectToChange {
-	private static int field;
-	private static double sField;
+	
+	private double data;
 
-	@Accessor("sField")
-	public static double getStatic() {
-		return sField;
-	}
-
-	@Accessor("sField")
-	public static void setStatic(double value) {
-		sField = value;
+	private static Map<Object,PlaygroundSubjectToChange> instances = new ConcurrentHashMap<>();
+	
+	public static PlaygroundSubjectToChange getSingleton(@Callee Object callee) {
+		PlaygroundSubjectToChange instance = instances.get(callee);
+		if (instance == null) {
+			synchronized (instances) {
+				instance = instances.get(callee);
+				if (instance == null) {
+					instance = new PlaygroundSubjectToChange();
+					instances.put(callee,instance);
+				}
+			}
+		}
+		return instance;
 	}
 	
-	@Accessor("field")
-	public static void setVar(int value) {
-		field = value;
+	@Accessor(value="sField",instanceFactory="getSingleton")
+	public double getStatic() {
+		return data;
 	}
-	
-	@Accessor("field")
-	public static int getVar() {
-		return field;
+
+	@Accessor(value="sField",instanceFactory="getSingleton")
+	public void setStatic(double value) {
+		data = value;
 	}
 	
 }

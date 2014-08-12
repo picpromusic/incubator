@@ -1,10 +1,10 @@
 package incubator.tests;
 
-import playground.PlaygroundSubjectToChange;
+import example12.SubjectToChange;
 
 
 
-public class PlaygroundTest {
+public class Example12 {
 	public static void main(String[] args) {
 		boolean changedVersion = Boolean.getBoolean("cfa.changedVersion");
 
@@ -12,9 +12,9 @@ public class PlaygroundTest {
 		boolean sol2 = solution != null ? solution.contains("2") : false;
 		boolean sol1 = solution != null ? solution.contains("1") : false;
 
-		PlaygroundSubjectToChange.sField = 27;
+		SubjectToChange.sField = 27;
 		
-		System.out.println(PlaygroundSubjectToChange.sField);
+		System.out.println(SubjectToChange.sField);
 	}
 
 }

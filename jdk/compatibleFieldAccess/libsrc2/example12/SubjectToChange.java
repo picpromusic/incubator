@@ -1,16 +1,16 @@
-package playground;
+package example12;
 
 import javalang.ref.Accessor;
 
-public class PlaygroundSubjectToChange {
+public class SubjectToChange {
 	
 	private double data;
 
-	private static ThreadLocal<PlaygroundSubjectToChange> instance = new ThreadLocal<>();
+	private static ThreadLocal<SubjectToChange> instance = new ThreadLocal<>();
 	
-	public static PlaygroundSubjectToChange getTLSingleton() {
+	public static SubjectToChange getTLSingleton() {
 		if (instance.get() == null) {
-			instance.set(new PlaygroundSubjectToChange());
+			instance.set(new SubjectToChange());
 		}
 		return instance.get();
 	}
