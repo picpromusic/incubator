@@ -22,6 +22,7 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 	private static final int TRACE_SIGNED_MESSAGE = 1;
 	private int traceLevel;
 	private PrintStream tracer;
+//	private int anonNumber;
 
 	public MyClassFileTransformer(Instrumentation inst) {
 		traceLevel = 0;
@@ -56,11 +57,19 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		}
 	}
 
+	
 	private byte[] transform(byte[] classfileBuffer, String className,
 			ClassLoader loader) throws IOException {
+		boolean printThisClassEvenIfNotTransformed = false;
 		ClassReader cr = new ClassReader(classfileBuffer);
 		ClassNode classNode = new ClassNode();
 		cr.accept(classNode, ClassReader.EXPAND_FRAMES);
+		if (className == null) {
+			className = classNode.name;
+//			className += + "Nr"+anonNumber++;
+			System.out.println(className + " without any Name");
+//			printThisClassEvenIfNotTransformed = true;
+		}
 		CheckFieldAccess inserter = new CheckFieldAccess(classNode, loader);
 		inserter.setTraceOutput(tracer);
 		inserter.setTraceLevel(traceLevel);
@@ -89,7 +98,7 @@ public class MyClassFileTransformer implements ClassFileTransformer {
 		// analyse(classNode);
 
 		byte[] byteArray = cw.toByteArray();
-		if (transformed) {
+		if (transformed || printThisClassEvenIfNotTransformed) {
 			File file = new File("tmp/" + className + ".class");
 			file.getParentFile().mkdirs();
 			FileOutputStream fout = new FileOutputStream(file);

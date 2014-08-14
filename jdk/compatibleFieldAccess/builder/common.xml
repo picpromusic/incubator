@@ -58,7 +58,7 @@
 
 	<target name="compile-poc" depends="compile-common">
 		<mkdir dir="target/poc" />
-		<javac srcdir="pocsrc" destdir="target/poc" classpath="target/common;libs/asm-debug-all-4.2.jar" debug="true" target="1.7" includeantruntime="false">
+		<javac srcdir="pocsrc" destdir="target/poc" classpath="target/common;libs/asm-debug-all-5.0.3.jar" debug="true" target="1.7" includeantruntime="false">
 			<filename name="**/*.java" />
 		</javac>
 	</target>

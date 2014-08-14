@@ -13,14 +13,17 @@ public class Example11 {
 		boolean sol2 = solution != null ? solution.contains("2") : false;
 		boolean sol1 = solution != null ? solution.contains("1") : false;
 
-		SubjectToChange.sField = 27;
+//		for(int i = 0 ; i < 100000; i++) {
 		
-		SubjectToChange pg = new SubjectToChange();
-		pg.field += 5;
-		
-		
-		System.out.println(pg.field) ;
-		System.out.println(SubjectToChange.sField);
+			SubjectToChange.sField = 27;
+			
+			SubjectToChange pg = new SubjectToChange();
+			pg.field += 5;
+			
+			
+			System.out.println(pg.field) ;
+			System.out.println(SubjectToChange.sField);
+//		}
 	}
 
 }
