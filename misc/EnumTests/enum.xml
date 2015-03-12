@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="false" context="enumbody_context" deleted="false" description="Code in new enum type bodies" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.enumbody" name="enumbody">// ###########WERTE#ANFANG###############
+
+//  ##Werte hier mit , und // getrennt. In Klammern jeweils die referenzierten Werte
+//	WERT1(Oe.Ik2IO), //
+
+// ###########WERTE#ENDE#################
+
+// Das Semikolon muss stehen bleiben.
+	;
+
+// ###########STRUKTUR#ANFANG############
+//	##Strukturelemente hier mit ; getrennt
+//	public final TYPE name;
+//  public final TYPE2 name2;
+// ###########STRUKTUR#ENDE##############
+	
+
+
+// ###########TECHNISCH#ANFANG###########
+//  ##Strukturelemente hier in den Klammen mit , getrennt
+//	${type_name}(TYPE name,TYPE2 name2) {
+	${type_name}() {
+//  ##Strukturelement hier übernehmen mit ; getrennt
+//		this.name = name;
+//		this.name2 = name;
+	}
+// ###########TECHNISCH#ENDE#############
+</template></templates>
