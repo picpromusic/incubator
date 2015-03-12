@@ -12,7 +12,7 @@ import static test.de.firma.projekt.interaktionen.hauptsystem.Interaktionen.*;
 public class FirstTest extends BaseTest {
 
 	@Test
-	public void test() {
+	public void testDieserTestTraegtKeinenBesonderesKurzenNamen() {
 
 		LdapDefinitionen.EinMitarbeiterInIoUndEinExterner();
 

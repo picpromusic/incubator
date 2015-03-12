@@ -48,4 +48,5 @@ public abstract class SUT {
 	public void clearValues() {
 		seenElements = new LinkedList<WhatEver>();
 	}
+
 }
