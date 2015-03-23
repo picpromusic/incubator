@@ -9,7 +9,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-public abstract class MyDefaultHandler<T extends TbElement> extends DefaultHandler {
+public abstract class MyTbElementHandler<T extends TbElement> extends DefaultHandler {
 
 	public static class SubdivisionInfo {
 		public final String name;
@@ -28,7 +28,7 @@ public abstract class MyDefaultHandler<T extends TbElement> extends DefaultHandl
 	
 	public interface EndOfRedirect {
 
-		void end();
+		void end(MyTbElementHandler handler);
 
 	}
 
@@ -42,7 +42,7 @@ public abstract class MyDefaultHandler<T extends TbElement> extends DefaultHandl
 	private String innerPk;
 	private String innerName;
 
-	public MyDefaultHandler(EndOfRedirect endOfRedirect,
+	public MyTbElementHandler(EndOfRedirect endOfRedirect,
 			List<SubdivisionInfo> path) {
 		this.endOfRedirect = endOfRedirect;
 		this.path = Collections.unmodifiableList(path);
@@ -83,7 +83,7 @@ public abstract class MyDefaultHandler<T extends TbElement> extends DefaultHandl
 		sb.setLength(0);
 		depth--;
 		if (depth == 0) {
-			endOfRedirect.end();
+			endOfRedirect.end(this);
 		}
 
 	}

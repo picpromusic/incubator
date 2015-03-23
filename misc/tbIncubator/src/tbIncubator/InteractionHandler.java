@@ -1,17 +1,18 @@
 package tbIncubator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-public class InteractionHandler extends MyDefaultHandler<Interaction> {
+public class InteractionHandler extends MyTbElementHandler<Interaction> {
 
 	private String lastDataTypeRef;
 	private ArrayList<InteractionParameter> parameters;
 
 	public InteractionHandler(EndOfRedirect endOfRedirect,
-			ArrayList<SubdivisionInfo> path) {
+			List<SubdivisionInfo> path) {
 		super(endOfRedirect, path);
 		this.parameters = new ArrayList<InteractionParameter>(6);
 	}
