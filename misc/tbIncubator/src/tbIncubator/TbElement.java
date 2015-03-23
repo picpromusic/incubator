@@ -6,7 +6,7 @@ import java.util.List;
 public class TbElement {
 
 	public static String replaceAll(String str) {
-		String replaceAll = str.replaceAll("( |,|<|>|\\?|=|!|\"|%|\\(|\\))", "_"); // Und
+		String replaceAll = str.replaceAll("( |\\-|;|:|\\+|,|<|>|\\?|=|!|\"|%|\\(|\\))", "_"); // Und
 																			// andere
 		replaceAll = replaceAll.replace('`', '_');
 		// Verbodene
@@ -17,6 +17,9 @@ public class TbElement {
 		if (replaceAll.charAt(0) == '-') {
 			replaceAll = "m" + replaceAll.substring(1);
 		}
+		replaceAll = replaceAll.replace("Boolean", "Wahrheitswert");
+		replaceAll = replaceAll.replace("true", "WAHR");
+		replaceAll = replaceAll.replace("false", "FALSCH");
 		replaceAll = replaceAll.replaceAll("-", "");
 		replaceAll = replaceAll.replaceAll("ä", "ae");
 		replaceAll = replaceAll.replaceAll("ö", "oe");

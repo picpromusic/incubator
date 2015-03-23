@@ -2,6 +2,7 @@ package tbIncubator;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Repeatable;
 import java.net.InterfaceAddress;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 						Representative lookupRepresentative = lookupRepresentative(ele.ref);
 						DataType dt = lookupRepresentative.getDefinedIn();
 						ClassName className = ClassName.get(dt.getPackage(),
-								dt.name);
+								dt.getSimpleName());
 						tvn[index++] = className;
 						tvn[index++] = TypeVariableName.get(
 								lookupRepresentative.toJavaName(), className);
@@ -89,21 +90,28 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 				}
 			}
+			if (dataType.representatives.isEmpty()) {
+				enu.addEnumConstant("DEFAULT");
+			}
 
 			MethodSpec.Builder ctorBuilder = MethodSpec.constructorBuilder();
 			for (Link fie : dataType.fieldLinks) {
 				DataType dt = lookupDataType(fie.ref);
-				TypeName fiedClass = ClassName.get(dt.getPackage(),
-						dt.getSimpleName());
-				String fiename = fie.name.substring(0, 1).toLowerCase()
-						+ fie.name.substring(1);
-				FieldSpec fs = FieldSpec.builder(fiedClass, fiename,
-						Modifier.PUBLIC, Modifier.FINAL).build();
-				enu.addField(fs);
-				ctorBuilder.addParameter(ParameterSpec.builder(fiedClass,
-						fiename).build());
-				ctorBuilder
-						.addCode("this." + fiename + " = " + fiename + ";\n");
+				if (dt != null) {
+					TypeName fiedClass = ClassName.get(dt.getPackage(),
+							dt.getSimpleName());
+
+					String fiename = fie.name.substring(0, 1).toLowerCase()
+							+ fie.name.substring(1);
+					fiename = TbElement.replaceAll(fiename);
+					FieldSpec fs = FieldSpec.builder(fiedClass, fiename,
+							Modifier.PUBLIC, Modifier.FINAL).build();
+					enu.addField(fs);
+					ctorBuilder.addParameter(ParameterSpec.builder(fiedClass,
+							fiename).build());
+					ctorBuilder.addCode("this." + fiename + " = " + fiename
+							+ ";\n");
+				}
 			}
 			if (dataType.fieldLinks.isEmpty()) {
 				enu.addField(FieldSpec.builder(String.class,
@@ -144,9 +152,13 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				.addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT);
 		for (InteractionParameter ele : inter.parameters) {
 			DataType dt = lookupDataType(ele.dataTypeRef.ref);
-			ClassName cn = ClassName.get(dt.getPackage(), dt.getSimpleName());
-			ParameterSpec para = ParameterSpec.builder(cn, ele.getJavaName()).build();
-			mBuilder.addParameter(para);
+			if (dt != null) {
+				ClassName cn = ClassName.get(dt.getPackage(),
+						dt.getSimpleName());
+				ParameterSpec para = ParameterSpec.builder(cn,
+						ele.getJavaName()).build();
+				mBuilder.addParameter(para);
+			}
 		}
 		MethodSpec methodSpec = mBuilder.build();
 
