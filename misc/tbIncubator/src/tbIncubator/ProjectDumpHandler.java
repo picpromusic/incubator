@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.xml.sax.Attributes;
 
-import tbIncubator.MyTbElementHandler.EndOfRedirect;
+import tbIncubator.TbElementHandler.EndOfRedirect;
 
 final class ProjectDumpHandler extends TbRedirectHandler {
 
@@ -26,7 +26,7 @@ final class ProjectDumpHandler extends TbRedirectHandler {
 		return new EndOfRedirect() {
 
 			@Override
-			public void end(MyTbElementHandler handler) {
+			public void end(TbElementHandler handler) {
 
 				TbElement tbElement = handler.getTbElement();
 				if (tbElement instanceof DataType) {
@@ -46,6 +46,7 @@ final class ProjectDumpHandler extends TbRedirectHandler {
 	protected void setupSubTypeHandlerFactories() {
 		setupSimple("interaction", InteractionHandler.class);
 		setupSimple("datatype", DataTypeHandler.class);
+		setupSimple("testcase", TestCaseHandler.class);
 	}
 
 	@Override

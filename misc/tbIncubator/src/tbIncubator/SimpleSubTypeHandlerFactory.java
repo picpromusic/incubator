@@ -6,22 +6,22 @@ import java.util.List;
 
 import org.xml.sax.Attributes;
 
-import tbIncubator.MyTbElementHandler.EndOfRedirect;
-import tbIncubator.MyTbElementHandler.SubdivisionInfo;
+import tbIncubator.TbElementHandler.EndOfRedirect;
+import tbIncubator.TbElementHandler.SubdivisionInfo;
 
 final class SimpleSubTypeHandlerFactory implements
 		SubTypeHandlerFactory {
-	private final Class<? extends MyTbElementHandler> clazz;
+	private final Class<? extends TbElementHandler> clazz;
 	private final String type;
 
 	SimpleSubTypeHandlerFactory(
-			String type, Class<? extends MyTbElementHandler> clazz) {
+			String type, Class<? extends TbElementHandler> clazz) {
 		this.clazz = clazz;
 		this.type = type;
 	}
 
 	@Override
-	public MyTbElementHandler<?> create(EndOfRedirect endOfRedirect,
+	public TbElementHandler<?> create(EndOfRedirect endOfRedirect,
 			List<SubdivisionInfo> pathAsList) {
 		try {
 			return clazz.getConstructor(EndOfRedirect.class,

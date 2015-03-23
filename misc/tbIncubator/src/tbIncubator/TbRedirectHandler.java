@@ -8,8 +8,8 @@ import java.util.Stack;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import tbIncubator.MyTbElementHandler.EndOfRedirect;
-import tbIncubator.MyTbElementHandler.SubdivisionInfo;
+import tbIncubator.TbElementHandler.EndOfRedirect;
+import tbIncubator.TbElementHandler.SubdivisionInfo;
 
 public abstract class TbRedirectHandler extends TbDumpPathHandler {
 
@@ -17,7 +17,7 @@ public abstract class TbRedirectHandler extends TbDumpPathHandler {
 
 	protected abstract EndOfRedirect endOfRedirect();
 
-	private MyTbElementHandler<?> redirectTo;
+	private TbElementHandler<?> redirectTo;
 	private Set<SubTypeHandlerFactory> subTypeHandlerFactories = new HashSet<SubTypeHandlerFactory>();
 
 	@Override
@@ -76,7 +76,7 @@ public abstract class TbRedirectHandler extends TbDumpPathHandler {
 		subTypeHandlerFactories.add(subTypeHandlerFactory);
 	}
 
-	protected void setupSimple(String type, Class<? extends MyTbElementHandler> clazz) {
+	protected void setupSimple(String type, Class<? extends TbElementHandler> clazz) {
 		setup(new SimpleSubTypeHandlerFactory(//
 				type, clazz));
 	}

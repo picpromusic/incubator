@@ -7,7 +7,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import tbIncubator.MyTbElementHandler.SubdivisionInfo;
+import tbIncubator.TbElementHandler.SubdivisionInfo;
 
 public abstract class TbDumpPathHandler extends DefaultHandler {
 

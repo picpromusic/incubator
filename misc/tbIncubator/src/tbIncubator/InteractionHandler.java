@@ -6,7 +6,7 @@ import java.util.List;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-public class InteractionHandler extends MyTbElementHandler<Interaction> {
+public class InteractionHandler extends TbElementHandler<Interaction> {
 
 	private String lastDataTypeRef;
 	private ArrayList<InteractionParameter> parameters;

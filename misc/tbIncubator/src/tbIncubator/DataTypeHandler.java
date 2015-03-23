@@ -6,10 +6,10 @@ import java.util.List;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import tbIncubator.MyTbElementHandler.EndOfRedirect;
-import tbIncubator.MyTbElementHandler.SubdivisionInfo;
+import tbIncubator.TbElementHandler.EndOfRedirect;
+import tbIncubator.TbElementHandler.SubdivisionInfo;
 
-public class DataTypeHandler extends MyTbElementHandler<DataType> {
+public class DataTypeHandler extends TbElementHandler<DataType> {
 
 	private List<Representative> representatives;
 	private List<Link> representativeLinks;

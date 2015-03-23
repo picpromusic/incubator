@@ -3,7 +3,7 @@ package tbIncubator;
 import java.util.Collections;
 import java.util.List;
 
-import tbIncubator.MyTbElementHandler.SubdivisionInfo;
+import tbIncubator.TbElementHandler.SubdivisionInfo;
 
 public class Interaction extends TbElement {
 
