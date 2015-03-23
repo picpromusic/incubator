@@ -1,4 +1,4 @@
-package tbIncubator;
+package tbIncubator.domain;
 
 import java.util.Collections;
 import java.util.List;

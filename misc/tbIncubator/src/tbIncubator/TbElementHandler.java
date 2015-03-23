@@ -2,11 +2,15 @@ package tbIncubator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import tbIncubator.domain.TbElement;
 
 
 public abstract class TbElementHandler<T extends TbElement> extends DefaultHandler {
@@ -41,11 +45,13 @@ public abstract class TbElementHandler<T extends TbElement> extends DefaultHandl
 	private String pk;
 	private String innerPk;
 	private String innerName;
+	private Map<String,String> innerStringValues;
 
 	public TbElementHandler(EndOfRedirect endOfRedirect,
 			List<SubdivisionInfo> path) {
 		this.endOfRedirect = endOfRedirect;
 		this.path = Collections.unmodifiableList(path);
+		this.innerStringValues = new HashMap<String,String>();
 	}
 
 	public abstract void innerStartElement(String uri, String localName,
@@ -68,6 +74,7 @@ public abstract class TbElementHandler<T extends TbElement> extends DefaultHandl
 			throws SAXException {
 		// TODO Auto-generated method stub
 		super.endElement(uri, localName, qName);
+		innerStringValues.put(localName, sb.toString());
 		if (localName.equals("name") && name == null) {
 			this.name = sb.toString();
 		} else if (localName.equals("name")) {
@@ -119,8 +126,14 @@ public abstract class TbElementHandler<T extends TbElement> extends DefaultHandl
 		return path;
 	}
 
+	protected String getInnerStringValue(String key) {
+		return innerStringValues.get(key);
+	}
+	
 	public abstract void innerEndElement(String uri, String localName,
 			String qName) throws SAXException;
 
 	public abstract T getTbElement();
+	
+	
 }

@@ -1,4 +1,4 @@
-package tbIncubator;
+package tbIncubator.generator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,6 +18,12 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
+
+import tbIncubator.domain.DataType;
+import tbIncubator.domain.Interaction;
+import tbIncubator.domain.InteractionParameter;
+import tbIncubator.domain.Link;
+import tbIncubator.domain.Representative;
 
 public class JavaCodeGeneratorWithStringBuilders extends JavaCodeGenerator {
 

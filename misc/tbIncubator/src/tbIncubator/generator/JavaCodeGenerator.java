@@ -1,4 +1,4 @@
-package tbIncubator;
+package tbIncubator.generator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import tbIncubator.domain.DataType;
+import tbIncubator.domain.Interaction;
+import tbIncubator.domain.InteractionParameter;
+import tbIncubator.domain.Representative;
+import tbIncubator.domain.TbElement;
+
 public abstract class JavaCodeGenerator<//
 DATATYPE extends JavaCodeGenerator.FlushToDir, //
 INTERACTION extends JavaCodeGenerator.FlushToDir, //
@@ -27,6 +33,8 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 
 	private Map<String, Representative> index;
 	private Map<String, DataType> typeIndex;
+	private Map<String, Interaction> interIndex;
+	private Map<String, InteractionParameter> paraIndex;
 	private List<DataType> datatypes;
 	private List<Interaction> interactions;
 	private Properties prop;
@@ -58,6 +66,18 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 			index = Collections.unmodifiableMap(index);
 			typeIndex = Collections.unmodifiableMap(typeIndex);
 		}
+		if (interIndex == null || paraIndex == null) {
+			interIndex = new HashMap<String, Interaction>();
+			paraIndex = new HashMap<String,InteractionParameter>();
+			for(Interaction inter : interactions) {
+				interIndex.put(inter.pk,inter);
+				for (InteractionParameter para : inter.parameters) {
+					paraIndex.put(para.pk,para);
+				}
+			}
+			interIndex = Collections.unmodifiableMap(interIndex);
+			paraIndex = Collections.unmodifiableMap(paraIndex);
+		}
 	}
 
 	protected Representative lookupRepresentative(String pk) {
@@ -70,6 +90,16 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 		return typeIndex.get(pk);
 	}
 
+	protected Interaction lookupInteraction(String pk) {
+		ensureIndexBuild();
+		return interIndex.get(pk);
+	}
+	
+	protected InteractionParameter lookupInteractionParameter(String pk) {
+		ensureIndexBuild();
+		return paraIndex.get(pk);
+	}
+	
 	public List<DataType> getDatatypes() {
 		return datatypes;
 	}
@@ -114,10 +144,6 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 		}
 		for (FlushToDir flushToDir : interactionInterfaces) {
 			flushToDir.flush(dir);
-		}
-		
-		for (Interaction interaction : interactions) {
-			
 		}
 	}
 

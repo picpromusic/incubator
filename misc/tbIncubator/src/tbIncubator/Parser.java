@@ -4,19 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Vector;
 
-import javax.xml.crypto.Data;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.stream.events.EndDocument;
 
-import org.xml.sax.HandlerBase;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+
+import tbIncubator.generator.JavaCodeGeneratorPoet;
+import tbIncubator.saxHandlers.ProjectDumpHandler;
 
 public class Parser {
 
@@ -38,6 +34,7 @@ public class Parser {
 			// projectDumpHandler.getInteractions()).generate(file);
 			new JavaCodeGeneratorPoet(projectDumpHandler.getDatatypes(),
 					projectDumpHandler.getInteractions()).generate(file);
+			
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

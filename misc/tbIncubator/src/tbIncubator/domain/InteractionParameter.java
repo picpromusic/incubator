@@ -1,4 +1,5 @@
-package tbIncubator;
+package tbIncubator.domain;
+
 
 public class InteractionParameter {
 

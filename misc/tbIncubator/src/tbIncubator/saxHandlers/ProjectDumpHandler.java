@@ -1,4 +1,4 @@
-package tbIncubator;
+package tbIncubator.saxHandlers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,9 +6,14 @@ import java.util.List;
 
 import org.xml.sax.Attributes;
 
+import tbIncubator.TbElementHandler;
+import tbIncubator.TbRedirectHandler;
 import tbIncubator.TbElementHandler.EndOfRedirect;
+import tbIncubator.domain.DataType;
+import tbIncubator.domain.Interaction;
+import tbIncubator.domain.TbElement;
 
-final class ProjectDumpHandler extends TbRedirectHandler {
+public class ProjectDumpHandler extends TbRedirectHandler {
 
 	private List<DataType> datatypes = new ArrayList<DataType>(500);
 	private List<Interaction> interactions = new ArrayList<Interaction>(500);

@@ -1,4 +1,4 @@
-package tbIncubator;
+package tbIncubator.generator;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,17 @@ import java.util.Map;
 
 import javax.lang.model.element.Modifier;
 
+import tbIncubator.domain.DataType;
+import tbIncubator.domain.Interaction;
+import tbIncubator.domain.InteractionParameter;
+import tbIncubator.domain.Link;
+import tbIncubator.domain.Representative;
+import tbIncubator.domain.SubCall;
+import tbIncubator.domain.TbElement;
+import tbIncubator.domain.Link.LinkType;
+
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -24,11 +34,11 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 	private class MyFlushToDisk implements FlushToDir {
 
-		public final Builder enu;
+		public final Builder[] enu;
 		public final String name;
 		public final String packageName;
 
-		public MyFlushToDisk(String packageName, String name, Builder enu) {
+		public MyFlushToDisk(String packageName, String name, Builder... enu) {
 			this.packageName = packageName;
 			this.name = name;
 			this.enu = enu;
@@ -41,14 +51,17 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 		@Override
 		public void flush(File dir) throws IOException {
-			JavaFile.builder(packageName, enu.build()).build().writeTo(dir);
+			for (Builder builder : enu) {
+				JavaFile.builder(packageName, builder.build()).build()
+						.writeTo(dir);
+			}
 		}
 
 	}
 
 	Map<String, MyFlushToDisk> interaktionenFlushes = new HashMap<String, MyFlushToDisk>();
 
-	protected JavaCodeGeneratorPoet(List datatypes, List interactions) {
+	public JavaCodeGeneratorPoet(List datatypes, List interactions) {
 		super(datatypes, interactions);
 	}
 
@@ -143,13 +156,19 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		MyFlushToDisk mfd = interaktionenFlushes.get(fqClassName);
 		if (mfd == null) {
 			Builder interfaceBuilder = TypeSpec.interfaceBuilder(className);
-			mfd = new MyFlushToDisk(pack, className, interfaceBuilder);
+			Builder implBuilder = TypeSpec.classBuilder(className + "Impl");
+			implBuilder.addSuperinterface(ClassName.get(fqPackage, className));
+			mfd = new MyFlushToDisk(fqPackage, className, interfaceBuilder,
+					implBuilder);
 			interaktionenFlushes.put(fqClassName, mfd);
 		}
 
 		com.squareup.javapoet.MethodSpec.Builder mBuilder = MethodSpec
 				.methodBuilder(inter.getSimpleName())
 				.addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT);
+		com.squareup.javapoet.MethodSpec.Builder mBuilderImpl = MethodSpec
+				.methodBuilder(inter.getSimpleName()).addModifiers(
+						Modifier.PUBLIC);
 		for (InteractionParameter ele : inter.parameters) {
 			DataType dt = lookupDataType(ele.dataTypeRef.ref);
 			if (dt != null) {
@@ -158,11 +177,55 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				ParameterSpec para = ParameterSpec.builder(cn,
 						ele.getJavaName()).build();
 				mBuilder.addParameter(para);
+				mBuilderImpl.addParameter(para);
 			}
 		}
 		MethodSpec methodSpec = mBuilder.build();
 
-		mfd.enu.addMethod(methodSpec);
+		mfd.enu[0].addMethod(methodSpec);
+
+		com.squareup.javapoet.CodeBlock.Builder cBuilder = CodeBlock.builder();
+		for (SubCall subCall : inter.subCalls) {
+			Interaction lookupInteraction = lookupInteraction(subCall.interactionRef);
+
+			StringBuilder sb = new StringBuilder();
+			if (lookupInteraction != null) {
+				String callClass = getFQClass(lookupInteraction.getPackage());
+				if (!callClass.equals(fqClassName)) {
+					sb.append(callClass);
+					sb.append(".");
+				}
+				sb.append(lookupInteraction.getSimpleName());
+				sb.append("(");
+				for (Link para : subCall.parameters) {
+					if (para.type == LinkType.REPRESENTATIVE) {
+						Representative repre = lookupRepresentative(para.ref);
+						DataType definedIn = repre.getDefinedIn();
+//						sb.append(definedIn.getPackage());
+//						sb.append(".");
+						sb.append(definedIn.getSimpleName());
+						sb.append(".");
+						sb.append(repre.toJavaName());
+						sb.append(",");
+					} else if (para.type == LinkType.PARAMETER) {
+						InteractionParameter iPara = lookupInteractionParameter(para.ref);
+						if (iPara != null) {
+							sb.append(iPara.getJavaName());
+						}else {
+							sb.append("FIXME:" + para.ref);
+						}
+						sb.append(",");
+						
+					}
+				}
+				if (!subCall.parameters.isEmpty()) {
+					sb.setLength(sb.length() - 1);
+				}
+				sb.append(")");
+				mBuilderImpl.addStatement(sb.toString());
+			}
+		}
+		mfd.enu[1].addMethod(mBuilderImpl.build());
 
 		return mfd;
 	}
