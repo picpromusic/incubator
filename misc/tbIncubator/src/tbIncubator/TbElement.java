@@ -21,8 +21,8 @@ public class TbElement {
 		replaceAll = replaceAll.replaceAll("ä", "ae");
 		replaceAll = replaceAll.replaceAll("ö", "oe");
 		replaceAll = replaceAll.replaceAll("ü", "üe");
-		replaceAll = replaceAll.replaceAll("Ä", "Äe");
-		replaceAll = replaceAll.replaceAll("Ö", "Öe");
+		replaceAll = replaceAll.replaceAll("Ä", "Ae");
+		replaceAll = replaceAll.replaceAll("Ö", "Oe");
 		replaceAll = replaceAll.replaceAll("Ü", "Üe");
 		if (Character.isDigit(replaceAll.charAt(0))) {
 			replaceAll = "_" + replaceAll;

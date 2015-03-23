@@ -162,7 +162,9 @@ public class Parser {
 				File file = new File("gen-src");
 				file.mkdirs();
 				try {
-					new JavaCodeGeneratorWithStringBuilders(datatypes,
+//					new JavaCodeGeneratorWithStringBuilders(datatypes,
+//							interactions).generate(file);
+					new JavaCodeGeneratorPoet(datatypes,
 							interactions).generate(file);
 				} catch (IOException e) {
 					throw new RuntimeException(e);

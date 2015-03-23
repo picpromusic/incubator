@@ -115,6 +115,10 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 		for (FlushToDir flushToDir : interactionInterfaces) {
 			flushToDir.flush(dir);
 		}
+		
+		for (Interaction interaction : interactions) {
+			
+		}
 	}
 
 	protected FlushToDir noFlushableResult(String name) {

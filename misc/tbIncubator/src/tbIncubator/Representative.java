@@ -8,7 +8,7 @@ public class Representative {
 	public final String name;
 	public final String pk;
 	public final List<Link> representativeLinks;
-	private TbElement definedIn;
+	private DataType definedIn;
 
 	public Representative(String name, String pk, List<Link> representativeLinks) {
 		this.name = name;
@@ -16,11 +16,11 @@ public class Representative {
 		this.representativeLinks = Collections.unmodifiableList(representativeLinks);
 	}
 	
-	public void setDefinedIn(TbElement definedIn) {
+	public void setDefinedIn(DataType definedIn) {
 		this.definedIn = definedIn;
 	}
 	
-	public TbElement getDefinedIn() {
+	public DataType getDefinedIn() {
 		return definedIn;
 	}
 	
@@ -29,7 +29,7 @@ public class Representative {
 		return name;
 	}
 
-	public Object toJavaName() {
+	public String toJavaName() {
 		return DataType.replaceAll(name.trim().replace('.', '_').replace('/', '_'));
 	}
 
