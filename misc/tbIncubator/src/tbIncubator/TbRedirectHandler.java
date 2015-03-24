@@ -1,15 +1,14 @@
 package tbIncubator;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
+import java.util.TreeSet;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import tbIncubator.TbElementHandler.EndOfRedirect;
-import tbIncubator.TbElementHandler.SubdivisionInfo;
+import tbIncubator.saxHandlers.Ignore;
 
 public abstract class TbRedirectHandler extends TbDumpPathHandler {
 
@@ -19,6 +18,12 @@ public abstract class TbRedirectHandler extends TbDumpPathHandler {
 
 	private TbElementHandler<?> redirectTo;
 	private Set<SubTypeHandlerFactory> subTypeHandlerFactories = new HashSet<SubTypeHandlerFactory>();
+
+	private static final Set<String> IGNORE = new TreeSet<String>();
+
+	static {
+		IGNORE.add("old-versions");
+	}
 
 	@Override
 	public void startDocument() throws SAXException {
@@ -31,6 +36,9 @@ public abstract class TbRedirectHandler extends TbDumpPathHandler {
 	public void startElement(String uri, String localName, String qName,
 			Attributes attributes) throws SAXException {
 		if (redirectTo != null) {
+			redirectTo.startElement(uri, localName, qName, attributes);
+		} else if (getIgnore().contains(localName)) {
+			redirectTo = new Ignore(endOfRedirect());
 			redirectTo.startElement(uri, localName, qName, attributes);
 		} else {
 			for (SubTypeHandlerFactory sthf : subTypeHandlerFactories) {
@@ -46,6 +54,9 @@ public abstract class TbRedirectHandler extends TbDumpPathHandler {
 		}
 	}
 
+	protected Set<String> getIgnore() {
+		return IGNORE;
+	}
 
 	@Override
 	public void characters(char[] ch, int start, int length)
@@ -62,10 +73,10 @@ public abstract class TbRedirectHandler extends TbDumpPathHandler {
 			throws SAXException {
 		if (redirectTo != null) {
 			redirectTo.endElement(uri, localName, qName);
-		}else {
+		} else {
 			super.endElement(uri, localName, qName);
 		}
-		
+
 	}
 
 	protected void clearRedirect() {
@@ -76,7 +87,8 @@ public abstract class TbRedirectHandler extends TbDumpPathHandler {
 		subTypeHandlerFactories.add(subTypeHandlerFactory);
 	}
 
-	protected void setupSimple(String type, Class<? extends TbElementHandler> clazz) {
+	protected void setupSimple(String type,
+			Class<? extends TbElementHandler> clazz) {
 		setup(new SimpleSubTypeHandlerFactory(//
 				type, clazz));
 	}

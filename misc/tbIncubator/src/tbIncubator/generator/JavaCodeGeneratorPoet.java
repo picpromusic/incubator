@@ -158,9 +158,12 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 		MyFlushToDisk mfd = interaktionenFlushes.get(fqClassName);
 		if (mfd == null) {
-			Builder interfaceBuilder = TypeSpec.interfaceBuilder(className);
-			Builder implBuilder = TypeSpec.classBuilder(className + "Impl");
-			implBuilder.addSuperinterface(ClassName.get(fqPackage, className));
+			Builder interfaceBuilder = TypeSpec.interfaceBuilder("I"
+					+ className);
+			Builder implBuilder = TypeSpec.classBuilder(className);
+//			implBuilder.addSuperinterface(ClassName.get(fqPackage, "I"
+//					+ className));
+			implBuilder.addModifiers(Modifier.PUBLIC);
 			mfd = new MyFlushToDisk(fqPackage, className, interfaceBuilder,
 					implBuilder);
 			interaktionenFlushes.put(fqClassName, mfd);
@@ -171,7 +174,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				.addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT);
 		com.squareup.javapoet.MethodSpec.Builder mBuilderImpl = MethodSpec
 				.methodBuilder(inter.getSimpleName()).addModifiers(
-						Modifier.PUBLIC);
+						Modifier.PUBLIC).addModifiers(Modifier.STATIC);
 		for (InteractionParameter ele : inter.parameters) {
 			DataType dt = lookupDataType(ele.dataTypeRef.ref);
 			if (dt != null) {
@@ -187,15 +190,17 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 		mfd.enu[0].addMethod(methodSpec);
 
-		com.squareup.javapoet.CodeBlock.Builder cBuilder = CodeBlock.builder();
 		for (SubCall subCall : inter.subCalls) {
 			Interaction lookupInteraction = lookupInteraction(subCall.interactionRef);
 
 			StringBuilder sb = new StringBuilder();
 			if (lookupInteraction != null) {
 				String callClass = getFQClassName(lookupInteraction);
+				String callClassPackage = callClass.substring(0,
+						callClass.lastIndexOf('.'));
+				String callClassName = callClass.substring(callClassPackage.length() + 1);
 				if (!callClass.equals(fqClassName)) {
-					sb.append(callClass);
+					sb.append(callClassName);
 					sb.append(".");
 				}
 				sb.append(lookupInteraction.getSimpleName());

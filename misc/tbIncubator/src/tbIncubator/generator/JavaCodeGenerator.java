@@ -111,13 +111,21 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 		do {
 			property = prop.getProperty(actPack);
 			int indexOf = actPack.lastIndexOf('.');
-			if (indexOf > 0) {
+			if (indexOf > 0 && property == null) {
 				actPack = actPack.substring(0, indexOf);
 			} else if (property == null) {
 				throw new RuntimeException("Nichts gefunden für " + pack);
 			}
 		} while (property == null);
 
+		if (property.endsWith(".*")) {
+			String rest = pack.substring(actPack.length()+1);
+			int lastIndexOf = Math.max(0,rest.lastIndexOf('.'));
+			rest = rest.substring(0, lastIndexOf);
+			property = property.substring(0, property.length()-1) + rest;
+			property = TbElement.replaceAll(property);
+		}
+		
 		boolean again = true;
 		while(again && !noUnderscore) {
 			again = false;

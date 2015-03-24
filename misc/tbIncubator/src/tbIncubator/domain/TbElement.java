@@ -6,8 +6,9 @@ import java.util.List;
 public class TbElement {
 
 	public static String replaceAll(String str) {
-		String replaceAll = str.replaceAll("( |\\-|;|:|\\+|,|<|>|\\?|=|!|\"|%|\\(|\\))", "_"); // Und
-																			// andere
+		String replaceAll = str.replaceAll(
+				"( |\\-|;|:|\\+|,|<|>|\\?|=|!|\"|%|\\(|\\))", "_"); // Und
+		// andere
 		replaceAll = replaceAll.replace('`', '_');
 		// Verbodene
 		// Zeichen
@@ -23,13 +24,21 @@ public class TbElement {
 		replaceAll = replaceAll.replaceAll("-", "");
 		replaceAll = replaceAll.replaceAll("ä", "ae");
 		replaceAll = replaceAll.replaceAll("ö", "oe");
-		replaceAll = replaceAll.replaceAll("ü", "üe");
+		replaceAll = replaceAll.replaceAll("ü", "ue");
 		replaceAll = replaceAll.replaceAll("Ä", "Ae");
 		replaceAll = replaceAll.replaceAll("Ö", "Oe");
 		replaceAll = replaceAll.replaceAll("Ü", "Üe");
-		if (Character.isDigit(replaceAll.charAt(0))) {
-			replaceAll = "_" + replaceAll;
-		}
+		String[] elements = replaceAll.split("\\.");
+		replaceAll = "";
+		for (String ele: elements) {
+			if (Character.isDigit(ele.charAt(0))) {
+				replaceAll += "_" + ele;
+			}else {
+				replaceAll +=ele;
+			}
+			replaceAll += ".";
+		};
+		replaceAll = replaceAll.substring(0,replaceAll.length()-1);
 		while (replaceAll.contains("__")) {
 			replaceAll = replaceAll.replaceAll("__", "_");
 		}
