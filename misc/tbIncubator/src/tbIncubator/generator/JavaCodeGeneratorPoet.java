@@ -67,9 +67,8 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 	@Override
 	protected FlushToDir generateDataType(DataType dataType) {
-		String fqClassName = dataType.getPackage() + "."
-				+ dataType.getSimpleName();
-		if (dataType.getPackage().startsWith("Neues_Schadensystem")) {
+		String fqClassName = getFqClassName(dataType);
+		if (shouldBeTransformed(dataType)) {
 			Builder enu = TypeSpec.enumBuilder(dataType.getSimpleName());
 			enu.addModifiers(Modifier.PUBLIC);
 
@@ -145,10 +144,14 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		}
 	}
 
+	private boolean shouldBeTransformed(TbElement element) {
+		return !element.getPackage().startsWith("Schadensystem");
+	}
+
 	@Override
 	protected FlushToDir generateInteraction(Interaction inter) {
 		String pack = inter.getPackage();
-		String fqClassName = getFQClass(pack);
+		String fqClassName = getFQClassName(inter);
 		String fqPackage = fqClassName.substring(0,
 				fqClassName.lastIndexOf('.'));
 		String className = fqClassName.substring(fqPackage.length() + 1);
@@ -190,7 +193,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 			StringBuilder sb = new StringBuilder();
 			if (lookupInteraction != null) {
-				String callClass = getFQClass(lookupInteraction.getPackage());
+				String callClass = getFQClassName(lookupInteraction);
 				if (!callClass.equals(fqClassName)) {
 					sb.append(callClass);
 					sb.append(".");
@@ -201,8 +204,8 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 					if (para.type == LinkType.REPRESENTATIVE) {
 						Representative repre = lookupRepresentative(para.ref);
 						DataType definedIn = repre.getDefinedIn();
-//						sb.append(definedIn.getPackage());
-//						sb.append(".");
+						// sb.append(definedIn.getPackage());
+						// sb.append(".");
 						sb.append(definedIn.getSimpleName());
 						sb.append(".");
 						sb.append(repre.toJavaName());
@@ -211,11 +214,11 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 						InteractionParameter iPara = lookupInteractionParameter(para.ref);
 						if (iPara != null) {
 							sb.append(iPara.getJavaName());
-						}else {
+						} else {
 							sb.append("FIXME:" + para.ref);
 						}
 						sb.append(",");
-						
+
 					}
 				}
 				if (!subCall.parameters.isEmpty()) {

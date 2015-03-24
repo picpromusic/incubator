@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import tbIncubator.domain.DataType;
 import tbIncubator.domain.Interaction;
@@ -38,6 +39,7 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 	private List<DataType> datatypes;
 	private List<Interaction> interactions;
 	private Properties prop;
+	private Set<String> typeNames;
 
 	protected JavaCodeGenerator(List<DataType> datatypes,
 			List<Interaction> interactions) {
@@ -54,10 +56,14 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 	}
 
 	private void ensureIndexBuild() {
+		if (typeNames == null) {
+			typeNames = new HashSet<String>();
+		}
 		if (index == null || typeIndex == null) {
 			index = new HashMap<String, Representative>();
 			typeIndex = new HashMap<String, DataType>();
 			for (DataType dataType : datatypes) {
+				typeNames.add(getFqClassName(dataType));
 				typeIndex.put(dataType.pk, dataType);
 				for (Representative rep : dataType.representatives) {
 					index.put(rep.pk, rep);
@@ -68,16 +74,67 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 		}
 		if (interIndex == null || paraIndex == null) {
 			interIndex = new HashMap<String, Interaction>();
-			paraIndex = new HashMap<String,InteractionParameter>();
-			for(Interaction inter : interactions) {
-				interIndex.put(inter.pk,inter);
+			paraIndex = new HashMap<String, InteractionParameter>();
+			for (Interaction inter : interactions) {
+				typeNames.add(getFQClassName(inter,true));
+				typeNames.add(getFQClassName(inter,true) + "Impl");
+				interIndex.put(inter.pk, inter);
 				for (InteractionParameter para : inter.parameters) {
-					paraIndex.put(para.pk,para);
+					paraIndex.put(para.pk, para);
 				}
 			}
 			interIndex = Collections.unmodifiableMap(interIndex);
 			paraIndex = Collections.unmodifiableMap(paraIndex);
 		}
+		
+	}
+
+	protected String getFqClassName(DataType dataType) {
+		return simpleCombinedName(dataType);
+	}
+
+	private String simpleCombinedName(TbElement ele) {
+		return ele.getPackage() + "." + ele.getSimpleName();
+	}
+
+	protected String getFQClassName(Interaction inter,boolean noUnderscore) {
+		return getFQClass(simpleCombinedName(inter),noUnderscore);
+	}
+
+	protected String getFQClassName(Interaction inter) {
+		return getFQClass(simpleCombinedName(inter),false);
+	}
+
+	private String getFQClass(final String pack,boolean noUnderscore) {
+		String property;
+		String actPack = pack;
+		do {
+			property = prop.getProperty(actPack);
+			int indexOf = actPack.lastIndexOf('.');
+			if (indexOf > 0) {
+				actPack = actPack.substring(0, indexOf);
+			} else if (property == null) {
+				throw new RuntimeException("Nichts gefunden für " + pack);
+			}
+		} while (property == null);
+
+		boolean again = true;
+		while(again && !noUnderscore) {
+			again = false;
+			for (String tn : typeNames) {
+				if (property.startsWith(tn) && property.length() > tn.length()) {
+					// + 1 ist super , weil wir ein zeichen nach dem . landen
+					// wollen und wenn es keinen punkt gibt sind wir bei 0 das
+					// auch super ist
+					int lastIndexOf = tn.lastIndexOf('.') + 1;
+					property = tn.substring(0, lastIndexOf) + "_"
+							+ tn.substring(lastIndexOf)
+							+ property.substring(tn.length());
+					again = true;
+				}
+			}
+		};
+		return property;
 	}
 
 	protected Representative lookupRepresentative(String pk) {
@@ -94,34 +151,18 @@ TEST extends JavaCodeGenerator.FlushToDir> {
 		ensureIndexBuild();
 		return interIndex.get(pk);
 	}
-	
+
 	protected InteractionParameter lookupInteractionParameter(String pk) {
 		ensureIndexBuild();
 		return paraIndex.get(pk);
 	}
-	
+
 	public List<DataType> getDatatypes() {
 		return datatypes;
 	}
 
 	public List<Interaction> getInteractions() {
 		return interactions;
-	}
-
-	protected String getFQClass(final String pack) {
-		String property;
-		String actPack = pack;
-		do {
-			property = prop.getProperty(actPack);
-			int indexOf = actPack.lastIndexOf('.');
-			if (indexOf > 0) {
-				actPack = actPack.substring(0, indexOf);
-			} else if (property == null) {
-				throw new RuntimeException("Nichts gefunden für " + pack);
-			}
-		} while (property == null);
-
-		return property;
 	}
 
 	protected String shortenPackage(TbElement dataType, String jName) {

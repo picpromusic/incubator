@@ -202,8 +202,7 @@ public class JavaCodeGeneratorWithStringBuilders extends JavaCodeGenerator {
 
 	@Override
 	protected FlushToDir generateInteraction(Interaction inter) {
-		String pack = inter.getPackage();
-		String fqClassName = getFQClass(pack);
+		String fqClassName = getFQClassName(inter);
 		String fqPackage = fqClassName.substring(0,
 				fqClassName.lastIndexOf('.'));
 		String className = fqClassName.substring(fqPackage.length() + 1);
