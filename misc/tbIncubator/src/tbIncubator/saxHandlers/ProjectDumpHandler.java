@@ -12,11 +12,13 @@ import tbIncubator.TbElementHandler.EndOfRedirect;
 import tbIncubator.domain.DataType;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.TbElement;
+import tbIncubator.domain.TestSatz;
 
 public class ProjectDumpHandler extends TbRedirectHandler {
 
 	private List<DataType> datatypes = new ArrayList<DataType>(500);
 	private List<Interaction> interactions = new ArrayList<Interaction>(500);
+	private List<TestSatz> testsaetze = new ArrayList<TestSatz>(500);
 
 	public List<DataType> getDatatypes() {
 		return Collections.unmodifiableList(datatypes);
@@ -38,6 +40,8 @@ public class ProjectDumpHandler extends TbRedirectHandler {
 					datatypes.add((DataType) tbElement);
 				} else if (tbElement instanceof Interaction) {
 					interactions.add((Interaction) tbElement);
+				} else if (tbElement instanceof TestSatz) {
+					testsaetze.add((TestSatz) tbElement);
 				}
 
 				clearRedirect();
@@ -83,5 +87,9 @@ public class ProjectDumpHandler extends TbRedirectHandler {
 	@Override
 	protected boolean isPotencialEnd(String localName) {
 		return isElementTag(localName) || isStartOfTestTheme(localName);
+	}
+
+	public List<TestSatz> getTestSaetze() {
+		return testsaetze;
 	}
 }

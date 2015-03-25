@@ -33,8 +33,9 @@ public class Parser {
 			// JavaCodeGeneratorWithStringBuilders(projectDumpHandler.getDatatypes(),
 			// projectDumpHandler.getInteractions()).generate(file);
 			new JavaCodeGeneratorPoet(projectDumpHandler.getDatatypes(),
-					projectDumpHandler.getInteractions()).generate(file);
-			
+					projectDumpHandler.getInteractions(),
+					projectDumpHandler.getTestSaetze()).generate(file);
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

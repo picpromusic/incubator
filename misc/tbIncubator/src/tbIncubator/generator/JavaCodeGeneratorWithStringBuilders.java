@@ -24,6 +24,7 @@ import tbIncubator.domain.Interaction;
 import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.Link;
 import tbIncubator.domain.Representative;
+import tbIncubator.domain.TestSatz;
 
 public class JavaCodeGeneratorWithStringBuilders extends JavaCodeGenerator {
 
@@ -112,8 +113,8 @@ public class JavaCodeGeneratorWithStringBuilders extends JavaCodeGenerator {
 	private Map<String, MyFlushToDir> interactionFiles;
 
 	public JavaCodeGeneratorWithStringBuilders(List<DataType> datatypes,
-			List<Interaction> interactions) {
-		super(datatypes, interactions);
+			List<Interaction> interactions, List<TestSatz> testsaetze) {
+		super(datatypes, interactions,testsaetze);
 		this.interactionFiles = new HashMap<String, MyFlushToDir>();
 	}
 
@@ -244,7 +245,7 @@ public class JavaCodeGeneratorWithStringBuilders extends JavaCodeGenerator {
 	}
 
 	@Override
-	protected FlushToDir generateTest(Object test) {
+	protected FlushToDir generateTest(TestSatz test) {
 		return noFlushableResult("not implemented yet");
 	}
 

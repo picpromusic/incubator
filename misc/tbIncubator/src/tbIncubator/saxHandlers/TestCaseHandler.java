@@ -8,6 +8,7 @@ import org.xml.sax.SAXException;
 import tbIncubator.TbElementHandler;
 import tbIncubator.TbElementHandler.EndOfRedirect;
 import tbIncubator.domain.TbElement;
+import tbIncubator.domain.TestSatz;
 
 public class TestCaseHandler extends TbElementHandler {
 
@@ -18,7 +19,7 @@ public class TestCaseHandler extends TbElementHandler {
 	@Override
 	public void innerStartElement(String uri, String localName, String qName,
 			Attributes attributes) throws SAXException {
-		
+
 	}
 
 	@Override
@@ -30,8 +31,7 @@ public class TestCaseHandler extends TbElementHandler {
 
 	@Override
 	public TbElement getTbElement() {
-		// TODO Auto-generated method stub
-		return null;
+		return new TestSatz("", getPathAsStringList(), getPk());
 	}
 
 }
