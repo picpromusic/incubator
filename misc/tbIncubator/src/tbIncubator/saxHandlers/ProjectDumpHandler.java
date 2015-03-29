@@ -38,10 +38,10 @@ public class ProjectDumpHandler extends TbRedirectHandler {
 				TbElement tbElement = handler.getTbElement();
 				if (tbElement instanceof DataType) {
 					datatypes.add((DataType) tbElement);
-				} else if (tbElement instanceof Interaction) {
-					interactions.add((Interaction) tbElement);
 				} else if (tbElement instanceof TestSatz) {
 					testsaetze.add((TestSatz) tbElement);
+				} else if (tbElement instanceof Interaction) {
+					interactions.add((Interaction) tbElement);
 				}
 
 				clearRedirect();
@@ -55,7 +55,7 @@ public class ProjectDumpHandler extends TbRedirectHandler {
 	protected void setupSubTypeHandlerFactories() {
 		setupSimple("interaction", InteractionHandler.class);
 		setupSimple("datatype", DataTypeHandler.class);
-		setupSimple("testcase", TestCaseHandler.class);
+		setupSimpleTestcaseHandlerFactory();
 	}
 
 	@Override

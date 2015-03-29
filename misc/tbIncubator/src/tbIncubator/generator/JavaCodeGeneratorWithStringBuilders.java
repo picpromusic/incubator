@@ -226,7 +226,7 @@ public class JavaCodeGeneratorWithStringBuilders extends JavaCodeGenerator {
 
 		StringBuilder sb = new StringBuilder();
 
-		for (InteractionParameter parameter : inter.parameters) {
+		for (InteractionParameter parameter : inter.getParameters()) {
 			DataType dataType = lookupDataType(parameter.dataTypeRef.ref);
 			fc.println(
 					1,

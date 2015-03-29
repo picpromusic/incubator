@@ -92,5 +92,9 @@ public abstract class TbRedirectHandler extends TbDumpPathHandler {
 		setup(new SimpleSubTypeHandlerFactory(//
 				type, clazz));
 	}
+	
+	protected void setupSimpleTestcaseHandlerFactory() {
+		setup(new TestCaseSubTypeHandlerFactory());
+	}
 
 }

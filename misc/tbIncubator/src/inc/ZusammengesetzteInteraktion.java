@@ -1,13 +1,10 @@
 package inc;
 
-import inc.Umsysteme.IBestandInteraktionen;
+ import inc.Umsysteme.IBestandInteraktionen;
 import inc.Umsysteme.IBusinessDelegateInteraktionen;
 import inc.Umsysteme.IKundeInteraktionen;
 import inc.Umsysteme.ILdapUndCoInteraktionen;
 import inc._Szenarien.IPmsSzenarien;
-import inc.allgemein.IInteraktionen;
-
-import javax.naming.ldap.InitialLdapContext;
 
 public class ZusammengesetzteInteraktion {
 

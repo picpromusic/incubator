@@ -1,5 +1,7 @@
 package tbIncubator.generator;
 
+import inc.BaseTest;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Repeatable;
@@ -11,15 +13,18 @@ import java.util.Map;
 
 import javax.lang.model.element.Modifier;
 
+import org.junit.Test;
 import org.omg.CORBA.INTERNAL;
 
 import tbIncubator.domain.DataType;
+import tbIncubator.domain.HasParameters;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.Link;
 import tbIncubator.domain.Representative;
 import tbIncubator.domain.SubCall;
 import tbIncubator.domain.TbElement;
+import tbIncubator.domain.TypeSimplification;
 import tbIncubator.domain.Link.LinkType;
 import tbIncubator.domain.TestSatz;
 
@@ -43,6 +48,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		private final String packageName;
 		private final String subDir;
 		private final boolean[] enabled;
+		private Runnable run;
 
 		public MyFlushToDisk(String packageName, String name, String subDir,
 				Builder... enu) {
@@ -60,6 +66,9 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 		@Override
 		public void flush(File dir) throws IOException {
+			if (run != null) {
+				run.run();
+			}
 			for (int i = 0; i < enabled.length; i++) {
 				if (enabled[i]) {
 					JavaFile.builder(packageName, enu[i].build()).build()
@@ -76,21 +85,32 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			enabled[index] = false;
 		}
 
+		public void flushPreprocess(Runnable run) {
+			this.run = run;
+		}
+
 	}
 
 	private static final int INDEX_ENUM = 0;
 	private static final int INDEX_INTERFACE = 0;
 	private static final int INDEX_IMPL = 1;
+	private static final int INDEX_TESTSATZ = 0;
 
 	Map<String, MyFlushToDisk> interaktionenFlushes = new HashMap<String, MyFlushToDisk>();
+	private Object dataTypeSimplification;
+	private Map<MyFlushToDisk,Integer> numberOfMethodsWithSubCalls;
+	private Map<MyFlushToDisk,Integer> numberOfMethods;
 
 	public JavaCodeGeneratorPoet(List<DataType> datatypes,
 			List<Interaction> interactions, List<TestSatz> testsaetze) {
 		super(datatypes, interactions, testsaetze);
+		this.numberOfMethodsWithSubCalls = new HashMap<MyFlushToDisk,Integer>();
+		this.numberOfMethods = new HashMap<MyFlushToDisk,Integer>();
 	}
 
 	@Override
 	protected FlushToDir generateDataType(DataType dataType) {
+		
 		String fqClassName = getFqClassName(dataType);
 		if (shouldBeTransformed(dataType)) {
 			Builder enu = TypeSpec.enumBuilder(dataType.getSimpleName());
@@ -170,6 +190,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		}
 	}
 
+
 	private boolean shouldBeTransformed(TbElement element) {
 		return !element.getPackage().startsWith("Schadensystem");
 	}
@@ -197,7 +218,24 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 					interfaceBuilder, implBuilder);
 			mfd.enableBuilder(INDEX_INTERFACE);
 			mfd.disableBuilder(INDEX_IMPL);
+			final MyFlushToDisk fReference = mfd;
+			mfd.flushPreprocess(new Runnable() {
+				
+				@Override
+				public void run() {
+					int numMethods = numberOfMethods.get(fReference);
+					int numMethodsWithSubCalls = numberOfMethodsWithSubCalls.get(fReference);
+					if (numMethodsWithSubCalls > 1 || numMethods == 1) {
+						fReference.disableBuilder(INDEX_INTERFACE);
+						fReference.enableBuilder(INDEX_IMPL);
+					}
+					
+				}
+			});
 
+			numberOfMethodsWithSubCalls.put(mfd,0);
+			numberOfMethods.put(mfd,0);
+			
 			interaktionenFlushes.put(fqClassName, mfd);
 		}
 
@@ -207,27 +245,32 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		com.squareup.javapoet.MethodSpec.Builder mBuilderImpl = MethodSpec
 				.methodBuilder(inter.getSimpleName())
 				.addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC);
-		for (InteractionParameter ele : inter.parameters) {
-			DataType dt = lookupDataType(ele.dataTypeRef.ref);
-			if (dt != null) {
-				ClassName cn = ClassName.get(dt.getPackage(),
-						dt.getSimpleName());
-				ParameterSpec para = ParameterSpec.builder(cn,
-						ele.getJavaName()).build();
-				mBuilder.addParameter(para);
-				mBuilderImpl.addParameter(para);
-			}
-		}
+		
+		
+		configureMethodSpec(inter, mBuilder, mBuilderImpl);
 		MethodSpec methodSpec = mBuilder.build();
 
 		mfd.enu[0].addMethod(methodSpec);
 
-		if (!inter.subCalls.isEmpty()) {
-			mfd.disableBuilder(INDEX_INTERFACE);
-			mfd.enableBuilder(INDEX_IMPL);
+		increase(numberOfMethods, mfd);
+		
+		if (inter.getSubCalls().iterator().hasNext()) {
+			increase(numberOfMethodsWithSubCalls,mfd);
 		}
 
-		for (SubCall subCall : inter.subCalls) {
+		buildMethodImplementation(inter, fqClassName, mBuilderImpl);
+		mfd.enu[1].addMethod(mBuilderImpl.build());
+
+		return mfd;
+	}
+
+	private void increase(Map<MyFlushToDisk, Integer> inMap, MyFlushToDisk position) {
+		inMap.put(position, inMap.get(position)+1);
+	}
+
+	private void buildMethodImplementation(HasSubCalls hasSubCalls, String fqClassName,
+			com.squareup.javapoet.MethodSpec.Builder mBuilderImpl) {
+		for (SubCall subCall : hasSubCalls.getSubCalls()) {
 			Interaction lookupInteraction = lookupInteraction(subCall.interactionRef);
 
 			StringBuilder sb = new StringBuilder();
@@ -271,14 +314,50 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				mBuilderImpl.addStatement(sb.toString());
 			}
 		}
-		mfd.enu[1].addMethod(mBuilderImpl.build());
+	}
 
-		return mfd;
+	private void configureMethodSpec(HasParameters inter,
+			com.squareup.javapoet.MethodSpec.Builder... mBuilders) {
+		for (InteractionParameter ele : inter.getParameters()) {
+			DataType dt = lookupDataType(ele.dataTypeRef.ref);
+			if (dt != null) {
+				ClassName cn = ClassName.get(dt.getPackage(),
+						dt.getSimpleName());
+				ParameterSpec para = ParameterSpec.builder(cn,
+						ele.getJavaName()).build();
+				for (com.squareup.javapoet.MethodSpec.Builder builder : mBuilders) {
+					builder.addParameter(para);
+				}
+			}
+		}
 	}
 
 	@Override
 	protected FlushToDir generateTest(TestSatz test) {
-		return noFlushableResult("");
+		String pack = test.getPackage();
+		String fqClassName = getFQClassName(test);
+		String fqPackage = fqClassName.substring(0,
+				fqClassName.lastIndexOf('.'));
+		String className = fqClassName.substring(fqPackage.length() + 1);
+		className = className.replace('.', '_');
+
+		Builder enu = TypeSpec.classBuilder(className);
+		enu.superclass(BaseTest.class);
+		enu.addModifiers(Modifier.PUBLIC);
+		
+		com.squareup.javapoet.MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("test");
+		
+		methodBuilder.addAnnotation(Test.class);
+		configureMethodSpec(test, methodBuilder);
+		buildMethodImplementation(test, fqClassName, methodBuilder);
+		
+		enu.addMethod(methodBuilder.build());
+
+		MyFlushToDisk mfd = new MyFlushToDisk(fqPackage, className, "tests",
+				enu);
+		mfd.enableBuilder(INDEX_TESTSATZ);
+		return mfd;
 	}
 
+	
 }

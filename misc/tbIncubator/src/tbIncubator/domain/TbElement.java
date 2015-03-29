@@ -7,7 +7,7 @@ public class TbElement {
 
 	public static String replaceAll(String str) {
 		String replaceAll = str.replaceAll(
-				"( |\\-|;|:|\\+|,|<|>|\\?|=|!|\"|%|\\(|\\))", "_"); // Und
+				"( |/|\\-|;|:|\\+|,|<|>|\\?|=|!|\"|%|\\(|\\))", "_"); // Und
 		// andere
 		replaceAll = replaceAll.replace('`', '_');
 		// Verbodene
@@ -27,7 +27,7 @@ public class TbElement {
 		replaceAll = replaceAll.replaceAll("ü", "ue");
 		replaceAll = replaceAll.replaceAll("Ä", "Ae");
 		replaceAll = replaceAll.replaceAll("Ö", "Oe");
-		replaceAll = replaceAll.replaceAll("Ü", "Üe");
+		replaceAll = replaceAll.replaceAll("Ü", "Ue");
 		String[] elements = replaceAll.split("\\.");
 		replaceAll = "";
 		for (String ele: elements) {

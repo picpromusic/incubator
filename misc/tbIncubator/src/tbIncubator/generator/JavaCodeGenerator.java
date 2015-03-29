@@ -13,6 +13,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import tbIncubator.domain.DataType;
+import tbIncubator.domain.HasParameters;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.Representative;
@@ -52,11 +53,14 @@ public abstract class JavaCodeGenerator {
 		}
 	}
 
-	private void ensureIndexBuild() {
+	private void ensureIndexesAreBuild() {
+		boolean indexesBuild = false;
 		if (typeNames == null) {
+			indexesBuild = true;
 			typeNames = new HashSet<String>();
 		}
 		if (index == null || typeIndex == null) {
+			indexesBuild = true;
 			index = new HashMap<String, Representative>();
 			typeIndex = new HashMap<String, DataType>();
 			for (DataType dataType : datatypes) {
@@ -70,20 +74,30 @@ public abstract class JavaCodeGenerator {
 			typeIndex = Collections.unmodifiableMap(typeIndex);
 		}
 		if (interIndex == null || paraIndex == null) {
+			indexesBuild = true;
 			interIndex = new HashMap<String, Interaction>();
 			paraIndex = new HashMap<String, InteractionParameter>();
 			for (Interaction inter : interactions) {
 				typeNames.add(getFQClassName(inter, true));
 				typeNames.add(getFQClassName(inter, true) + "Impl");
 				interIndex.put(inter.pk, inter);
-				for (InteractionParameter para : inter.parameters) {
-					paraIndex.put(para.pk, para);
-				}
+				indexParameter(inter);
 			}
+			
+			for (TestSatz ts: testsatz) {
+				indexParameter(ts);
+			}
+			
 			interIndex = Collections.unmodifiableMap(interIndex);
 			paraIndex = Collections.unmodifiableMap(paraIndex);
 		}
+	}
 
+
+	private void indexParameter(HasParameters inter) {
+		for (InteractionParameter para : inter.getParameters()) {
+			paraIndex.put(para.pk, para);
+		}
 	}
 
 	protected String getFqClassName(DataType dataType) {
@@ -100,6 +114,10 @@ public abstract class JavaCodeGenerator {
 
 	protected String getFQClassName(Interaction inter) {
 		return getFQClass(simpleCombinedName(inter), false);
+	}
+
+	protected String getFQClassName(TestSatz testsatz) {
+		return simpleCombinedName(testsatz);
 	}
 
 	private String getFQClass(final String pack, boolean noUnderscore) {
@@ -144,22 +162,22 @@ public abstract class JavaCodeGenerator {
 	}
 
 	protected Representative lookupRepresentative(String pk) {
-		ensureIndexBuild();
+		ensureIndexesAreBuild();
 		return index.get(pk);
 	}
 
 	protected DataType lookupDataType(String pk) {
-		ensureIndexBuild();
+		ensureIndexesAreBuild();
 		return typeIndex.get(pk);
 	}
 
 	protected Interaction lookupInteraction(String pk) {
-		ensureIndexBuild();
+		ensureIndexesAreBuild();
 		return interIndex.get(pk);
 	}
 
 	protected InteractionParameter lookupInteractionParameter(String pk) {
-		ensureIndexBuild();
+		ensureIndexesAreBuild();
 		return paraIndex.get(pk);
 	}
 

@@ -9,6 +9,7 @@ import org.xml.sax.SAXException;
 import tbIncubator.TbElementHandler;
 import tbIncubator.TbElementHandler.EndOfRedirect;
 import tbIncubator.TbElementHandler.SubdivisionInfo;
+import tbIncubator.domain.HasParameters;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.Link;
