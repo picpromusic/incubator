@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import tbIncubator.TbElementHandler.SubdivisionInfo;
 import tbIncubator.generator.HasSubCalls;
 
 public class Interaction extends TbElement implements HasParameters,HasSubCalls{

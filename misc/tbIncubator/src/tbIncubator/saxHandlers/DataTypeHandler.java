@@ -7,12 +7,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import tbIncubator.TbElementHandler;
-import tbIncubator.TbElementHandler.EndOfRedirect;
-import tbIncubator.TbElementHandler.SubdivisionInfo;
 import tbIncubator.domain.DataType;
 import tbIncubator.domain.Link;
-import tbIncubator.domain.Representative;
 import tbIncubator.domain.Link.LinkType;
+import tbIncubator.domain.Representative;
 
 public class DataTypeHandler extends TbElementHandler<DataType> {
 

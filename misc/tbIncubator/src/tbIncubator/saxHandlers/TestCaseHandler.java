@@ -1,20 +1,15 @@
 package tbIncubator.saxHandlers;
 
-import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import tbIncubator.TbElementHandler;
-import tbIncubator.TbElementHandler.EndOfRedirect;
+import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.Link;
 import tbIncubator.domain.Link.LinkType;
-import tbIncubator.domain.Interaction;
-import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.SubCall;
 import tbIncubator.domain.TbElement;
 import tbIncubator.domain.TestSatz;

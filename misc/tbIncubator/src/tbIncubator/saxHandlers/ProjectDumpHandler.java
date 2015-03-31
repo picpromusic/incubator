@@ -7,8 +7,8 @@ import java.util.List;
 import org.xml.sax.Attributes;
 
 import tbIncubator.TbElementHandler;
-import tbIncubator.TbRedirectHandler;
 import tbIncubator.TbElementHandler.EndOfRedirect;
+import tbIncubator.TbRedirectHandler;
 import tbIncubator.domain.DataType;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.TbElement;

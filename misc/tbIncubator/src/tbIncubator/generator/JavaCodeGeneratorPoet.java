@@ -4,9 +4,6 @@ import inc.BaseTest;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Repeatable;
-import java.net.InterfaceAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,22 +11,19 @@ import java.util.Map;
 import javax.lang.model.element.Modifier;
 
 import org.junit.Test;
-import org.omg.CORBA.INTERNAL;
 
 import tbIncubator.domain.DataType;
 import tbIncubator.domain.HasParameters;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.Link;
+import tbIncubator.domain.Link.LinkType;
 import tbIncubator.domain.Representative;
 import tbIncubator.domain.SubCall;
 import tbIncubator.domain.TbElement;
-import tbIncubator.domain.TypeSimplification;
-import tbIncubator.domain.Link.LinkType;
 import tbIncubator.domain.TestSatz;
 
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;

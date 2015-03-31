@@ -5,6 +5,7 @@ import inc.Umsysteme.IBusinessDelegateInteraktionen;
 import inc.Umsysteme.IKundeInteraktionen;
 import inc.Umsysteme.ILdapUndCoInteraktionen;
 import inc._Szenarien.IPmsSzenarien;
+import inc.allgemein.IInteraktionen;
 
 public class ZusammengesetzteInteraktion {
 
@@ -36,6 +37,9 @@ public class ZusammengesetzteInteraktion {
 		return null;
 	}
 	
+	protected static IOberflaeche Oberflaeche() {
+		return null;
+	}
 	
 
 }

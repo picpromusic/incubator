@@ -7,14 +7,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import tbIncubator.TbElementHandler;
-import tbIncubator.TbElementHandler.EndOfRedirect;
-import tbIncubator.TbElementHandler.SubdivisionInfo;
-import tbIncubator.domain.HasParameters;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.Link;
-import tbIncubator.domain.SubCall;
 import tbIncubator.domain.Link.LinkType;
+import tbIncubator.domain.SubCall;
 
 public class InteractionHandler extends TbElementHandler<Interaction> {
 
