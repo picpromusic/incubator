@@ -4,6 +4,7 @@ import inc.BaseTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.lang.model.element.Modifier;
 import org.junit.Test;
 
 import tbIncubator.domain.DataType;
+import tbIncubator.domain.DataTypeSimplification;
 import tbIncubator.domain.HasParameters;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.InteractionParameter;
@@ -92,46 +94,63 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 	Map<String, MyFlushToDisk> interaktionenFlushes = new HashMap<String, MyFlushToDisk>();
 	private Object dataTypeSimplification;
-	private Map<MyFlushToDisk,Integer> numberOfMethodsWithSubCalls;
-	private Map<MyFlushToDisk,Integer> numberOfMethods;
+	private Map<MyFlushToDisk, Integer> numberOfMethodsWithSubCalls;
+	private Map<MyFlushToDisk, Integer> numberOfMethods;
 
 	public JavaCodeGeneratorPoet(List<DataType> datatypes,
 			List<Interaction> interactions, List<TestSatz> testsaetze) {
 		super(datatypes, interactions, testsaetze);
-		this.numberOfMethodsWithSubCalls = new HashMap<MyFlushToDisk,Integer>();
-		this.numberOfMethods = new HashMap<MyFlushToDisk,Integer>();
+		this.numberOfMethodsWithSubCalls = new HashMap<MyFlushToDisk, Integer>();
+		this.numberOfMethods = new HashMap<MyFlushToDisk, Integer>();
 	}
 
 	@Override
 	protected FlushToDir generateDataType(DataType dataType) {
-		
+
 		String fqClassName = getFqClassName(dataType);
+		DataTypeSimplification lookup = DataTypeSimplification
+				.lookup(fqClassName);
+		if (lookup != null) {
+			return noFlushableResult(fqClassName);
+		}
+
 		if (shouldBeTransformed(dataType)) {
 			Builder enu = TypeSpec.enumBuilder(dataType.getSimpleName());
+
 			enu.addModifiers(Modifier.PUBLIC);
 
 			for (Representative repre : dataType.representatives) {
 				String javaName = repre.toJavaName();
 				if (!javaName.trim().isEmpty()) {
-					TypeName tvn[] = new TypeName[repre.representativeLinks
-							.size() * 2];
+					ArrayList<TypeName> tvn = new ArrayList<TypeName>(
+							repre.representativeLinks.size() * 2);
 					int index = 0;
 					StringBuilder sb = new StringBuilder();
 					for (Link ele : repre.representativeLinks) {
 						Representative lookupRepresentative = lookupRepresentative(ele.ref);
 						DataType dt = lookupRepresentative.getDefinedIn();
-						ClassName className = ClassName.get(dt.getPackage(),
-								dt.getSimpleName());
-						tvn[index++] = className;
-						tvn[index++] = TypeVariableName.get(
-								lookupRepresentative.toJavaName(), className);
-						sb.append("$T.$L,");
+
+						ClassName className = buildClassName(dt);
+						DataTypeSimplification lookupTypeSimplification = lookupTypeSimplification(dt);
+						if (lookupTypeSimplification == null) {
+							tvn.add(className);
+							tvn.add(TypeVariableName.get(
+									lookupRepresentative.toJavaName(),
+									className));
+							sb.append("$T.$L,");
+						} else {
+							sb.append("Static."
+									+ lookupTypeSimplification.methodName
+									+ "(\"" + lookupRepresentative.name
+									+ "\"),");
+						}
 					}
 					sb.setLength(Math.max(0, sb.length() - 1));
-					if (tvn.length > 0) {
-						enu.addEnumConstant(javaName, TypeSpec
-								.anonymousClassBuilder(sb.toString(), tvn)
-								.build());
+					if (repre.representativeLinks.size() > 0) {
+						enu.addEnumConstant(
+								javaName,
+								TypeSpec.anonymousClassBuilder(sb.toString(),
+										tvn.toArray()).build());
 					} else {
 						enu.addEnumConstant(javaName, TypeSpec
 								.anonymousClassBuilder("$S", repre.name)
@@ -148,8 +167,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			for (Link fie : dataType.fieldLinks) {
 				DataType dt = lookupDataType(fie.ref);
 				if (dt != null) {
-					TypeName fiedClass = ClassName.get(dt.getPackage(),
-							dt.getSimpleName());
+					TypeName fiedClass = buildClassName(dt);
 
 					String fiename = fie.name.substring(0, 1).toLowerCase()
 							+ fie.name.substring(1);
@@ -184,6 +202,22 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		}
 	}
 
+	private DataTypeSimplification lookupTypeSimplification(DataType dt) {
+		String tName = dt.getPackage() + "." + dt.getSimpleName();
+		DataTypeSimplification dts = DataTypeSimplification.lookup(tName);
+		return dts;
+	}
+
+	private ClassName buildClassName(DataType dt) {
+		ClassName className;
+		DataTypeSimplification dts = lookupTypeSimplification(dt);
+		if (dts == null) {
+			className = ClassName.get(dt.getPackage(), dt.getSimpleName());
+		} else {
+			className = ClassName.get(dts.valueType);
+		}
+		return className;
+	}
 
 	private boolean shouldBeTransformed(TbElement element) {
 		return !element.getPackage().startsWith("Schadensystem");
@@ -213,23 +247,25 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			mfd.enableBuilder(INDEX_INTERFACE);
 			mfd.disableBuilder(INDEX_IMPL);
 			final MyFlushToDisk fReference = mfd;
+
 			mfd.flushPreprocess(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					int numMethods = numberOfMethods.get(fReference);
-					int numMethodsWithSubCalls = numberOfMethodsWithSubCalls.get(fReference);
+					int numMethodsWithSubCalls = numberOfMethodsWithSubCalls
+							.get(fReference);
 					if (numMethodsWithSubCalls > 1 || numMethods == 1) {
 						fReference.disableBuilder(INDEX_INTERFACE);
 						fReference.enableBuilder(INDEX_IMPL);
 					}
-					
+
 				}
 			});
 
-			numberOfMethodsWithSubCalls.put(mfd,0);
-			numberOfMethods.put(mfd,0);
-			
+			numberOfMethodsWithSubCalls.put(mfd, 0);
+			numberOfMethods.put(mfd, 0);
+
 			interaktionenFlushes.put(fqClassName, mfd);
 		}
 
@@ -239,17 +275,16 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		com.squareup.javapoet.MethodSpec.Builder mBuilderImpl = MethodSpec
 				.methodBuilder(inter.getSimpleName())
 				.addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC);
-		
-		
+
 		configureMethodSpec(inter, mBuilder, mBuilderImpl);
 		MethodSpec methodSpec = mBuilder.build();
 
 		mfd.enu[0].addMethod(methodSpec);
 
 		increase(numberOfMethods, mfd);
-		
+
 		if (inter.getSubCalls().iterator().hasNext()) {
-			increase(numberOfMethodsWithSubCalls,mfd);
+			increase(numberOfMethodsWithSubCalls, mfd);
 		}
 
 		buildMethodImplementation(inter, fqClassName, mBuilderImpl);
@@ -258,11 +293,13 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		return mfd;
 	}
 
-	private void increase(Map<MyFlushToDisk, Integer> inMap, MyFlushToDisk position) {
-		inMap.put(position, inMap.get(position)+1);
+	private void increase(Map<MyFlushToDisk, Integer> inMap,
+			MyFlushToDisk position) {
+		inMap.put(position, inMap.get(position) + 1);
 	}
 
-	private void buildMethodImplementation(HasSubCalls hasSubCalls, String fqClassName,
+	private void buildMethodImplementation(HasSubCalls hasSubCalls,
+			String fqClassName,
 			com.squareup.javapoet.MethodSpec.Builder mBuilderImpl) {
 		for (SubCall subCall : hasSubCalls.getSubCalls()) {
 			Interaction lookupInteraction = lookupInteraction(subCall.interactionRef);
@@ -284,12 +321,20 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 					if (para.type == LinkType.REPRESENTATIVE) {
 						Representative repre = lookupRepresentative(para.ref);
 						DataType definedIn = repre.getDefinedIn();
-						// sb.append(definedIn.getPackage());
-						// sb.append(".");
-						sb.append(definedIn.getSimpleName());
-						sb.append(".");
-						sb.append(repre.toJavaName());
-						sb.append(",");
+						DataTypeSimplification dts = lookupTypeSimplification(definedIn);
+						if (dts == null) {
+							// sb.append(definedIn.getPackage());
+							// sb.append(".");
+							sb.append(definedIn.getSimpleName());
+							sb.append(".");
+							sb.append(repre.toJavaName());
+							sb.append(",");
+						} else {
+							sb.append(dts.methodName);
+							sb.append("(\"");
+							sb.append(repre.name);
+							sb.append("\"),");
+						}
 					} else if (para.type == LinkType.PARAMETER) {
 						InteractionParameter iPara = lookupInteractionParameter(para.ref);
 						if (iPara != null) {
@@ -315,10 +360,15 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		for (InteractionParameter ele : inter.getParameters()) {
 			DataType dt = lookupDataType(ele.dataTypeRef.ref);
 			if (dt != null) {
-				ClassName cn = ClassName.get(dt.getPackage(),
-						dt.getSimpleName());
-				ParameterSpec para = ParameterSpec.builder(cn,
-						ele.getJavaName()).build();
+				DataTypeSimplification dts = lookupTypeSimplification(dt);
+				ParameterSpec para;
+				if (dts == null) {
+					ClassName cn = buildClassName(dt);
+					para = ParameterSpec.builder(cn, ele.getJavaName()).build();
+				} else {
+					para = ParameterSpec.builder(dts.valueType,
+							ele.getJavaName()).build();
+				}
 				for (com.squareup.javapoet.MethodSpec.Builder builder : mBuilders) {
 					builder.addParameter(para);
 				}
@@ -338,13 +388,14 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		Builder enu = TypeSpec.classBuilder(className);
 		enu.superclass(BaseTest.class);
 		enu.addModifiers(Modifier.PUBLIC);
-		
-		com.squareup.javapoet.MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("test");
-		
+
+		com.squareup.javapoet.MethodSpec.Builder methodBuilder = MethodSpec
+				.methodBuilder("test");
+
 		methodBuilder.addAnnotation(Test.class);
 		configureMethodSpec(test, methodBuilder);
 		buildMethodImplementation(test, fqClassName, methodBuilder);
-		
+
 		enu.addMethod(methodBuilder.build());
 
 		MyFlushToDisk mfd = new MyFlushToDisk(fqPackage, className, "tests",
@@ -353,5 +404,4 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		return mfd;
 	}
 
-	
 }

@@ -25,4 +25,12 @@ public interface ZusammengesetzteInteraktionInterf {
 
 	IOberflaeche Oberflaeche();
 
+	String Wert(String string);
+
+	String Name(String string);
+
+	String Text(String string);
+
+	String Schluessel(String string);
+
 }

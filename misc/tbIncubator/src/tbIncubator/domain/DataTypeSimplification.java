@@ -7,8 +7,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import Neues_Schadensystem.Datentypen.Insuranceformat;
-
 public enum DataTypeSimplification {
 	Anzahl(new String[] { //
 					"Neues_Schadensystem.Datentypen.PMS_Datentypen.Anzahl",//
@@ -75,8 +73,8 @@ public enum DataTypeSimplification {
 					"Neues_Schadensystem.Datentypen.PMS_Datentypen.Schluessel",//
 					"Neues_Schadensystem.Datentypen.PMS_Datentypen.Version",//
 					"Neues_Schadensystem.Datentypen.PMS_Datentypen.VKE",//
-					"Neues_Schadensystem.Datentypen.PMS_Datentypen.Schluessel",//
 					"Neues_Schadensystem.Datentypen.PMS_Datentypen.Select_ID",//
+					"Neues_Schadensystem.Datentypen.Technische_Datentypen.Schluessel",//
 					"Neues_Schadensystem.Datentypen.DECK_UMF_SCHL",//
 					"Neues_Schadensystem.Datentypen.Deckungsart",//
 					"Neues_Schadensystem.Datentypen.Exkasso_Sparte",//
@@ -123,30 +121,31 @@ public enum DataTypeSimplification {
 	;
 
 	private String[] classNames;
-	private String methodName;
-	private Class valueType;
-	private static final Map<String,DataTypeSimplification> INDEX;
-	
+	public final String methodName;
+	public final Class valueType;
+	private static final Map<String, DataTypeSimplification> INDEX;
+
 	static {
 		HashMap<String, DataTypeSimplification> temp = new HashMap<String, DataTypeSimplification>();
-		for (DataTypeSimplification	ele : EnumSet.allOf(DataTypeSimplification.class)) {
+		for (DataTypeSimplification ele : EnumSet
+				.allOf(DataTypeSimplification.class)) {
 			for (String className : ele.classNames) {
 				temp.put(className, ele);
 			}
 		}
 		INDEX = Collections.unmodifiableMap(temp);
 	}
-	
+
 	private DataTypeSimplification(String[] classNames, String methodName,
 			Class valueType) {
-				this.classNames = classNames;
-				this.methodName = methodName;
-				this.valueType = valueType;
-		
+		this.classNames = classNames;
+		this.methodName = methodName;
+		this.valueType = valueType;
+
 	}
 
-	public DataTypeSimplification lookup(String className) {
+	public static DataTypeSimplification lookup(String className) {
 		return INDEX.get(className);
 	}
-	
+
 }
