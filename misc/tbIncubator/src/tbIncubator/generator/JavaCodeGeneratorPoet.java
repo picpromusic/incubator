@@ -131,18 +131,16 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 						DataType dt = lookupRepresentative.getDefinedIn();
 
 						ClassName className = buildClassName(dt);
-						DataTypeSimplification lookupTypeSimplification = lookupTypeSimplification(dt);
-						if (lookupTypeSimplification == null) {
+						DataTypeSimplification dts = lookupTypeSimplification(dt);
+						if (dts == null) {
 							tvn.add(className);
 							tvn.add(TypeVariableName.get(
 									lookupRepresentative.toJavaName(),
 									className));
 							sb.append("$T.$L,");
 						} else {
-							sb.append("Static."
-									+ lookupTypeSimplification.methodName
-									+ "(\"" + lookupRepresentative.name
-									+ "\"),");
+							sb.append(representativeSimplified("Static.",
+									lookupRepresentative, dts));
 						}
 					}
 					sb.setLength(Math.max(0, sb.length() - 1));
@@ -330,10 +328,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 							sb.append(repre.toJavaName());
 							sb.append(",");
 						} else {
-							sb.append(dts.methodName);
-							sb.append("(\"");
-							sb.append(repre.name);
-							sb.append("\"),");
+							sb.append(representativeSimplified("", repre, dts));
 						}
 					} else if (para.type == LinkType.PARAMETER) {
 						InteractionParameter iPara = lookupInteractionParameter(para.ref);
@@ -353,6 +348,30 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				mBuilderImpl.addStatement(sb.toString());
 			}
 		}
+	}
+
+	private String representativeSimplified(String prefix,
+			Representative repre, DataTypeSimplification dts) {
+		StringBuilder sb = new StringBuilder();
+		if (dts.valueType.equals(String.class)) {
+			if (repre.name.equals("<leer>") || repre.name.equals("<<leer>>") || repre.name.equals("<keine Auswahl>")) {
+				sb.append("null,");
+			} else {
+				sb.append("\"");
+				sb.append(repre.name);
+				sb.append("\",");
+				if (repre.name.contains("<")) {
+					System.out.println(repre.name);
+				}
+			}
+		} else {
+			sb.append(prefix);
+			sb.append(dts.methodName);
+			sb.append("(\"");
+			sb.append(repre.name);
+			sb.append("\"),");
+		}
+		return sb.toString();
 	}
 
 	private void configureMethodSpec(HasParameters inter,
@@ -385,6 +404,10 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		String className = fqClassName.substring(fqPackage.length() + 1);
 		className = className.replace('.', '_');
 
+		if (shouldTestBeIgnored(fqPackage)) {
+			return noFlushableResult(className);
+		}
+
 		Builder enu = TypeSpec.classBuilder(className);
 		enu.superclass(BaseTest.class);
 		enu.addModifiers(Modifier.PUBLIC);
@@ -402,6 +425,10 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				enu);
 		mfd.enableBuilder(INDEX_TESTSATZ);
 		return mfd;
+	}
+
+	private boolean shouldTestBeIgnored(String fqPackage) {
+		return fqPackage.toLowerCase().contains("manuelle_test");
 	}
 
 }

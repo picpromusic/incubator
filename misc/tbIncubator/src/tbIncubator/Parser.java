@@ -22,12 +22,13 @@ public class Parser {
 		spf.setNamespaceAware(true);
 		SAXParser saxParser = spf.newSAXParser();
 
+		File file = new File(args[0],"gen-src");
+		file.mkdirs();
+		
 		ProjectDumpHandler projectDumpHandler = new ProjectDumpHandler();
 		saxParser.parse(new FileInputStream(new File("project-dump.xml")),
 				projectDumpHandler);
 
-		File file = new File("gen-src");
-		file.mkdirs();
 		try {
 			// new
 			// JavaCodeGeneratorWithStringBuilders(projectDumpHandler.getDatatypes(),
