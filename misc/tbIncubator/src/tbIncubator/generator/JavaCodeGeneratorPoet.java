@@ -1,7 +1,5 @@
 package tbIncubator.generator;
 
-import inc.tf.TestWithData;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +13,8 @@ import java.util.Set;
 import javax.lang.model.element.Modifier;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import tbIncubator.domain.DataType;
 import tbIncubator.domain.DataTypeSimplification;
@@ -30,11 +30,13 @@ import tbIncubator.domain.TbElement;
 import tbIncubator.domain.TestFall;
 import tbIncubator.domain.TestSatz;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
@@ -352,7 +354,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 						}
 					} else if (para.type == LinkType.PARAMETER) {
 						if (testMethod) {
-							sb.append("testwerte.");
+							sb.append("parameter.");
 						}
 						InteractionParameter iPara = lookupInteractionParameter(para.ref);
 						if (iPara != null) {
@@ -401,13 +403,6 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 	private void configureTestMethodSpec(HasRepresentatives inter,
 			com.squareup.javapoet.MethodSpec.Builder mBuilder) {
 		mBuilder.addModifiers(Modifier.PUBLIC);
-		if (inter.getRepresentatives().iterator().hasNext()) {
-			mBuilder.addAnnotation(TestWithData.class);
-			mBuilder.addParameter(//
-			ParameterSpec.builder(//
-					ClassName.get("", "Data"), "testwerte").build()//
-			);
-		}
 	}
 
 	private void configureInteractionMethodSpec(HasParameters inter,
@@ -446,17 +441,34 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		if (shouldTestBeIgnored(fqPackage)) {
 			return noFlushableResult(className);
 		}
+		boolean hasParameters = test.getParameterValues().iterator().hasNext();
 
 		Builder enu = TypeSpec.classBuilder(className);
-		enu.superclass(ClassName.get("inc", "BaseTest"));
+		if (hasParameters) {
+			com.squareup.javapoet.AnnotationSpec.Builder annoBuilder = AnnotationSpec.builder(RunWith.class);
+			annoBuilder.addMember("value", "Parameterized.class");
+			enu.addAnnotation(annoBuilder.build());
+			ClassName rawType = ClassName.get("inc", "BaseTestWithData");
+			ClassName type = ClassName.get("", className + ".Data");
+			ParameterizedTypeName pType = ParameterizedTypeName.get(rawType,
+					type);
+			enu.superclass(pType);
+			com.squareup.javapoet.MethodSpec.Builder ctor = MethodSpec
+					.constructorBuilder();
+			ctor.addParameter(ClassName.get("","Data"), "parameters");
+			ctor.addCode("super(parameters);");
+			ctor.addModifiers(Modifier.PUBLIC);
+			enu.addMethod(ctor.build());
+		} else {
+			enu.superclass(ClassName.get("inc", "BaseTest"));
+		}
 		enu.addModifiers(Modifier.PUBLIC);
 
 		com.squareup.javapoet.MethodSpec.Builder methodBuilder = MethodSpec
 				.methodBuilder("test");
 
-		if (!test.getParameterValues().iterator().hasNext()) {
-			methodBuilder.addAnnotation(Test.class);
-		} else {
+		methodBuilder.addAnnotation(Test.class);
+		if (hasParameters) {
 			if (test.parameterAnzahlPasst()) {
 				addTestDataEnum(enu, test.getParameters(), test);
 			} else {

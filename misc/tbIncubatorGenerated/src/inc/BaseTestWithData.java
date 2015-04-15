@@ -15,7 +15,7 @@ public class BaseTestWithData<DATA> extends BaseTest {
 		this.parameter = parameter;
 	}
 
-	@Parameters
+	@Parameters(name="{0})")
 	public static Iterable<Object[]> parameters() {
 		return new Iterable<Object[]>() {
 
