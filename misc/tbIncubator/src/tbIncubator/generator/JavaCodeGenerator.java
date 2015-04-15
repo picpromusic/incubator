@@ -66,7 +66,7 @@ public abstract class JavaCodeGenerator {
 			for (DataType dataType : datatypes) {
 				typeNames.add(getFqClassName(dataType));
 				typeIndex.put(dataType.pk, dataType);
-				for (Representative rep : dataType.representatives) {
+				for (Representative rep : dataType.getRepresentatives()) {
 					index.put(rep.pk, rep);
 				}
 			}

@@ -1,13 +1,16 @@
 package tbIncubator.generator;
 
-import inc.BaseTest;
+import inc.tf.TestWithData;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.lang.model.element.Modifier;
 
@@ -16,6 +19,7 @@ import org.junit.Test;
 import tbIncubator.domain.DataType;
 import tbIncubator.domain.DataTypeSimplification;
 import tbIncubator.domain.HasParameters;
+import tbIncubator.domain.HasRepresentatives;
 import tbIncubator.domain.Interaction;
 import tbIncubator.domain.InteractionParameter;
 import tbIncubator.domain.Link;
@@ -23,6 +27,7 @@ import tbIncubator.domain.Link.LinkType;
 import tbIncubator.domain.Representative;
 import tbIncubator.domain.SubCall;
 import tbIncubator.domain.TbElement;
+import tbIncubator.domain.TestFall;
 import tbIncubator.domain.TestSatz;
 
 import com.squareup.javapoet.ClassName;
@@ -96,6 +101,13 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 	private Object dataTypeSimplification;
 	private Map<MyFlushToDisk, Integer> numberOfMethodsWithSubCalls;
 	private Map<MyFlushToDisk, Integer> numberOfMethods;
+	private static final Set<String> VERBOTENE_FELD_NAME;
+
+	static {
+		Set<String> temp = new HashSet<>();
+		temp.add("boolean");
+		VERBOTENE_FELD_NAME = Collections.unmodifiableSet(temp);
+	}
 
 	public JavaCodeGeneratorPoet(List<DataType> datatypes,
 			List<Interaction> interactions, List<TestSatz> testsaetze) {
@@ -119,74 +131,27 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 			enu.addModifiers(Modifier.PUBLIC);
 
-			for (Representative repre : dataType.representatives) {
-				String javaName = repre.toJavaName();
-				if (!javaName.trim().isEmpty()) {
-					ArrayList<TypeName> tvn = new ArrayList<TypeName>(
-							repre.representativeLinks.size() * 2);
-					int index = 0;
-					StringBuilder sb = new StringBuilder();
-					for (Link ele : repre.representativeLinks) {
-						Representative lookupRepresentative = lookupRepresentative(ele.ref);
-						DataType dt = lookupRepresentative.getDefinedIn();
-
-						ClassName className = buildClassName(dt);
-						DataTypeSimplification dts = lookupTypeSimplification(dt);
-						if (dts == null) {
-							tvn.add(className);
-							tvn.add(TypeVariableName.get(
-									lookupRepresentative.toJavaName(),
-									className));
-							sb.append("$T.$L,");
-						} else {
-							sb.append(representativeSimplified("Static.",
-									lookupRepresentative, dts));
-						}
-					}
-					sb.setLength(Math.max(0, sb.length() - 1));
-					if (repre.representativeLinks.size() > 0) {
-						enu.addEnumConstant(
-								javaName,
-								TypeSpec.anonymousClassBuilder(sb.toString(),
-										tvn.toArray()).build());
-					} else {
-						enu.addEnumConstant(javaName, TypeSpec
-								.anonymousClassBuilder("$S", repre.name)
-								.build());
-					}
-
-				}
-			}
-			if (dataType.representatives.isEmpty()) {
-				enu.addEnumConstant("DEFAULT");
-			}
+			addEnumConstants(dataType, enu);
 
 			MethodSpec.Builder ctorBuilder = MethodSpec.constructorBuilder();
 			for (Link fie : dataType.fieldLinks) {
 				DataType dt = lookupDataType(fie.ref);
 				if (dt != null) {
 					TypeName fiedClass = buildClassName(dt);
-
-					String fiename = fie.name.substring(0, 1).toLowerCase()
-							+ fie.name.substring(1);
-					fiename = TbElement.replaceAll(fiename);
+					String fiename = createFieldName(fie.name);
 					FieldSpec fs = FieldSpec.builder(fiedClass, fiename,
 							Modifier.PUBLIC, Modifier.FINAL).build();
 					enu.addField(fs);
-					ctorBuilder.addParameter(ParameterSpec.builder(fiedClass,
-							fiename).build());
-					ctorBuilder.addCode("this." + fiename + " = " + fiename
-							+ ";\n");
+					addSimpleValueParameterToCtor(ctorBuilder, fiedClass,
+							fiename);
 				}
 			}
 			if (dataType.fieldLinks.isEmpty()) {
 				enu.addField(FieldSpec.builder(String.class,
 						"textuelleRepresentation", Modifier.PUBLIC,
 						Modifier.FINAL).build());
-				ctorBuilder.addParameter(ParameterSpec.builder(String.class,
-						"textuelleRepresentation").build());
-				ctorBuilder
-						.addCode("this.textuelleRepresentation = textuelleRepresentation;\n");
+				addSimpleValueParameterToCtor(ctorBuilder,
+						TypeName.get(String.class), "textuelleRepresentation");
 			}
 
 			enu.addMethod(ctorBuilder.build());
@@ -198,6 +163,60 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		} else {
 			return noFlushableResult(fqClassName);
 		}
+	}
+
+	private void addEnumConstants(HasRepresentatives dataType, Builder enu) {
+		boolean wasEingefuegt = false;
+		for (Representative repre : dataType.getRepresentatives()) {
+			wasEingefuegt = true;
+			String javaName = repre.toJavaName();
+			if (!javaName.trim().isEmpty()) {
+				ArrayList<TypeName> tvn = new ArrayList<TypeName>(
+						repre.representativeLinks.size() * 2);
+				int index = 0;
+				StringBuilder sb = new StringBuilder();
+				for (Link ele : repre.representativeLinks) {
+					Representative lookupRepresentative = lookupRepresentative(ele.ref);
+					DataType dt = lookupRepresentative.getDefinedIn();
+
+					ClassName className = buildClassName(dt);
+					DataTypeSimplification dts = lookupTypeSimplification(dt);
+					if (dts == null) {
+						tvn.add(className);
+						tvn.add(TypeVariableName.get(
+								lookupRepresentative.toJavaName(), className));
+						sb.append("$T.$L,");
+					} else {
+						sb.append(representativeSimplified("Static.",
+								lookupRepresentative, dts));
+					}
+				}
+				sb.setLength(Math.max(0, sb.length() - 1));
+				if (repre.representativeLinks.size() > 0) {
+					enu.addEnumConstant(
+							javaName,
+							TypeSpec.anonymousClassBuilder(sb.toString(),
+									tvn.toArray()).build());
+				} else {
+					enu.addEnumConstant(javaName, TypeSpec
+							.anonymousClassBuilder("$S", repre.name).build());
+				}
+
+			}
+		}
+		if (!wasEingefuegt) {
+			enu.addEnumConstant("DEFAULT");
+		}
+	}
+
+	private String createFieldName(String fieName) {
+		String fiename = fieName.substring(0, 1).toLowerCase()
+				+ fieName.substring(1);
+		fiename = TbElement.replaceAll(fiename);
+		if (VERBOTENE_FELD_NAME.contains(fiename)) {
+			fiename = "_" + fiename;
+		}
+		return fiename;
 	}
 
 	private DataTypeSimplification lookupTypeSimplification(DataType dt) {
@@ -274,7 +293,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				.methodBuilder(inter.getSimpleName())
 				.addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC);
 
-		configureMethodSpec(inter, mBuilder, mBuilderImpl);
+		configureInteractionMethodSpec(inter, mBuilder, mBuilderImpl);
 		MethodSpec methodSpec = mBuilder.build();
 
 		mfd.enu[0].addMethod(methodSpec);
@@ -285,7 +304,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			increase(numberOfMethodsWithSubCalls, mfd);
 		}
 
-		buildMethodImplementation(inter, fqClassName, mBuilderImpl);
+		buildMethodImplementation(inter, fqClassName, mBuilderImpl, false);
 		mfd.enu[1].addMethod(mBuilderImpl.build());
 
 		return mfd;
@@ -298,7 +317,8 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 	private void buildMethodImplementation(HasSubCalls hasSubCalls,
 			String fqClassName,
-			com.squareup.javapoet.MethodSpec.Builder mBuilderImpl) {
+			com.squareup.javapoet.MethodSpec.Builder mBuilderImpl,
+			boolean testMethod) {
 		for (SubCall subCall : hasSubCalls.getSubCalls()) {
 			Interaction lookupInteraction = lookupInteraction(subCall.interactionRef);
 
@@ -331,6 +351,9 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 							sb.append(representativeSimplified("", repre, dts));
 						}
 					} else if (para.type == LinkType.PARAMETER) {
+						if (testMethod) {
+							sb.append("testwerte.");
+						}
 						InteractionParameter iPara = lookupInteractionParameter(para.ref);
 						if (iPara != null) {
 							sb.append(iPara.getJavaName());
@@ -354,7 +377,8 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			Representative repre, DataTypeSimplification dts) {
 		StringBuilder sb = new StringBuilder();
 		if (dts.valueType.equals(String.class)) {
-			if (repre.name.equals("<leer>") || repre.name.equals("<<leer>>") || repre.name.equals("<keine Auswahl>")) {
+			if (repre.name.equals("<leer>") || repre.name.equals("<<leer>>")
+					|| repre.name.equals("<keine Auswahl>")) {
 				sb.append("null,");
 			} else {
 				sb.append("\"");
@@ -374,8 +398,23 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		return sb.toString();
 	}
 
-	private void configureMethodSpec(HasParameters inter,
+	private void configureTestMethodSpec(HasRepresentatives inter,
+			com.squareup.javapoet.MethodSpec.Builder mBuilder) {
+		mBuilder.addModifiers(Modifier.PUBLIC);
+		if (inter.getRepresentatives().iterator().hasNext()) {
+			mBuilder.addAnnotation(TestWithData.class);
+			mBuilder.addParameter(//
+			ParameterSpec.builder(//
+					ClassName.get("", "Data"), "testwerte").build()//
+			);
+		}
+	}
+
+	private void configureInteractionMethodSpec(HasParameters inter,
 			com.squareup.javapoet.MethodSpec.Builder... mBuilders) {
+		for (com.squareup.javapoet.MethodSpec.Builder builder : mBuilders) {
+			builder.addModifiers(Modifier.PUBLIC);
+		}
 		for (InteractionParameter ele : inter.getParameters()) {
 			DataType dt = lookupDataType(ele.dataTypeRef.ref);
 			if (dt != null) {
@@ -409,15 +448,25 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 		}
 
 		Builder enu = TypeSpec.classBuilder(className);
-		enu.superclass(BaseTest.class);
+		enu.superclass(ClassName.get("inc", "BaseTest"));
 		enu.addModifiers(Modifier.PUBLIC);
 
 		com.squareup.javapoet.MethodSpec.Builder methodBuilder = MethodSpec
 				.methodBuilder("test");
 
-		methodBuilder.addAnnotation(Test.class);
-		configureMethodSpec(test, methodBuilder);
-		buildMethodImplementation(test, fqClassName, methodBuilder);
+		if (!test.getParameterValues().iterator().hasNext()) {
+			methodBuilder.addAnnotation(Test.class);
+		} else {
+			if (test.parameterAnzahlPasst()) {
+				addTestDataEnum(enu, test.getParameters(), test);
+			} else {
+				methodBuilder.addAnnotation(ClassName.get("inc",
+						"EtwasPasstNichtMitDenParametern"));
+			}
+		}
+
+		configureTestMethodSpec(test, methodBuilder);
+		buildMethodImplementation(test, fqClassName, methodBuilder, true);
 
 		enu.addMethod(methodBuilder.build());
 
@@ -425,6 +474,36 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				enu);
 		mfd.enableBuilder(INDEX_TESTSATZ);
 		return mfd;
+	}
+
+	private void addTestDataEnum(Builder enu,
+			Iterable<InteractionParameter> parameters,
+			HasRepresentatives testfaelle) {
+		Builder enumBuilder = TypeSpec.enumBuilder("Data");
+		enumBuilder.addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+		addEnumConstants(testfaelle, enumBuilder);
+
+		MethodSpec.Builder ctorBuilder = MethodSpec.constructorBuilder();
+		for (InteractionParameter interactionParameter : parameters) {
+			DataType dt = lookupDataType(interactionParameter.dataTypeRef.ref);
+			ClassName buildClassName = buildClassName(dt);
+			String fiename = createFieldName(interactionParameter.name);
+			enumBuilder.addField(//
+					FieldSpec.builder(buildClassName, fiename, Modifier.PUBLIC,
+							Modifier.FINAL).build());
+
+			addSimpleValueParameterToCtor(ctorBuilder, buildClassName, fiename);
+		}
+		enumBuilder.addMethod(ctorBuilder.build());
+		enu.addType(enumBuilder.build());
+	}
+
+	private void addSimpleValueParameterToCtor(MethodSpec.Builder ctorBuilder,
+			TypeName buildClassName, String fiename) {
+		ctorBuilder.addParameter(ParameterSpec.builder(buildClassName, fiename)
+				.build());
+		ctorBuilder.addCode("this." + fiename + " = " + fiename + ";\n");
 	}
 
 	private boolean shouldTestBeIgnored(String fqPackage) {

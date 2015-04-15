@@ -6,59 +6,63 @@ import inc.Umsysteme.IKundeInteraktionen;
 import inc.Umsysteme.ILdapUndCoInteraktionen;
 import inc._Szenarien.IPmsSzenarien;
 import inc.allgemein.IInteraktionen;
+import inc.impl.TechnischImpl;
+import inc.tf.ruleImpl.CleanupImplementations;
+import inc.tf.ruleImpl.SetImplementation;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.junit.Rule;
+import org.junit.rules.TestRule;
 
-public class BaseTest implements ZusammengesetzteInteraktionInterf {
+public class BaseTest implements ZusammengesetzteInteraktionInterf{
 
+	@Rule
+	public TestRule setTechnisch = new SetImplementation(TechnischImpl.class);
+
+	@Rule
+	public TestRule cleanupImplementations = new CleanupImplementations();
+
+	
 	@Override
 	public ITechnisch Technisch() {
-		// TODO Auto-generated method stub
-		return null;
+		return ZusammengesetzteInteraktion.Technisch();
 	}
 
 	@Override
 	public ILdapUndCoInteraktionen LdapUndCoInteraktionen() {
-		// TODO Auto-generated method stub
-		return null;
+		return ZusammengesetzteInteraktion.LdapUndCoInteraktionen();
 	}
 
 	@Override
 	public IKundeInteraktionen KundeInteraktionen() {
-		// TODO Auto-generated method stub
-		return null;
+		return ZusammengesetzteInteraktion.KundeInteraktionen();
 	}
 
 	@Override
 	public IInteraktionen Interaktionen() {
-		// TODO Auto-generated method stub
-		return null;
+		return ZusammengesetzteInteraktion.Interaktionen();
 	}
 
 	@Override
 	public IBestandInteraktionen BestandInteraktionen() {
-		// TODO Auto-generated method stub
-		return null;
+		return ZusammengesetzteInteraktion.BestandInteraktionen();
 	}
 
 	@Override
 	public IBusinessDelegateInteraktionen BusinessDelegateInteraktionen() {
-		// TODO Auto-generated method stub
-		return null;
+		return ZusammengesetzteInteraktion.BusinessDelegateInteraktionen();
 	}
 
 	@Override
 	public IPmsSzenarien PmsSzenarien() {
-		// TODO Auto-generated method stub
-		return null;
+		return ZusammengesetzteInteraktion.PmsSzenarien();
 	}
 
 	@Override
 	public IOberflaeche Oberflaeche() {
-		// TODO Auto-generated method stub
-		return null;
+		return ZusammengesetzteInteraktion.Oberflaeche();
 	}
 
 	@Override
@@ -70,7 +74,7 @@ public class BaseTest implements ZusammengesetzteInteraktionInterf {
 	public Integer Anzahl(String string) {
 		return Static.Anzahl(string);
 	}
-	
+
 	@Override
 	public BigDecimal Betrag(String string) {
 		return Static.Betrag(string);
@@ -80,5 +84,6 @@ public class BaseTest implements ZusammengesetzteInteraktionInterf {
 	public BigDecimal Prozent(String string) {
 		return Static.Prozent(string);
 	}
+
 
 }

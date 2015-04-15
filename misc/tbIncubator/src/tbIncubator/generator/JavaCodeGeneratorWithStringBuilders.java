@@ -119,7 +119,7 @@ public class JavaCodeGeneratorWithStringBuilders extends JavaCodeGenerator {
 			pw.println("public enum " + dataType.getSimpleName() + "{");
 			System.out.println(dataType.getSimpleName());
 
-			for (Representative rep : dataType.representatives) {
+			for (Representative rep : dataType.getRepresentatives()) {
 				pw.print("\t" + rep.toJavaName());
 				StringBuilder sb = new StringBuilder();
 				for (Link link : rep.representativeLinks) {

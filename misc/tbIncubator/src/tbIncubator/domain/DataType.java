@@ -3,9 +3,9 @@ package tbIncubator.domain;
 import java.util.Collections;
 import java.util.List;
 
-public class DataType extends TbElement {
+public class DataType extends TbElement implements HasRepresentatives{
 
-	public final List<Representative> representatives;
+	private final List<Representative> representatives;
 	public final List<Link> fieldLinks;
 
 	public DataType(String name, List<String> path, String pk,
@@ -18,6 +18,10 @@ public class DataType extends TbElement {
 	@Override
 	public String toString() {
 		return name + " " + representatives;
+	}
+	
+	public Iterable<Representative> getRepresentatives() {
+		return representatives;
 	}
 
 }
