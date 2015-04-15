@@ -1,7 +1,6 @@
 package inc.impl;
 
 import inc.ITechnisch;
-import inc.tf.Interaction;
 import Technisch.Interaktionskontext;
 
 public class TechnischImpl implements ITechnisch {
