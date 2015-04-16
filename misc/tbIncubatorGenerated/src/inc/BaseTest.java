@@ -6,6 +6,11 @@ import inc.Umsysteme.IKundeInteraktionen;
 import inc.Umsysteme.ILdapUndCoInteraktionen;
 import inc._Szenarien.IPmsSzenarien;
 import inc.allgemein.IInteraktionen;
+import inc.impl.BestandImpl;
+import inc.impl.BusinessDelegateImpl;
+import inc.impl.InteraktionenImpl;
+import inc.impl.KundeInteraktionenImpl;
+import inc.impl.LdapUndCoImpl;
 import inc.impl.TechnischImpl;
 import inc.tf.ruleImpl.CleanupImplementations;
 import inc.tf.ruleImpl.SetImplementation;
@@ -14,17 +19,22 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import org.junit.Rule;
+import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 
-public class BaseTest implements ZusammengesetzteInteraktionInterf{
+public class BaseTest implements ZusammengesetzteInteraktionInterf {
 
 	@Rule
-	public TestRule setTechnisch = new SetImplementation(TechnischImpl.class);
+	public TestRule setImpl = RuleChain.outerRule(new CleanupImplementations())//
+			.around(new SetImplementation(TechnischImpl.class))//
+			.around(new SetImplementation(LdapUndCoImpl.class))//
+			.around(new SetImplementation(KundeInteraktionenImpl.class))//
+			.around(new SetImplementation(InteraktionenImpl.class))//
+			.around(new SetImplementation(BestandImpl.class))//
+			.around(new SetImplementation(BusinessDelegateImpl.class))//
+			.around(new SetImplementation(PmsSzenarienImpl.class))//
+	;
 
-	@Rule
-	public TestRule cleanupImplementations = new CleanupImplementations();
-
-	
 	@Override
 	public ITechnisch Technisch() {
 		return ZusammengesetzteInteraktion.Technisch();
@@ -84,6 +94,5 @@ public class BaseTest implements ZusammengesetzteInteraktionInterf{
 	public BigDecimal Prozent(String string) {
 		return Static.Prozent(string);
 	}
-
 
 }

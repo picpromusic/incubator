@@ -16,13 +16,13 @@ public class BaseTestWithData<DATA> extends BaseTest {
 	}
 
 	@Parameters(name="{0})")
-	public static Iterable<Object[]> parameters() {
+	protected static Iterable<Object[]> parametersHelper(final Class clazz) {
 		return new Iterable<Object[]>() {
 
 			@Override
 			public Iterator<Object[]> iterator() {
 				EnumSet allOf = EnumSet
-						.allOf((Class<? extends Enum>) Data.class);
+						.allOf((Class<? extends Enum>) clazz);
 				final Iterator iterator = allOf.iterator();
 				return new Iterator<Object[]>() {
 
@@ -33,7 +33,8 @@ public class BaseTestWithData<DATA> extends BaseTest {
 
 					@Override
 					public Object[] next() {
-						return new Object[] { iterator.next() };
+						Object next = iterator.next();
+						return new Object[] { next };
 					}
 
 					@Override

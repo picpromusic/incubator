@@ -14,7 +14,7 @@ import javax.lang.model.element.Modifier;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import tbIncubator.domain.DataType;
 import tbIncubator.domain.DataTypeSimplification;
@@ -27,7 +27,6 @@ import tbIncubator.domain.Link.LinkType;
 import tbIncubator.domain.Representative;
 import tbIncubator.domain.SubCall;
 import tbIncubator.domain.TbElement;
-import tbIncubator.domain.TestFall;
 import tbIncubator.domain.TestSatz;
 
 import com.squareup.javapoet.AnnotationSpec;
@@ -257,6 +256,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			Builder implBuilder = TypeSpec.classBuilder(className);
 			// implBuilder.addSuperinterface(ClassName.get(fqPackage, "I"
 			// + className));
+			interfaceBuilder.addAnnotation(inc.tf.Interaction.class);
 			interfaceBuilder.addModifiers(Modifier.PUBLIC);
 			implBuilder.addModifiers(Modifier.PUBLIC);
 			implBuilder.superclass(ClassName.get("inc",
@@ -445,7 +445,8 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 		Builder enu = TypeSpec.classBuilder(className);
 		if (hasParameters) {
-			com.squareup.javapoet.AnnotationSpec.Builder annoBuilder = AnnotationSpec.builder(RunWith.class);
+			com.squareup.javapoet.AnnotationSpec.Builder annoBuilder = AnnotationSpec
+					.builder(RunWith.class);
 			annoBuilder.addMember("value", "Parameterized.class");
 			enu.addAnnotation(annoBuilder.build());
 			ClassName rawType = ClassName.get("inc", "BaseTestWithData");
@@ -455,10 +456,25 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			enu.superclass(pType);
 			com.squareup.javapoet.MethodSpec.Builder ctor = MethodSpec
 					.constructorBuilder();
-			ctor.addParameter(ClassName.get("","Data"), "parameters");
+			ctor.addParameter(ClassName.get("", "Data"), "parameters");
 			ctor.addCode("super(parameters);");
 			ctor.addModifiers(Modifier.PUBLIC);
 			enu.addMethod(ctor.build());
+
+			// @Parameters(name = "{0})")
+			// public static Iterable<Object[]> parameters() {
+			// return BaseTestWithData.parametersHelper(Data.class);
+			// }
+
+			com.squareup.javapoet.MethodSpec.Builder methodBuilder = MethodSpec
+					.methodBuilder("parameters");
+			methodBuilder.addModifiers(Modifier.STATIC, Modifier.PUBLIC);
+			methodBuilder.addAnnotation(AnnotationSpec
+					.builder(Parameters.class).addMember("name", "\"{0}\"")
+					.build());
+			methodBuilder.addCode("BaseTestWithData.parametersHelper(Data.class, args);");
+			enu.addMethod(methodBuilder.build());
+
 		} else {
 			enu.superclass(ClassName.get("inc", "BaseTest"));
 		}
