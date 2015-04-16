@@ -5,8 +5,6 @@ import java.util.Iterator;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import Neues_Schadensystem.Schaden_anlegen.Backend.Eingabe_Tote_und_Verletze_ermoeglichen.Data;
-
 public class BaseTestWithData<DATA> extends BaseTest {
 
 	protected DATA parameter;

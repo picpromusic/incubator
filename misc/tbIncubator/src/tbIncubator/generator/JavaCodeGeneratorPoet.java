@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.lang.model.element.Modifier;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -457,22 +458,19 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			com.squareup.javapoet.MethodSpec.Builder ctor = MethodSpec
 					.constructorBuilder();
 			ctor.addParameter(ClassName.get("", "Data"), "parameters");
-			ctor.addCode("super(parameters);");
+			ctor.addCode("super(parameters);\n");
 			ctor.addModifiers(Modifier.PUBLIC);
 			enu.addMethod(ctor.build());
 
-			// @Parameters(name = "{0})")
-			// public static Iterable<Object[]> parameters() {
-			// return BaseTestWithData.parametersHelper(Data.class);
-			// }
 
 			com.squareup.javapoet.MethodSpec.Builder methodBuilder = MethodSpec
 					.methodBuilder("parameters");
 			methodBuilder.addModifiers(Modifier.STATIC, Modifier.PUBLIC);
+		    methodBuilder.returns(ParameterizedTypeName.get(Iterable.class,Object[].class));
 			methodBuilder.addAnnotation(AnnotationSpec
 					.builder(Parameters.class).addMember("name", "\"{0}\"")
 					.build());
-			methodBuilder.addCode("BaseTestWithData.parametersHelper(Data.class, args);");
+			methodBuilder.addCode("return BaseTestWithData.parametersHelper(Data.class);\n");
 			enu.addMethod(methodBuilder.build());
 
 		} else {
@@ -495,7 +493,9 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 
 		configureTestMethodSpec(test, methodBuilder);
 		buildMethodImplementation(test, fqClassName, methodBuilder, true);
-
+		if (fqPackage.contains("Laufendes")) {
+			methodBuilder.addAnnotation(Ignore.class);
+		}
 		enu.addMethod(methodBuilder.build());
 
 		MyFlushToDisk mfd = new MyFlushToDisk(fqPackage, className, "tests",
