@@ -1,51 +1,66 @@
 package inc;
 
-import inc.Umsysteme.IBestandInteraktionen;
-import inc.Umsysteme.IBusinessDelegateInteraktionen;
-import inc.Umsysteme.IKundeInteraktionen;
-import inc.Umsysteme.ILdapUndCoInteraktionen;
-import inc._Szenarien.IPmsSzenarien;
-import inc.allgemein.IInteraktionen;
-import inc.tf.InteractionManager;
+import inc.impl.BestandImpl;
+import inc.impl.BusinessDelegateImpl;
+import inc.impl.InteraktionenImpl;
+import inc.impl.KundeInteraktionenImpl;
+import inc.impl.LdapUndCoImpl;
+import inc.impl.SpecialBestandImpl;
+import inc.impl.SpecialBusinessDelegateImpl;
+import inc.impl.SpecialInteraktionenImpl;
+import inc.impl.SpecialKundeInteraktionenImpl;
+import inc.impl.SpecialLdapUndCoImpl;
+import inc.impl.SpecialPmsSzenarienImpl;
+import inc.impl.SpecialTechnischImpl;
+import inc.impl.TechnischImpl;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class ZusammengesetzteInteraktion {
 
-	protected static ITechnisch Technisch() {
-		return InteractionManager.get(ITechnisch.class);
+	@Impl(SpecialTechnischImpl.class)
+	protected static TechnischImpl Technisch;
+
+	@Impl(SpecialLdapUndCoImpl.class)
+	protected static LdapUndCoImpl LdapUndCoInteraktionen;
+
+	@Impl(SpecialKundeInteraktionenImpl.class)
+	protected static KundeInteraktionenImpl KundeInteraktionen;
+
+	@Impl(SpecialInteraktionenImpl.class)
+	protected static InteraktionenImpl Interaktionen;
+
+	@Impl(SpecialBestandImpl.class)
+	protected static BestandImpl BestandInteraktionen;
+
+	@Impl(SpecialBusinessDelegateImpl.class)
+	protected static BusinessDelegateImpl BusinessDelegateInteraktionen;
+
+	@Impl(SpecialPmsSzenarienImpl.class)
+	protected static PmsSzenarienImpl PmsSzenarien;
+
+	static {
+		instanziiereNeueProxies();
 	}
 
-	protected static ILdapUndCoInteraktionen LdapUndCoInteraktionen() {
-		return InteractionManager.get(ILdapUndCoInteraktionen.class);
+	protected static void instanziiereNeueProxies() {
+		for (Field field : ZusammengesetzteInteraktion.class
+				.getDeclaredFields()) {
+			Impl annotation = field.getAnnotation(Impl.class);
+			if (annotation != null) {
+				try {
+					field.set(null, InteractionProxy.build(annotation.value()));
+				} catch (IllegalArgumentException e) {
+					throw new RuntimeException(e);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 	}
 
-	protected static IKundeInteraktionen KundeInteraktionen() {
-		return InteractionManager.get(IKundeInteraktionen.class);
-	}
-
-	protected static IInteraktionen Interaktionen() {
-		return InteractionManager.get(IInteraktionen.class);
-	}
-
-	protected static IBestandInteraktionen BestandInteraktionen() {
-		return InteractionManager.get(IBestandInteraktionen.class);
-	}
-
-	protected static IBusinessDelegateInteraktionen BusinessDelegateInteraktionen() {
-		return InteractionManager.get(IBusinessDelegateInteraktionen.class);
-	}
-
-	protected static IPmsSzenarien PmsSzenarien() {
-		return InteractionManager.get(IPmsSzenarien.class);
-	}
-
-	protected static IOberflaeche Oberflaeche() {
-		return InteractionManager.get(IOberflaeche.class);
-	}
-
-	
 	protected static Date Datum(String string) {
 		return Static.Datum(string);
 	}

@@ -6,7 +6,7 @@ import inc.tf.ruleImpl.FinallyRule.Runner;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 
-public class BaseTest extends ZusammengesetzteInteraktion {
+public class BaseTestOberflaeche extends ZusammengesetzteInteraktionOberflaeche {
 
 	@Rule
 	public TestRule setImpl = new FinallyRule(new Runner() {

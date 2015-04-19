@@ -22,7 +22,7 @@ public class Parser {
 		spf.setNamespaceAware(true);
 		SAXParser saxParser = spf.newSAXParser();
 
-		File file = new File(args[0],"gen-src");
+		File file = new File(args[0],"ks-src");
 		file.mkdirs();
 		
 		ProjectDumpHandler projectDumpHandler = new ProjectDumpHandler();

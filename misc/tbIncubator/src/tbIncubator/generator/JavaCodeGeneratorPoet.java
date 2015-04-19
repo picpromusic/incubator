@@ -257,7 +257,6 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			Builder implBuilder = TypeSpec.classBuilder(className);
 			// implBuilder.addSuperinterface(ClassName.get(fqPackage, "I"
 			// + className));
-			interfaceBuilder.addAnnotation(inc.tf.Interaction.class);
 			interfaceBuilder.addModifiers(Modifier.PUBLIC);
 			implBuilder.addModifiers(Modifier.PUBLIC);
 			implBuilder.superclass(ClassName.get("inc",
@@ -438,6 +437,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 				fqClassName.lastIndexOf('.'));
 		String className = fqClassName.substring(fqPackage.length() + 1);
 		className = className.replace('.', '_');
+		String extension = fqPackage.contains("Frontend") ? "Oberflaeche" : "";
 
 		if (shouldTestBeIgnored(fqPackage)) {
 			return noFlushableResult(className);
@@ -450,7 +450,7 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 					.builder(RunWith.class);
 			annoBuilder.addMember("value", "Parameterized.class");
 			enu.addAnnotation(annoBuilder.build());
-			ClassName rawType = ClassName.get("inc", "BaseTestWithData");
+			ClassName rawType = ClassName.get("inc", "BaseTest"+extension+"WithData");
 			ClassName type = ClassName.get("", className + ".Data");
 			ParameterizedTypeName pType = ParameterizedTypeName.get(rawType,
 					type);
@@ -470,11 +470,11 @@ public class JavaCodeGeneratorPoet extends JavaCodeGenerator {
 			methodBuilder.addAnnotation(AnnotationSpec
 					.builder(Parameters.class).addMember("name", "\"{0}\"")
 					.build());
-			methodBuilder.addCode("return BaseTestWithData.parametersHelper(Data.class);\n");
+			methodBuilder.addCode("return BaseTest"+extension+"WithData.parametersHelper(Data.class);\n");
 			enu.addMethod(methodBuilder.build());
 
 		} else {
-			enu.superclass(ClassName.get("inc", "BaseTest"));
+			enu.superclass(ClassName.get("inc", "BaseTest"+extension));
 		}
 		enu.addModifiers(Modifier.PUBLIC);
 

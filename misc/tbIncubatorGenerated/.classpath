@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="gen-src/datenTypen"/>
-	<classpathentry kind="src" path="gen-src/interaktionen"/>
-	<classpathentry kind="src" path="gen-src/tests"/>
 	<classpathentry kind="src" path="ks-src/datenTypen"/>
 	<classpathentry kind="src" path="ks-src/interaktionen"/>
 	<classpathentry kind="src" path="ks-src/tests"/>

@@ -1098,8 +1098,6 @@ public class InteraktionenImpl implements IInteraktionen{
 
 	@Override
 	public void Setze_VS_Nr(String bestand) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

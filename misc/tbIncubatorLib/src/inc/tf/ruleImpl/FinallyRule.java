@@ -1,12 +1,20 @@
 package inc.tf.ruleImpl;
 
-import inc.tf.InteractionManager;
-
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public class CleanupImplementations implements TestRule {
+public class FinallyRule implements TestRule {
+
+	public interface Runner {
+		public void run();
+	}
+
+	private Runner fr;
+
+	public FinallyRule(Runner fr) {
+		this.fr = fr;
+	}
 
 	@Override
 	public Statement apply(final Statement base, Description description) {
@@ -17,7 +25,7 @@ public class CleanupImplementations implements TestRule {
 				try {
 					base.evaluate();
 				} finally {
-					InteractionManager.cleanup();
+					fr.run();
 				}
 			}
 
