@@ -32,7 +32,7 @@ import Neues_Schadensystem.Datentypen.Technische_Datentypen.TOMAS_Tabellen_Datum
 import Neues_Schadensystem.Datentypen.Technische_Datentypen.TOMAS_Tabellen_Version;
 import Neues_Schadensystem.Datentypen.Technische_Datentypen.Wahrheitswert;
 
-public class InteraktionenImpl implements IInteraktionen{
+public abstract class InteraktionenImpl implements IInteraktionen{
 
 	@Override
 	public void Checke_AKZ(String aKZ) {

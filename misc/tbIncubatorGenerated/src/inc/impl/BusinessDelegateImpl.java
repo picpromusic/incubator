@@ -4,7 +4,7 @@ import inc.Umsysteme.IBusinessDelegateInteraktionen;
 
 import java.math.BigDecimal;
 
-public class BusinessDelegateImpl implements IBusinessDelegateInteraktionen{
+public abstract class BusinessDelegateImpl implements IBusinessDelegateInteraktionen{
 
 	@Override
 	public void Stelle_Sicher_Bestand(String bestand) {

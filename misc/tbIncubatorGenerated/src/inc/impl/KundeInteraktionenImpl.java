@@ -3,7 +3,7 @@ package inc.impl;
 import inc.Umsysteme.IKundeInteraktionen;
 import Neues_Schadensystem.Datentypen.Anrede;
 
-public class KundeInteraktionenImpl implements IKundeInteraktionen{
+public abstract class KundeInteraktionenImpl implements IKundeInteraktionen{
 
 	@Override
 	public void StelleSicher_AdrKey(String lfdNrAdr) {

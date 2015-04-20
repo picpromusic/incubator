@@ -12,7 +12,7 @@ import Neues_Schadensystem.Datentypen.TK;
 import Neues_Schadensystem.Datentypen.Tarifmerkmale;
 import Neues_Schadensystem.Datentypen.VK;
 
-public class BestandImpl implements IBestandInteraktionen{
+public abstract class BestandImpl implements IBestandInteraktionen{
 
 	@Override
 	public void StelleSicher_AKZ(String aKZ) {

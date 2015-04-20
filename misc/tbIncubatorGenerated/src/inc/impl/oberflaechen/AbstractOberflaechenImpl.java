@@ -25,7 +25,7 @@ import Neues_Schadensystem.Datentypen.Technische_Datentypen.GUI_Status;
 import Neues_Schadensystem.Datentypen.Technische_Datentypen.Select_ID;
 import Neues_Schadensystem.Datentypen.Technische_Datentypen.Wahrheitswert;
 
-public class AbstractOberflaechenImpl implements IOberflaeche{
+public abstract class AbstractOberflaechenImpl implements IOberflaeche{
 
 	@Override
 	public void Breche_AP_Anlage_ab() {

@@ -4,7 +4,7 @@ import inc.Umsysteme.ILdapUndCoInteraktionen;
 import Neues_Schadensystem.Datentypen.OE;
 import Neues_Schadensystem.Datentypen.Sachbearbeiter;
 
-public class LdapUndCoImpl implements ILdapUndCoInteraktionen{
+public abstract class LdapUndCoImpl implements ILdapUndCoInteraktionen{
 
 	@Override
 	public void Stelle_Sicher_Mitarbeiter(Sachbearbeiter mitarbeiter) {

@@ -2,7 +2,7 @@ package inc.impl;
 
 import inc.ITechnisch;
 
-public class TechnischImpl implements ITechnisch {
+public abstract class TechnischImpl implements ITechnisch {
 
 	@Override
 	public void Ende_Scenario(Integer lfdNr_Szenario) {

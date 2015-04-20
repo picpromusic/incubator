@@ -1,19 +1,38 @@
 package inc;
 
-import inc.tf.ruleImpl.FinallyRule;
-import inc.tf.ruleImpl.FinallyRule.Runner;
+import inc.impl.InteraktionenImpl;
 
-import org.junit.Rule;
-import org.junit.rules.TestRule;
+import javax.inject.Inject;
 
-public class BaseTest extends ZusammengesetzteInteraktion {
+import org.junit.After;
+import org.junit.Before;
 
-	@Rule
-	public TestRule setImpl = new FinallyRule(new Runner() {
-		@Override
-		public void run() {
-			instanziiereNeueProxies();
-		}
-	});
+public abstract class BaseTest extends BasisAPI {
 
+	protected final GuiceIntegration guice;
+	
+	@Inject
+	protected Szenarien Szenarien;
+	
+	@Inject
+	protected InteraktionenImpl Interaktionen;
+
+	
+	
+	public BaseTest() {
+		this.guice = new GuiceIntegration();
+	}
+	
+	@Before
+	public void setup() {
+		guice.setup(new BaseTestModule(),this);
+	}
+
+	
+	@After
+	public void tearDown() {
+		guice.cleanup();
+	}
+	
+	
 }
