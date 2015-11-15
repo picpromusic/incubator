@@ -6,21 +6,25 @@ public class SubjectToChange {
 	
 	private double data;
 
-	private static ThreadLocal<SubjectToChange> instance = new ThreadLocal<>();
+	private static SubjectToChange instance;
 	
-	public static SubjectToChange getTLSingleton() {
-		if (instance.get() == null) {
-			instance.set(new SubjectToChange());
+	public static SubjectToChange getSingleton() {
+		if (instance == null) {
+			synchronized (SubjectToChange.class) {
+				if (instance == null) {
+					instance = new SubjectToChange();
+				}
+			}
 		}
-		return instance.get();
+		return instance;
 	}
 	
-	@Accessor(value="sField",instanceFactory="getTLSingleton")
+	@Accessor(value="sField",instanceFactory="getSingleton")
 	public double getStatic() {
 		return data;
 	}
 
-	@Accessor(value="sField",instanceFactory="getTLSingleton")
+	@Accessor(value="sField",instanceFactory="getSingleton")
 	public void setStatic(double value) {
 		data = value;
 	}

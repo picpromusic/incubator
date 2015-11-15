@@ -42,7 +42,7 @@ public class Example7 {
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
 		MethodTracer.checkIf("SubjectToChange.getProtectedToPackageField()",
-				changedVersion && sol2);
+				changedVersion && sol1);
 
 		System.out.println(extend.getPublicToPackageFieldAsHexString());
 		MethodTracer
@@ -53,16 +53,16 @@ public class Example7 {
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
 		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
-				changedVersion && sol2);
+				changedVersion && sol1);
 
 		System.out.println(extend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeGoodFriend.getPublicToProtectedFieldAsHexString()");
-		if (!sol2) {
+		if (!sol1) {
 			// No call to SubjectToChange.getPublicToProtectedField() because
 			// package access is allowed for extending class in same package
 		} else {
-			// The above fact feels quite naturally, but in solution 2. Where it
+			// The above fact feels quite naturally, but in solution 1. Where it
 			// is not possible to have fields with the same name as the
 			// accessor-Methods. The calls goes through the public method
 			MethodTracer.check("SubjectToChange.getPublicToProtectedField()");
@@ -95,11 +95,11 @@ public class Example7 {
 				.check("SubjectToChangeExtension.getPublicToPackageFieldAsHexString()");
 		if (changedVersion) {
 			MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()",
-					sol2);
+					sol1);
 			MethodTracer
 					.checkIf(
 							"SubjectToChange.getPublicToPackageFieldProtectedLevelAccess()",
-							sol1);
+							sol2);
 		}
 
 		System.out.println(extend.getPublicToProtectedFieldAsHexString());
@@ -111,7 +111,7 @@ public class Example7 {
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
 		MethodTracer.checkIf("SubjectToChange.getPublicToProtectedField()",
-				changedVersion && sol2);
+				changedVersion && sol1);
 
 		MethodTracer.checkCallCountAndClean("");
 	}
@@ -134,7 +134,7 @@ public class Example7 {
 		// The above fact feels quite naturally, but in solution 2. Where it
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
-		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()", sol2);
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()", sol1);
 
 		System.out.println(friend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
@@ -143,11 +143,11 @@ public class Example7 {
 			MethodTracer
 			.checkIf(
 					"SubjectToChange.getPublicToProtectedFieldPackageLevelAccess()",
-					sol1);
+					sol2);
 			MethodTracer
 			.checkIf(
 					"SubjectToChange.getPublicToProtectedField()",
-					sol2);
+					sol1);
 		}
 		MethodTracer.checkCallCountAndClean("");
 	}

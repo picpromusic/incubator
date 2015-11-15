@@ -1,29 +1,28 @@
 package incubator;
 import javalang.ref.Accessor;
 
-
 public class SubjectToChange {
 
-	private Throwable cause = new RuntimeException("INIT_NEW");
-	private static Object staticField = "ORIG_VALUE_NEW";
-	
+	private Throwable inner_cause = new RuntimeException("INIT_NEW2");
+	private static Object inner_staticField = "ORIG_VALUE_NEW";
+
 	@Accessor("cause")
 	public Throwable getCause() {
-		return cause;
+		return inner_cause;
 	}
 	
 	@Accessor("cause")
 	public void initCause(Throwable cause) {
-		this.cause = cause;
+		throw new IllegalStateException("Not allowed to change the cause. This message is intendend");
 	}
-
+	
 	@Accessor("staticField")
 	public static Object getFoo() {
-		return staticField;
+		return inner_staticField;
 	}
 
 	@Accessor("staticField")
 	public static void setFoo(Object value) {
-		staticField = value;
+		throw new IllegalStateException("PutStatic of staticField not allowed anymore. This message is intendend");
 	}
 }

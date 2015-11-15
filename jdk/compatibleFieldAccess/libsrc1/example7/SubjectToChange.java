@@ -5,88 +5,64 @@ import javalang.ref.Accessor;
 
 public class SubjectToChange {
 
-	protected int publicToProtectedField;
-	/* package */int publicToPackageField;
-	/* package */int protectedToPackageField;
-	protected int packageToProtectedField;
+	private int innerPublicToProtectedField;
+	private int innerPublicToPackageField;
+	private int innerProtectedToPackageField;
+	private int innerPackageToProtectedField;
 
 	public SubjectToChange(int value) {
-		this.publicToProtectedField = value;
-		this.publicToPackageField = value;
-		this.protectedToPackageField = value;
-		this.packageToProtectedField = value;
+		this.innerPublicToProtectedField = value;
+		this.innerPublicToPackageField = value;
+		this.innerProtectedToPackageField = value;
+		this.innerPackageToProtectedField = value;
 	}
 
 	@Accessor()
 	public int getPublicToProtectedField() {
 		MethodTracer.trace("SubjectToChange.getPublicToProtectedField()");
-		return publicToProtectedField;
+		return innerPublicToProtectedField;
 	}
 
 	@Accessor
 	public void setPublicToProtectedField(int value) {
 		MethodTracer.trace("SubjectToChange.setPublicToProtectedField()");
-		this.publicToProtectedField = value;
+		this.innerPublicToProtectedField = value;
 	}
 
-	@Accessor("publicToProtectedField")
-	/*package*/ int getPublicToProtectedFieldPackageLevelAccess() {
-		MethodTracer.trace("SubjectToChange.getPublicToProtectedFieldPackageLevelAccess()");
-		return publicToProtectedField;
-	}
-
-	@Accessor("publicToProtectedField")
-	/*package*/ void setPublicToProtectedFieldPackageLevelAccess(int value) {
-		MethodTracer.trace("SubjectToChange.setPublicToProtectedFieldPackageLevelAccess()");
-		this.publicToProtectedField = value;
-	}
-	
 	@Accessor
 	public int getPublicToPackageField() {
 		MethodTracer.trace("SubjectToChange.getPublicToPackageField()");
-		return publicToPackageField;
+		return innerPublicToPackageField;
 	}
 
 	@Accessor
 	public void setPublicToPackageField(int value) {
 		MethodTracer.trace("SubjectToChange.setPublicToPackageField()");
-		this.publicToPackageField = value;
-	}
-
-	@Accessor("publicToPackageField")
-	protected int getPublicToPackageFieldProtectedLevelAccess() {
-		MethodTracer.trace("SubjectToChange.getPublicToPackageFieldProtectedLevelAccess()");
-		return publicToPackageField;
-	}
-
-	@Accessor("publicToPackageField")
-	protected void setPublicToPackageFieldProtectedLevelAccess(int value) {
-		MethodTracer.trace("SubjectToChange.setPublicToPackageFieldProtectedLevelAccess()");
-		this.publicToPackageField = value;
+		this.innerPublicToPackageField = value;
 	}
 
 	@Accessor
 	protected int getProtectedToPackageField() {
 		MethodTracer.trace("SubjectToChange.getProtectedToPackageField()");
-		return protectedToPackageField;
+		return innerProtectedToPackageField;
 	}
 
 	@Accessor
 	protected void setProtectedToPackageField(int value) {
 		MethodTracer.trace("SubjectToChange.setProtectedToPackageField()");
-		this.protectedToPackageField = value;
+		this.innerProtectedToPackageField = value;
 	}
 
 	@Accessor
 	/* package */int getPackageToProtectedField() {
 		MethodTracer.trace("SubjectToChange.getPackageToProtectedField()");
-		return packageToProtectedField;
+		return innerPackageToProtectedField;
 	}
 
 	@Accessor
 	/* package */void setPackageToProtectedField(int value) {
 		MethodTracer.trace("SubjectToChange.setPackageToProtectedField()");
-		this.packageToProtectedField = value;
+		this.innerPackageToProtectedField = value;
 	}
 
 }

@@ -3,30 +3,30 @@ package example5;
 import javalang.ref.Accessor;
 
 public class SubjectToChange {
-	private int value;
-	private static int privateStaticField;
+	private int publicField;
+	private static int publicStaticField = 42;
 	
 	public SubjectToChange(int value) {
-		this.value = value;
+		this.publicField = value;
 	}
 	
 	@Accessor("publicField")
-	public static int getValue() {
-		return privateStaticField;
+	public static int getPublicField() {
+		return publicStaticField;
 	}
 	
 	@Accessor("publicField")
-	public static void setValue(int value) {
-		privateStaticField = value;
+	public static void setPublicField(int value) {
+		publicStaticField = value;
 	}
 	
 	@Accessor("publicStaticField")
-	public int getStatic() {
-		return value;
+	public int getPublicStaticField() {
+		return publicField;
 	}
 	
 	@Accessor("publicStaticField")
-	public void setStatic(int newValue) {
-		value = newValue;
+	public void setPublicStaticField(int newValue) {
+		publicField = newValue;
 	}
 }

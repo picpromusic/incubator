@@ -4,15 +4,15 @@ import javalang.ref.Accessor;
 
 public class SubjectToChange10Extension extends SubjectToChange10 {
 
-	private int myField;
+	private int field;
 
 	@Accessor
 	public int getField() {
-		return myField;
+		return field;
 	}
 
 	@Accessor
 	public void setField(int value) {
-		myField = value;
+		field = value;
 	}
 }

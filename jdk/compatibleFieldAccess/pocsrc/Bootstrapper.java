@@ -87,7 +87,7 @@ public class Bootstrapper {
 							throw new UnambiguousFieldError();
 						}
 					} else {
-						if (!symetryCheck && sol2) {
+						if (!symetryCheck && sol1) {
 							for (Field f : clazz.getDeclaredFields()) {
 								potentialUnambiguousFieldDetected |= f
 										.getName().equals(name);
@@ -185,7 +185,7 @@ public class Bootstrapper {
 													: "Static"), name,
 											(staticProperty ? "static"
 													: "non-static"));
-							if (sol2) {
+							if (sol1) {
 								throw new IncompatibleClassChangeError(message);
 							} else {
 								suppressedIncompatible
@@ -217,7 +217,7 @@ public class Bootstrapper {
 											+ lookup.lookupClass());
 								}
 							} catch (IllegalAccessException e) {
-								if (sol2) {
+								if (sol1) {
 									throw e;
 								} else {
 									suppressedIllegal.add(e);
@@ -448,7 +448,7 @@ public class Bootstrapper {
 							throw new UnambiguousFieldError();
 						}
 					} else {
-						if (!symetryCheck && sol2) {
+						if (!symetryCheck && sol1) {
 							for (Field f : clazz.getDeclaredFields()) {
 								potentialUnambiguousFieldDetected |= f
 										.getName().equals(name);

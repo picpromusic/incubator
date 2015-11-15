@@ -1,19 +1,26 @@
 package playground;
 
 import javalang.ref.Accessor;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PlaygroundSubjectToChange {
 	
 	private double data;
 
-	@Accessor(value="sField")
+	private static ThreadLocal<PlaygroundSubjectToChange> instance = new ThreadLocal<>();
+	
+	public static PlaygroundSubjectToChange getTLSingleton() {
+		if (instance.get() == null) {
+			instance.set(new PlaygroundSubjectToChange());
+		}
+		return instance.get();
+	}
+	
+	@Accessor(value="sField",instanceFactory="getTLSingleton")
 	public double getStatic() {
 		return data;
 	}
 
-	@Accessor(value="sField")
+	@Accessor(value="sField",instanceFactory="getTLSingleton")
 	public void setStatic(double value) {
 		data = value;
 	}

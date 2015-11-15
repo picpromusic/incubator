@@ -1,4 +1,5 @@
-Place asm-debug-all-4.2.jar in libs dir and run
+Place asm-debug-all-5.0.4.jar in libs dir and run
+inside the builder/AllExamples directory
 ant clean
 ant test-original-disable-transform
 ant test-original

@@ -19,7 +19,7 @@ import example1.SubjectToChange;
  * This is the unchanged part of the Example. But now we want to change our 
  * public fields to private one and provide access throught getter/setter pairs.
  * 
- * See libsrc1/example1/SubjectToChange.java and libsrc1/example2/SubjectToChange.java
+ * See libsrc1/example1/SubjectToChange.java and libsrc2/example1/SubjectToChange.java
  * for two implementations that changes the accessiblity of both fields and guard
  * the access through accesor-methods.
  * 

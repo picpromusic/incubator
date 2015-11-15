@@ -50,10 +50,10 @@ public class Example5 {
 		boolean sol1 = solution != null ? solution.contains("1") : false;
 		boolean sol2 = solution != null ? solution.contains("2") : false;
 
-		if (sol2 && !(e.getCause() instanceof IncompatibleClassChangeError)) {
+		if (sol1 && !(e.getCause() instanceof IncompatibleClassChangeError)) {
 			return false;
 		}
-		if (sol1 && e.getCause() instanceof IncompatibleClassChangeError) {
+		if (sol2 && e.getCause() instanceof IncompatibleClassChangeError) {
 			if (!e.getCause().getMessage()
 					.equals("One or more IncompatibleClassChangeError thrown")) {
 				return false;

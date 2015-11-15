@@ -14,14 +14,14 @@ public class Example6 {
 		boolean changedVersion = Boolean.getBoolean("cfa.changedVersion");
 
 		String solution = System.getProperty("SolutionList");
-		boolean sol2 = solution != null ? solution.contains("2") : false;
+		boolean sol1 = solution != null ? solution.contains("1") : false;
 
-		testItExtension(sol2, changedVersion);
-		testItFriend(sol2, changedVersion);
-		testItExtensionFriend(sol2, changedVersion);
+		testItExtension(sol1, changedVersion);
+		testItFriend(sol1, changedVersion);
+		testItExtensionFriend(sol1, changedVersion);
 	}
 
-	private static void testItExtensionFriend(boolean sol2,
+	private static void testItExtensionFriend(boolean sol1,
 			boolean changedVersion) {
 		MethodTracer.checkCallCountAndClean("testItExtensionFriend");
 		SubjectToChangeGoodFriend extend = new SubjectToChangeGoodFriend(51966);
@@ -57,16 +57,16 @@ public class Example6 {
 		// The above fact feels quite naturally, but in solution 2. Where it
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
-		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()", sol2);
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()", sol1);
 
 		System.out.println(extend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
 				.check("SubjectToChangeGoodFriend.getPublicToProtectedFieldAsHexString()");
-		if (!sol2) {
+		if (!sol1) {
 			// No call to SubjectToChange.getPublicToProtectedField() because
 			// package access is allowed for extending class in same package
 		} else {
-			// The above fact feels quite naturally, but in solution 2. Where it
+			// The above fact feels quite naturally, but in solution 1. Where it
 			// is not possible to have fields with the same name as the
 			// accessor-Methods. The calls goes through the public method
 			MethodTracer.check("SubjectToChange.getPublicToProtectedField()");
@@ -74,7 +74,7 @@ public class Example6 {
 		MethodTracer.checkCallCountAndClean("");
 	}
 
-	private static void testItExtension(boolean sol2, boolean changedVersion) {
+	private static void testItExtension(boolean sol1, boolean changedVersion) {
 		MethodTracer.checkCallCountAndClean("testItExtension");
 
 		SubjectToChangeExtension extend = new SubjectToChangeExtension(51966);
@@ -109,12 +109,12 @@ public class Example6 {
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
 		MethodTracer.checkIf("SubjectToChange.getPublicToProtectedField()",
-				changedVersion && sol2);
+				changedVersion && sol1);
 
 		MethodTracer.checkCallCountAndClean("");
 	}
 
-	private static void testItFriend(boolean sol2, boolean changedVersion) {
+	private static void testItFriend(boolean sol1, boolean changedVersion) {
 		MethodTracer.checkCallCountAndClean("testItFriend");
 		SubjectToChange stc = new SubjectToChange(47806);
 		SubjectToChangeFriend friend = new SubjectToChangeFriend(stc);
@@ -133,7 +133,7 @@ public class Example6 {
 		// The above fact feels quite naturally, but in solution 2. Where it
 		// is not possible to have fields with the same name as the
 		// accessor-Methods. The calls goes through the public method
-		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()", sol2);
+		MethodTracer.checkIf("SubjectToChange.getPublicToPackageField()", sol1);
 
 		System.out.println(friend.getPublicToProtectedFieldAsHexString());
 		MethodTracer
@@ -142,5 +142,4 @@ public class Example6 {
 				changedVersion);
 		MethodTracer.checkCallCountAndClean("");
 	}
-
 }

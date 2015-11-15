@@ -3,16 +3,15 @@ package example5;
 import javalang.ref.Accessor;
 
 //public class SubjectToChange {
-//	private static int privateStaticField;
+//	private static int publicStaticField = 42;
 //	
 //	@Accessor("publicStaticField")
-//	public int getStatic() {
-//		return privateStaticField;
+//	public int getPublicStaticField() {
+//		return publicStaticField;
 //	}
 //	
 //	@Accessor("publicStaticField")
-//	public void setStatic(int newValue) {
-//		privateStaticField = newValue;
+//	public void setPublicStaticField(int newValue) {
+//		publicStaticField = newValue;
 //	}
-//
 //}

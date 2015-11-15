@@ -5,47 +5,59 @@ import javalang.ref.Accessor;
 public class SubjectToChange {
 	
 	/**
-	 * An instance variable. Use to store the value
-	 * of publicField in the previous version of
-	 * example1.SubjectToChange. In Solution 2 it
-	 * is not allowed to have the property multiple
-	 * times. So we changed it from publicField to 
-	 * value
+	 * Now the field is private. But we have getter and setter to 
+	 * access the value
 	 */
-	private int value;
-
+	private int publicField;
+	
 	/**
-	 * An static variable. Use to store the value
-	 * of publicStaticField in the previous version
-	 * of example1.SubjectToChange. In Solution 2 it
-	 * is not allowed to have the property multiple 
-	 * times. So we changed it from publicStaticField 
-	 * to privateStaticField.
+	 * Now the static field is private. But we have getter and setter
+	 * to access the value
 	 */
-	private static int privateStaticField;
+	private static int publicStaticField = 42;
 	
 	public SubjectToChange(int value) {
-		this.value = value;
+		this.publicField = value;
 	}
 	
+	/**
+	 * static getter-accessor-Method for the property publicStaticField.
+	 * type of the getter is int. name of the static property is publicStaticField.
+	 * the name of the method is irrelevant.
+	 */
 	@Accessor("publicStaticField")
-	public static int getStatic() {
-		return privateStaticField;
+	public static int getStaticField() {
+		return publicStaticField;
 	}
 	
+	/**
+	 * static setter-accessor-Method for the property publicStaticField.
+	 * type of the Setter is int. name of the static property is publicStaticField.
+	 * the name of the method is irrelevant.
+	 */
 	@Accessor("publicStaticField")
-	public static void setStatic(int newValue) {
-		privateStaticField = newValue;
+	public static void setStaticField(int newValue) {
+		publicStaticField = newValue;
 	}
 
+	/**
+	 * getter-accessor-Method for the property publicField.
+	 * type of the getter is int. name of the property is publicField 
+	 * which is direved from the methodname. 
+	 */
 	@Accessor()
 	public int getPublicField() {
-		return value;
+		return publicField;
 	}
 	
+	/**
+	 * setter-accessor-Method for the property publicField.
+	 * type of the setter is int. name of the property is publicField 
+	 * wich is direved from the methodname. 
+	 */
 	@Accessor()
 	public void setPublicField(int value) {
-		this.value = value;
+		this.publicField = value;
 	}
-
+	
 }

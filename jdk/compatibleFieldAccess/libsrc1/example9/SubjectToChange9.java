@@ -4,16 +4,16 @@ import javalang.ref.Accessor;
 
 public class SubjectToChange9 {
 
-	private int field;
+	private int innerField;
 
 	@Accessor
 	public int getField() {
-		return field;
+		return innerField;
 	}
 
 	@Accessor
 	public void setField(int value) {
-		field = value;
+		innerField = value;
 	}
 
 }

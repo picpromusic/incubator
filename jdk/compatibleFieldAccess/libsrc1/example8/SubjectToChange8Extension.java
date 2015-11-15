@@ -6,16 +6,16 @@ import incubator.tests.SubjectToChange8;
 
 public class SubjectToChange8Extension extends SubjectToChange8 {
 
-	private int pField;
+	private int innerField;
 	
 	@Accessor("pField")
 	public int getField() {
-		return pField;
+		return innerField;
 	}
 	
 	@Accessor("pField")
 	public void setField(int value) {
-		pField = Math.max(0, value);
+		innerField = Math.max(0, value);
 	}
 
 }
