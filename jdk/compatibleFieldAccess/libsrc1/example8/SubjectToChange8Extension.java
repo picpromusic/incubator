@@ -1,6 +1,6 @@
 package example8;
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 import incubator.tests.SubjectToChange8;
 
 

@@ -28,7 +28,7 @@ public class Example8 {
 				throw new AssertionError("0 expected. Got:" + extend.pField);
 		}
 		if (stc.pField != -2)
-			throw new AssertionError("2 expected. Got:" + stc.pField);
+			throw new AssertionError("-2 expected. Got:" + stc.pField);
 	}
 
 }

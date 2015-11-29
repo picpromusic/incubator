@@ -1,6 +1,6 @@
 package playground;
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

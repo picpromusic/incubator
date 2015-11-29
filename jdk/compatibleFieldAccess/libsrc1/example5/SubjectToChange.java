@@ -1,32 +1,32 @@
 package example5;
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 
 public class SubjectToChange {
-	private int value;
-	private static int privateStaticField;
+	private int wasStaticField;
+	private static int wasNonStaticField;
 	
 	public SubjectToChange(int value) {
-		this.value = value;
+		this.wasStaticField = value;
 	}
 	
 	@Accessor("publicField")
 	public static int getValue() {
-		return privateStaticField;
+		return wasNonStaticField;
 	}
 	
 	@Accessor("publicField")
 	public static void setValue(int value) {
-		privateStaticField = value;
+		wasNonStaticField = value;
 	}
 	
 	@Accessor("publicStaticField")
 	public int getStatic() {
-		return value;
+		return wasStaticField;
 	}
 	
 	@Accessor("publicStaticField")
 	public void setStatic(int newValue) {
-		value = newValue;
+		wasStaticField = newValue;
 	}
 }

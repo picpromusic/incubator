@@ -1,6 +1,6 @@
 package example1;
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 
 public class SubjectToChange {
 	

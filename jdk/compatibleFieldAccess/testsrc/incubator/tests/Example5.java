@@ -2,6 +2,15 @@ package incubator.tests;
 
 import example5.SubjectToChange;
 
+/**
+ * In Example 5 we test what happens when an static access is changed to be using
+ * a non-static Accessor-Method and vice-versa. It is expected to throw an 
+ * IncompatibleClassChangeError, which is also the case when changing a field 
+ * from static to non-static and vice-versa.
+ * 
+ * @author sebastian
+ *
+ */
 public class Example5 {
 	public static void main(String[] args) {
 

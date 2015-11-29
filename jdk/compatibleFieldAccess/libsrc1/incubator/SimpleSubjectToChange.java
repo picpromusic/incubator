@@ -3,7 +3,7 @@ package incubator;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 
 public class SimpleSubjectToChange {
 

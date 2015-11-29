@@ -31,4 +31,5 @@ Example1: Everything is fine.
 Example2: AsymeticAcessorError Detection
 Example3: UnambiguousFieldError Detection for get Accessor
 Example4: UnambiguousFieldError Detection for set Accessor
-Example5: Static non static chane Detection    
+Example5: Static non static change Detection
+Example6: ?????    

@@ -1,12 +1,12 @@
 package example2;
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 
 public class SubjectToChange {
-	private int value;
+	private int publicField;
 	
 	public SubjectToChange(int value) {
-		this.value = value;
+		this.publicField = value;
 	}
 	
 	/**
@@ -14,8 +14,8 @@ public class SubjectToChange {
 	 * @return the value of publicField.
 	 */
 	@Accessor("publicField")
-	public int getValue() {
-		return value;
+	public int getPublicField() {
+		return publicField;
 	}
 	
 	/* 

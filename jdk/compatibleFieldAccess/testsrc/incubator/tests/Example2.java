@@ -8,7 +8,7 @@ import example2.SubjectToChange;
  * example2.SubjecToChange has an adequate access-method but the definition of
  * accesor-methods is Asymetric (getter without setter or vice versa). It shows up
  * a error which could be at link-time. Because we evaluate it lazyly via invokedynamic
- * this prototype shows up an error at execution(invokedynmic-linking)-time.  
+ * this prototype shows up an error at execution(invokedynamic-linking)-time.  
  */
 public class Example2 {
 	public static void main(String[] args) {

@@ -1,6 +1,6 @@
 package example11;
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 
 public class SubjectToChange {
 	private static int field;

@@ -3,8 +3,8 @@ import java.lang.annotation.Documented;
 
 import incubator.FieldAnnotationForTesting; 
 import java.lang.annotation.Documented;
-import javalang.ref.AccessorAnnotationWrapper;
-import javalang.ref.Accessor;
+import java.lang.reflect.AccessorAnnotationWrapper;
+import java.lang.reflect.Accessor;
 
 
 public class SubjectToChange {

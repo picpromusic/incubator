@@ -2,7 +2,7 @@ package incubator;
 
 import java.util.Arrays;
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 
 public class StcA {
 

@@ -3,6 +3,14 @@ package incubator.tests;
 import javalang.ref.UnambiguousFieldError;
 import example3.SubjectToChange;
 
+/**
+ * Example 4 shows that in solution 1 the fieldname of the changed field
+ * must be changed. If it is not changed (as in this example) a
+ * UnambiguousFieldError is thrown while writing to the field. 
+ * 
+ * @author sebastian
+ *
+ */
 public class Example4 {
 	public static void main(String[] args) {
 		String solution = System.getProperty("SolutionList");

@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-import javalang.ref.Accessor;
+import java.lang.reflect.Accessor;
 import javalang.ref.AsymeticAcessorError;
 import javalang.ref.UnambiguousFieldError;
 
