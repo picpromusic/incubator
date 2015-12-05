@@ -22,7 +22,7 @@ public class SubjectToChange {
 	 * times. So we changed it from publicStaticField 
 	 * to privateStaticField.
 	 */
-	private static int staticValue;
+	private static int staticValue = 43;
 	
 	public SubjectToChange(int value) {
 		this.value = value;
